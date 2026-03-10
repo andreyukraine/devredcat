@@ -300,6 +300,262 @@ class ModelExtensionModuleOcimport extends Model
     }
   }
 
+  /**
+   * Імпорт з CSV експорту WooCommerce: категорії, товари (variable/variation), атрибути, опції, ціни.
+   * Використовує addCategory та addProduct моделі.
+   *
+   * @param string $filepath шлях до CSV файлу
+   * @return array ['success' => string] або ['error' => string]
+   */
+  public function importFromWooCommerceCsv($filepath, $offset = 0, $limit = 0)
+  {
+    $this->getLanguageId($this->config->get('config_language'));
+
+    if (!is_readable($filepath)) {
+      return array('error' => 'Файл не читається: ' . $filepath);
+    }
+
+    $handle = fopen($filepath, 'r');
+    if ($handle === false) {
+      return array('error' => 'Не вдалося відкрити CSV');
+    }
+
+    // UTF-8 BOM
+    $bom = fread($handle, 3);
+    if ($bom !== "\xEF\xBB\xBF") {
+      rewind($handle);
+    }
+
+    $header = fgetcsv($handle, 0, ',', '"', '');
+    if ($header === false || empty($header)) {
+      fclose($handle);
+      return array('error' => 'Порожній або некоректний CSV');
+    }
+
+    $header = array_map('trim', $header);
+    if (isset($header[0]) && substr($header[0], 0, 3) === "\xEF\xBB\xBF") {
+      $header[0] = substr($header[0], 3);
+    }
+    $col = array();
+    foreach ($header as $i => $h) {
+      $col[$h] = $i;
+    }
+
+    $hasType = isset($col['Тип']);
+    $hasCategories = isset($col['Категорії']);
+    $hasName = isset($col['Назва']);
+    if (!$hasName || !$hasType) {
+      fclose($handle);
+      return array('error' => 'У CSV мають бути стовпці: Тип, Назва.');
+    }
+
+    $rows = array();
+    while (($row = fgetcsv($handle, 0, ',', '"', '')) !== false) {
+      if (count($row) < count($header)) {
+        $row = array_pad($row, count($header), '');
+      }
+      $rows[] = $row;
+    }
+    fclose($handle);
+
+    $categoriesCreated = 0;
+    $productsCreated = 0;
+
+    // 1) Групуємо товари: variable = батьківський, variation = варіанти
+    $parentRows = array();
+    $variationsByParent = array();
+    foreach ($rows as $row) {
+      $type = isset($row[$col['Тип']]) ? trim($row[$col['Тип']]) : '';
+      if ($type === 'variable') {
+        $parentRows[] = $row;
+      } elseif ($type === 'variation') {
+        $predok = (isset($col['Предок']) && isset($row[$col['Предок']])) ? trim($row[$col['Предок']]) : '';
+        if (preg_match('/id\s*:\s*(\d+)/i', $predok, $m)) {
+          $pId = (int)$m[1];
+          if (!isset($variationsByParent[$pId])) $variationsByParent[$pId] = array();
+          $variationsByParent[$pId][] = $row;
+        }
+      }
+    }
+
+    $totalProducts = count($parentRows);
+
+    // Якщо offset == 0, імпортуємо категорії
+    if ($offset == 0 && $hasCategories) {
+      $allPaths = array();
+      foreach ($rows as $row) {
+        $catStr = isset($row[$col['Категорії']]) ? trim($row[$col['Категорії']]) : '';
+        if ($catStr === '') continue;
+        $parts = preg_split('/\s*,\s*/u', $catStr);
+        foreach ($parts as $pathStr) {
+          $pathStr = trim($pathStr);
+          if ($pathStr === '') continue;
+          $segments = array_map('trim', explode('>', $pathStr));
+          $segments = array_filter($segments);
+          if (empty($segments)) continue;
+          $fullPath = implode(' > ', $segments);
+          $allPaths[$fullPath] = $segments;
+        }
+      }
+      ksort($allPaths);
+
+      $createdGuids = array();
+      foreach ($allPaths as $fullPath => $segments) {
+        $guid = 'csv_' . md5($fullPath);
+        if (isset($createdGuids[$guid])) continue;
+        $parentGuids = array();
+        for ($i = 0; $i < count($segments) - 1; $i++) {
+          $parentPath = implode(' > ', array_slice($segments, 0, $i + 1));
+          $parentGuids[] = 'csv_' . md5($parentPath);
+        }
+        $name = end($segments);
+        $level = count($segments);
+        $catData = array(
+          'id' => $guid, 'name' => $name, 'level' => $level, 'child_categories' => $parentGuids,
+          'type' => 0, 'description' => '', 'meta_title' => $name, 'meta_description' => '', 'meta_keyword' => ''
+        );
+        $existing = $this->getCategoryByUid($guid);
+        if (empty($existing)) {
+          $this->addCategory($catData);
+          $categoriesCreated++;
+        }
+        $createdGuids[$guid] = true;
+      }
+    }
+
+    // Склад
+    $warehouses = $this->getWarehouses();
+    $warehouse_id = !empty($warehouses) ? (int)$warehouses[0]['warehouse_id'] : 0;
+    if ($warehouse_id <= 0) {
+      return array('error' => 'Додайте склад для імпорту товарів.');
+    }
+
+    $dir_product = DIR_IMAGE . 'catalog/product/';
+    if (!is_dir($dir_product)) mkdir($dir_product, 0755, true);
+
+    // Зріз товарів
+    if ($limit > 0) {
+      $parentRowsSlice = array_slice($parentRows, $offset, $limit);
+    } else {
+      $parentRowsSlice = $parentRows;
+    }
+
+    foreach ($parentRowsSlice as $row) {
+      $parentId = isset($row[$col['ID']]) ? (int)$row[$col['ID']] : 0;
+      $name = isset($row[$col['Назва']]) ? trim($row[$col['Назва']]) : '';
+      if ($name === '') continue;
+
+      $variations = isset($variationsByParent[$parentId]) ? $variationsByParent[$parentId] : array();
+      
+      $catId = null;
+      if ($hasCategories && isset($row[$col['Категорії']])) {
+        $catStr = trim($row[$col['Категорії']]);
+        if ($catStr !== '') {
+          $firstPath = trim(explode(',', $catStr)[0]);
+          if ($firstPath !== '') $catId = 'csv_' . md5($firstPath);
+        }
+      }
+
+      $brand = isset($col['Бренди']) && isset($row[$col['Бренди']]) ? trim($row[$col['Бренди']]) : '';
+      $shortDesc = isset($col['Короткий опис']) && isset($row[$col['Короткий опис']]) ? trim($row[$col['Короткий опис']]) : '';
+      $desc = isset($col['Опис']) && isset($row[$col['Опис']]) ? trim($row[$col['Опис']]) : $shortDesc;
+
+      $opts = array();
+      for ($n = 1; $n <= 12; $n++) {
+        $nameKey = 'Назва ' . $n . ' атрибуту';
+        $valKey = $n . ' значення атрибуту';
+        if (!isset($col[$nameKey]) || !isset($col[$valKey])) continue;
+        $attrName = trim($row[$col[$nameKey]]);
+        $attrVal = trim($row[$col[$valKey]]);
+        if ($attrName === '' || $attrVal === '') continue;
+        $opts[] = array('name' => $attrName, 'value' => $attrVal, 'guid' => 'csv_attr_' . md5($attrName));
+      }
+
+      $variants = array();
+      if (empty($variations)) {
+        $price = 0;
+        if (isset($col['Звичайна ціна'])) $price = (float)str_replace(array(',', ' '), array('.', ''), $row[$col['Звичайна ціна']]);
+        $priceBase = $price;
+        if (isset($col['Ціна зі знижкою'])) {
+          $sale = (float)str_replace(array(',', ' '), array('.', ''), $row[$col['Ціна зі знижкою']]);
+          if ($sale > 0) $price = $sale;
+        }
+        $sku = isset($col['Артикул']) ? trim($row[$col['Артикул']]) : ('csv' . $parentId);
+        if (isset($col['Зображення']) && !empty($row[$col['Зображення']]) && !empty($sku)) {
+          $imgUrls = explode(',', $row[$col['Зображення']]);
+          $this->downloadProductImage(trim($imgUrls[0]), $sku);
+        }
+        $variants[] = array(
+          'barcode' => $sku, 'sku' => $sku, 'guid' => 'csv' . $parentId . '_0',
+          'price' => $price, 'price_base' => $priceBase,
+          'weight' => (isset($col['Вага (кг)']) && isset($row[$col['Вага (кг)']])) ? str_replace(',', '.', $row[$col['Вага (кг)']]) : 0,
+          'quantity' => 0, 'unit' => 'шт', 'var' => array()
+        );
+      } else {
+        foreach ($variations as $vIdx => $vRow) {
+          $price = 0;
+          if (isset($col['Звичайна ціна'])) $price = (float)str_replace(array(',', ' '), array('.', ''), $vRow[$col['Звичайна ціна']]);
+          $priceBase = $price;
+          if (isset($col['Ціна зі знижкою'])) {
+            $sale = (float)str_replace(array(',', ' '), array('.', ''), $vRow[$col['Ціна зі знижкою']]);
+            if ($sale > 0) $price = $sale;
+          }
+          $sku = isset($col['Артикул']) ? trim($vRow[$col['Артикул']]) : ('csv' . $parentId . '_' . $vIdx);
+          if (isset($col['Зображення']) && !empty($vRow[$col['Зображення']]) && !empty($sku)) {
+            $vImgUrls = explode(',', $vRow[$col['Зображення']]);
+            $this->downloadProductImage(trim($vImgUrls[0]), $sku);
+          }
+          $optName = 'Вага'; $optVal = '';
+          if (isset($col['Вага (кг)'])) $optVal = trim($vRow[$col['Вага (кг)']]);
+          if ($optVal === '' && isset($col['2 значення атрибуту']) && isset($vRow[$col['2 значення атрибуту']])) {
+            $optVal = trim($vRow[$col['2 значення атрибуту']]);
+            if (isset($col['Назва 2 атрибуту']) && isset($vRow[$col['Назва 2 атрибуту']])) {
+              $optName = trim($vRow[$col['Назва 2 атрибуту']]); if ($optName === '') $optName = 'Вага';
+            }
+          }
+          if ($optVal === '' && isset($col['1 значення атрибуту']) && isset($vRow[$col['1 значення атрибуту']])) {
+            $optVal = trim($vRow[$col['1 значення атрибуту']]);
+            if (isset($col['Назва 1 атрибуту']) && isset($vRow[$col['Назва 1 атрибуту']])) {
+              $optName = trim($vRow[$col['Назва 1 атрибуту']]); if ($optName === '') $optName = 'Варіант';
+            }
+          }
+          $var = array();
+          if ($optVal !== '') $var[] = array('name' => $optName, 'value' => $optVal, 'id' => $sku, 'description' => '', 'composition' => '');
+          $variants[] = array(
+            'barcode' => $sku, 'sku' => $sku, 'guid' => $sku, 'price' => $price, 'price_base' => $priceBase,
+            'weight' => (isset($col['Вага (кг)']) && isset($vRow[$col['Вага (кг)']])) ? str_replace(',', '.', $vRow[$col['Вага (кг)']]) : 0,
+            'quantity' => 0, 'unit' => 'шт', 'var' => $var
+          );
+        }
+      }
+
+      $brandData = array();
+      if ($brand !== '') $brandData[] = array('name' => $brand, 'guid' => 'csv_brand_' . md5($brand));
+
+      $productData = array(
+        'name' => $name, 'description' => $desc, 'id' => 'csv_prod_' . $parentId,
+        'code' => 'csv' . $parentId, 'catId' => $catId, 'brand' => $brandData,
+        'opts' => $opts, 'variants' => $variants
+      );
+
+      try {
+        $existing = $this->getProductByUid($productData['id']);
+        if (!empty($existing)) {
+          $this->updateProduct($warehouse_id, $existing, $productData);
+        } else {
+          $this->addProduct($warehouse_id, $productData);
+        }
+        $productsCreated++;
+      } catch (Exception $e) {}
+    }
+
+    return array(
+      'success' => 'Оброблено ' . ($offset + count($parentRowsSlice)) . ' з ' . $totalProducts . ' товарів.',
+      'total' => $totalProducts,
+      'imported' => $offset + count($parentRowsSlice),
+      'done' => ($offset + count($parentRowsSlice)) >= $totalProducts
+    );
+  }
 
   public function cropProductImg($filter_data, $img_name = "")
   {
@@ -2511,12 +2767,16 @@ class ModelExtensionModuleOcimport extends Model
     // Перевіряємо чи є у товара опції
     $has_options = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_option WHERE product_id = '" . (int)$prod_id . "'")->num_rows > 0;
 
-    $massFindProds = array();
     $dir = DIR_IMAGE . "/catalog/product";
     if (!is_dir($dir)) return;
 
-    $files = array_diff(scandir($dir), ['.', '..']);
-    foreach ($files as $file) {
+    $massFindProds = array();
+    // Використовуємо glob замість scandir для значного прискорення
+    $files = glob($dir . "/" . $ean . "*");
+    if (!$files) return;
+
+    foreach ($files as $filepath) {
+      $file = basename($filepath);
       $name_file = explode(".", $file)[0];
       $parts = explode("_", $name_file);
       $is_additional = (count($parts) > 1);
@@ -2813,7 +3073,7 @@ class ModelExtensionModuleOcimport extends Model
         $this->log($data, 2);
       }
       foreach ($data as $field => $row) {
-        if (!isset($fields[$field])) {
+        if (is_array($data) && !isset($fields[$field])) {
           unset($data[$field]);
           $this->log("Удалено поле " . $field);
         }
@@ -2873,6 +3133,8 @@ class ModelExtensionModuleOcimport extends Model
       $sql[] = $mode == 'set' ? "`length_class_id` = '" . (int)$data['length_class_id'] . "'" : "`length_class_id`";
     if (isset($data['weight_class_id']))
       $sql[] = $mode == 'set' ? "`weight_class_id` = '" . (int)$data['weight_class_id'] . "'" : "`weight_class_id`";
+    if (isset($data['image']))
+      $sql[] = $mode == 'set' ? "`image` = '" . $this->db->escape($data['image']) . "'" : "`image`";
 
     return implode(($mode = 'set' ? ', ' : ' AND '), $sql);
 
@@ -2963,7 +3225,9 @@ class ModelExtensionModuleOcimport extends Model
     }
 
     //ОПИСАНИЕ ПРОИЗВОДИТЕЛЯ
-    unset($data['name']);
+    if (is_array($data)) {
+      unset($data['name']);
+    }
     $sql = $this->prepareQueryDescription($data, "set");
     if ($sql) {
       $this->query("INSERT INTO `" . DB_PREFIX . "manufacturer_description` SET " . $sql . ", `language_id` = " . $this->LANG_ID . ", `manufacturer_id` = " . (int)$manufacturer_id);
@@ -4000,6 +4264,27 @@ class ModelExtensionModuleOcimport extends Model
     }
   }
 
+
+  private function downloadProductImage($url, $sku)
+  {
+    if (empty($url) || empty($sku)) return false;
+
+    $filename = $sku . '.jpg';
+    $filepath = DIR_IMAGE . 'catalog/product/' . $filename;
+
+    if (!file_exists($filepath)) {
+      $ctx = stream_context_create(['http' => ['timeout' => 10]]);
+      $content = @file_get_contents($url, false, $ctx);
+      if ($content !== false) {
+        file_put_contents($filepath, $content);
+        return 'catalog/product/' . $filename;
+      }
+    } else {
+      return 'catalog/product/' . $filename;
+    }
+
+    return false;
+  }
 
   public function install()
   {

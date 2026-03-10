@@ -78,6 +78,54 @@ class ControllerExtensionModuleOcimport extends Controller
     $this->response->setOutput(json_encode($json));
   }
 
+  public function importFromCsv() {
+    // Гарантовано лише JSON: прибираємо будь-який попередній вивід
+    while (ob_get_level()) {
+      ob_end_clean();
+    }
+    ob_start();
+
+    $json = array('success' => '', 'error' => '');
+
+    try {
+      $this->load->model('extension/module/ocimport');
+
+      if (empty($this->request->post['import_csv'])) {
+        $json['error'] = "Виберіть CSV файл і натисніть Завантажити";
+      } else {
+        $filename = $this->request->post['import_csv'];
+        $offset = isset($this->request->post['offset']) ? (int)$this->request->post['offset'] : 0;
+        $limit = 50; // Порція по 50 товарів
+        
+        $upload_dir = defined('DIR_UPLOAD') ? DIR_UPLOAD : (DIR_APPLICATION . 'upload/');
+        $filepath = $upload_dir . $filename;
+
+        if (!file_exists($filepath) || !is_readable($filepath)) {
+          $json['error'] = "Файл не знайдено або недоступний: " . $filename;
+        } else {
+          $result = $this->model_extension_module_ocimport->importFromWooCommerceCsv($filepath, $offset, $limit);
+          if (!empty($result['success'])) {
+            $json['success'] = $result['success'];
+          }
+          if (!empty($result['error'])) {
+            $json['error'] = $result['error'];
+          }
+          if (isset($result['total'])) {
+            $json['total'] = $result['total'];
+            $json['imported'] = $result['imported'];
+            $json['done'] = $result['done'];
+          }
+        }
+      }
+    } catch (Throwable $e) {
+      $json['error'] = "Помилка імпорту: " . $e->getMessage();
+    }
+
+    ob_end_clean();
+    $this->response->addHeader('Content-Type: application/json; charset=utf-8');
+    $this->response->setOutput(json_encode($json, JSON_UNESCAPED_UNICODE));
+  }
+
   public function import_product_img()
   {
     $json['status'] = 'Процес виконується.';

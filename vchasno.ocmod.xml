@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<name>Vchasno.Kassa Button</name>
+	<code>vchasno_kassa_button</code>
+	<version>1.0</version>
+	<author>Andrey</author>
+	<link>http://vchasno.ua</link>
+	<file path="admin/view/template/sale/order_info.twig">
+		<operation>
+			<search><![CDATA[<div class="pull-right">]]></search>
+			<add position="after"><![CDATA[
+				{% if vchasno_receipt_url %}
+				<a href="{{ vchasno_receipt_url }}" target="_blank" class="btn btn-success" data-toggle="tooltip" title="Переглянути чек Вчасно.Каса"><i class="fa fa-file-text-o"></i> Чек Вчасно</a>
+				{% else %}
+				<button type="button" id="button-vchasno" data-toggle="tooltip" title="Створити чек Вчасно.Каса" class="btn btn-warning"><i class="fa fa-plus-circle"></i> Створити чек Вчасно</button>
+				<script type="text/javascript"><!--
+				$('#button-vchasno').on('click', function() {
+					if (!confirm('Ви впевнені, що хочете створити чек у Вчасно.Каса?')) return false;
+					
+					$.ajax({
+						url: 'index.php?route=extension/module/vchasno/createReceipt&user_token={{ user_token }}&order_id={{ order_id }}',
+						dataType: 'json',
+						beforeSend: function() {
+							$('#button-vchasno').button('loading');
+						},
+						complete: function() {
+							$('#button-vchasno').button('reset');
+						},
+						success: function(json) {
+							if (json['error']) {
+								alert(json['error']);
+							}
+							if (json['success']) {
+								alert(json['success']);
+								location.reload();
+							}
+						},
+						error: function(xhr, ajaxOptions, thrownError) {
+							alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+						}
+					});
+				});
+				//--></script>
+				{% endif %}
+			]]></add>
+		</operation>
+	</file>
+	<file path="admin/controller/sale/order.php">
+		<operation>
+			<search><![CDATA[$data['order_id'] = $this->request->get['order_id'];]]></search>
+			<add position="after"><![CDATA[
+				$query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "vchasno_receipt` WHERE order_id = '" . (int)$this->request->get['order_id'] . "'");
+				if ($query->num_rows) {
+					$data['vchasno_receipt_url'] = $query->row['vchasno_receipt_url'];
+				} else {
+					$data['vchasno_receipt_url'] = '';
+				}
+			]]></add>
+		</operation>
+	</file>
+</modification>

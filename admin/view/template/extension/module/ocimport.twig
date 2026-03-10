@@ -30,6 +30,7 @@
           <li class="active"><a href="#tab-product" data-toggle="tab">Товари</a></li>
           <li><a href="#tab-client" data-toggle="tab">Клієнти</a></li>
           <li><a href="#tab-seo" data-toggle="tab">Seo</a></li>
+          <li><a href="#tab-csv" data-toggle="tab">Завантаження з CSV</a></li>
           <li><a href="#tab-img" data-toggle="tab">Зображення</a></li>
           <li><a href="#tab-email" data-toggle="tab">Перевірка пошти</a></li>
         </ul>
@@ -338,6 +339,31 @@
 
                 </form>
           </div>
+
+          {# Завантаження з CSV (WooCommerce export) #}
+          <div class="tab-pane" id="tab-csv">
+            <form action="" method="post" enctype="multipart/form-data" id="form-import-csv">
+              <div class="form-group form-group-sm">
+                <label class="col-sm-2 control-label">CSV файл (WooCommerce)</label>
+                <div class="col-sm-4">
+                  <div class="input-group">
+                    <input type="file" name="file" accept=".csv" style="display: none"/>
+                    <input type="text" name="import_csv" value="" placeholder="Оберіть файл" id="input-csv-filename" class="form-control" readonly/>
+                    <span class="input-group-btn">
+                      <button type="button" id="button-upload-csv" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-upload"></i> {{ button_upload }}</button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-6">
+                  <p class="text-muted">Підтримується експорт WooCommerce: категорії, товари (variable/variation), атрибути, опції (наприклад Вага), ціни (звичайна та зі знижкою).</p>
+                  <button type="button" id="import-csv-run" class="btn btn-success">Виконати імпорт з CSV</button>
+                  <span id="import-csv-status" class="help-block"></span>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -387,6 +413,96 @@
           });
         }
       }, 100);
+    });
+
+    $('#button-upload-csv').on('click', function() {
+      $('#form-import-csv input[name=\'file\']').trigger('click');
+    });
+    $('#form-import-csv input[name=\'file\']').on('change', function() {
+      var fileInput = $(this);
+      if (fileInput[0].files && fileInput[0].files.length && fileInput[0].files[0].name) {
+        var formData = new FormData($('#form-import-csv')[0]);
+        $.ajax({
+          url: 'index.php?route=extension/module/ocimport/ajaxUploadFile&user_token={{ user_token }}',
+          type: 'post',
+          dataType: 'json',
+          data: formData,
+          cache: false,
+          contentType: false,
+          processData: false,
+          beforeSend: function() {
+            $('#button-upload-csv').button('loading');
+          },
+          complete: function() {
+            $('#button-upload-csv').button('reset');
+          },
+          success: function(json) {
+            if (json['error']) {
+              $('#import-csv-status').html('<span class="text-danger">' + json['error'] + '</span>');
+            } else {
+              $('input[name=\'import_csv\']').val(json['filename']);
+              $('#input-csv-filename').val(json['filename']);
+              $('#import-csv-status').html('');
+            }
+          },
+          error: function(xhr, ajaxOptions, thrownError) {
+            $('#import-csv-status').html('<span class="text-danger">' + thrownError + '</span>');
+          }
+        });
+      }
+    });
+    $('#import-csv-run').on('click', function() {
+      var filename = $('input[name=\'import_csv\']').val();
+      if (!filename) {
+        $('#import-csv-status').html('<span class="text-danger">Спочатку завантажте CSV файл.</span>');
+        return;
+      }
+      
+      $('#import-csv-run').button('loading');
+      $('#import-csv-status').html('<span class="text-info">Підготовка до імпорту...</span>');
+      
+      var offset = 0;
+      
+      function runImport(currentOffset) {
+        $.ajax({
+          url: 'index.php?route=extension/module/ocimport/importFromCsv&user_token={{ user_token }}',
+          type: 'post',
+          data: { import_csv: filename, offset: currentOffset },
+          dataType: 'json',
+          success: function(json) {
+            if (json['error']) {
+              $('#import-csv-status').html('<span class="text-danger">' + json['error'] + '</span>');
+              $('#import-csv-run').button('reset');
+              return;
+            }
+            
+            if (json['success']) {
+              $('#import-csv-status').html('<span class="text-success">' + json['success'] + '</span>');
+            }
+            
+            if (json['done']) {
+              $('#import-csv-run').button('reset');
+              $('#import-csv-status').append('<br><span class="text-success"><b>Імпорт повністю завершено!</b></span>');
+            } else if (json['total'] > 0) {
+              // Продовжуємо наступну порцію
+              runImport(json['imported']);
+            } else {
+              // Щось пішло не так, total не повернувся або 0
+              $('#import-csv-run').button('reset');
+            }
+          },
+          error: function(xhr, ajaxOptions, thrownError) {
+            $('#import-csv-run').button('reset');
+            var msg = thrownError;
+            if (xhr.responseText && xhr.responseText.substring(0, 1) === '<') {
+              msg = 'Сервер повернув HTML замість JSON. Перезайдіть в админку (сесія могла закінчитись) і спробуйте знову. Якщо помилка лишається — у вкладці Network (F12) подивіться відповідь на запит importFromCsv.';
+            }
+            $('#import-csv-status').html('<span class="text-danger">' + msg + '</span>');
+          }
+        });
+      }
+      
+      runImport(0);
     });
 
     $('#import-mete-category-excel').on('click', function() {
