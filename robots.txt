@@ -1,0 +1,49 @@
+
+User-agent: *
+Disallow: /admin/
+Disallow: /system/
+Disallow: /*route=account/
+Disallow: /*route=affiliate/
+Disallow: /*route=checkout/
+Disallow: /*route=product/search
+Disallow: /*route=product/product*&manufacturer_id=
+Disallow: /*?sort=
+Disallow: /*&sort=
+Disallow: /*?order=
+Disallow: /*&order=
+Disallow: /*?limit=
+Disallow: /*&limit=
+Disallow: /*?format=
+Disallow: /*&format=
+Disallow: /*?tracking=
+Disallow: /*&tracking=
+Disallow: /*?filter=
+Disallow: /*&filter=
+Disallow: /*?filter_name=
+Disallow: /*&filter_name=
+Disallow: /*?filter_sub_category=
+Disallow: /*&filter_sub_category=
+Disallow: /*?filter_description=
+Disallow: /*&filter_description=
+Disallow: /image/cache/
+Disallow: /upload/  # Стара папка бітрікса
+Disallow: /bitrix/
+
+# Для Google Image бота - жорсткіше обмеження (якщо він все ще активний)
+User-agent: Googlebot-Image
+Disallow: /image/cache/
+Disallow: /upload/  # Стара папка бітрікса
+Disallow: /bitrix/
+Crawl-delay: 3
+
+# Дозволити індексацію головної та інших важливих сторінок
+Allow: /
+Allow: /*route=common/home
+Allow: /*route=product/category
+Allow: /*route=product/manufacturer
+Allow: /*route=product/product
+Allow: /*route=information/information
+
+# Важливо: використовуйте правильний домен
+Host: https://detta.com.ua
+Sitemap: https://detta.com.ua/sitemap.xml

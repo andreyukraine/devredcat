@@ -1,0 +1,94 @@
+{% if (sets_array) %} 
+    <script>
+        function getDecimal()
+        {
+            return {{ decimal_place }};
+        }
+    </script>
+
+    {% for sets in sets_array %} 
+        {% for iset,set in sets %} 
+            {% for key,product in set['products'] %} 
+                {% if (product['use_option'] is defined) %} 
+                    {% if (product['use_option'] == 'fixed') %} 
+                        {{ product['html_options'] }}
+                    {% elseif (product['use_option'] == 'popup') %} 
+                        {{ product['html_options'] }}
+                    {% endif %} 
+                {% endif %} 
+            {% endfor %} 
+        {% endfor %} 
+    {% endfor %} 
+
+    <div class='sets' id='prd-sets'>
+        <h3>{{ text_sets }}</h3>
+        {% for sets in sets_array %} 
+            <div class='sets-slick'>
+                {% for iset,set in sets %} 
+                    <div class="set">
+                        <input type='hidden' name='economy' value="{{ set['discount'] }}">
+                        <input type='hidden' name='iset' value="{{ iset }}">
+                        <input type='hidden' name='product_id' value="{{ set['product_id'] }}">
+                        <div class='set_table'>
+                            {% set i=0 %}
+                            {% for key,product in set['products'] %} 
+                                {% if (i) %}
+
+                                    <div class='cell ao plus'>+</div>
+                                {% endif %} 
+                                {% set i = i + 1 %}
+                                <div class="cell set-product product{{ product['product_id']~key }}" >
+                                    <input type='hidden' name='cprice' value="{{ product['cprice'] }}">
+                                    <input type='hidden' name='option_price' value="0">
+
+                                    <input type='hidden' name='product_id' value="{{ product['product_id'] }}">
+                                    <input type='hidden' name='quantity' value="{{ product['quantity'] }}">
+                                    {% if (product['thumb']) %} 
+                                        <a href="{{ product['href'] }}"><img src='{{ product['thumb'] }}' class='img-responsive'></a>
+                                        {% endif %} 
+                                    <h4><a href="{{ product['href'] }}">{{ product['product_name'] }}</a></h4>
+
+                                    <span class='new_price'>{{ product['price'] }}</span>
+                                    {% if (show_qty) %} 
+                                        {% if (product['quantity']>1) %} 
+                                            <div class='quantity'>x{{ product['quantity'] }}</div>
+                                        {% endif %} 
+                                    {% endif %} 
+
+
+                                    {% if (product['use_option'] is defined) %} 
+                                        {% if (product['use_option'] == 'fixed') %} 
+                                            {{ product['html_options_button'] }}
+                                        {% elseif (product['use_option'] == 'popup') %} 
+                                            {{ product['html_options_button'] }}
+                                        {% else %} 
+                                            <input type='hidden' name='option' value='no'>
+                                        {% endif %} 
+                                    {% else %} 
+                                        <input type='hidden' name='option' value='no'>
+                                    {% endif %} 
+                                </div>
+                            {% endfor %} 
+
+                            <div class='cell ao'>=</div>
+                            <div class='cell total'>
+                                {% if (set['discount_prec'] is defined) %} 
+
+                                    <div class='disc'>{{ set['discount_prec'] }}</div>
+                                {% endif %} 
+
+                                <span class='economy_text'>{{ text_economy }}</span>: <span class='economy_val'>{{ set['economy'] }}</span>
+
+                                <div class='new_summ'>{{ set['new_total'] }}</div>
+
+                                <button class='add-set-btn btn btn-primary' data-success-text="<i class='fa fa-check'></i>" data-loading-text="<i class='fa fa-spinner fa-spin '></i>">{{ text_buy_sets }}</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %} 
+            </div>
+        {% endfor %} 
+    </div>
+
+
+{% endif %}

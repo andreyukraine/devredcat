@@ -1,0 +1,158 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-left">
+        <h1>{{ heading_title }}</h1>
+        <ul class="breadcrumb">
+          {% for breadcrumb in breadcrumbs %}
+            <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="pull-right">
+        {% if is_admin == 1 %}
+        <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+        {% endif %}
+      </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        {% if is_admin == 1 %}
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+              <div class="col-sm-10">
+                <select name="module_ocimagecrop_status" id="input-status" class="form-control">
+                  {% if module_ocimagecrop_status %}
+                  <option value="1" selected="selected">{{ text_enabled }}</option>
+                  <option value="0">{{ text_disabled }}</option>
+                  {% else %}
+                  <option value="1">{{ text_enabled }}</option>
+                  <option value="0" selected="selected">{{ text_disabled }}</option>
+                  {% endif %}
+                </select>
+              </div>
+            </div>
+          </form>
+        {% endif %}
+        <hr />
+
+        <div class="form-horizontal">
+
+          {% if is_admin == 1 %}
+            <div class="form-group">
+              <label class="col-sm-2 control-label" for="input-category">{{ entry_category }}</label>
+              <div class="col-sm-10">
+                <select name="img_category" id="input-category" class="form-control">
+                  <option value="0">{{ text_select }}</option>
+                  {% for category in categories %}
+                  <option value="{{ category.category_id }}">{{ category.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-img-name">{{ entry_img_name }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="img_name" value="" placeholder="{{ entry_img_name }}" id="input-img-name" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-10 col-sm-offset-2">
+              <button type="button" id="button-crop" class="btn btn-warning"><i class="fa fa-scissors"></i> {{ button_crop }}</button>
+            </div>
+          </div>
+          
+          <div class="form-group">
+             <div class="col-sm-10 col-sm-offset-2">
+               <div id="crop-status" class="alert alert-info" style="display:none;"></div>
+               <div id="crop-progress" style="display:none;">
+                 <pre id="progress-content" style="max-height: 200px; overflow-y: auto;"></pre>
+               </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript"><!--
+var timer;
+
+$('#button-crop').on('click', function() {
+    var img_category = $('#input-category').val();
+    var img_name = $('#input-img-name').val();
+    
+    $.ajax({
+        url: 'index.php?route=extension/module/ocimagecrop/crop&user_token={{ user_token }}&img_category=' + img_category + '&img_name=' + encodeURIComponent(img_name),
+        type: 'get',
+        dataType: 'json',
+        beforeSend: function() {
+            $('#button-crop').button('loading');
+            $('#crop-status').removeClass('alert-danger alert-success').addClass('alert-info').html('Початок...').show();
+            $('#crop-progress').show();
+            $('#progress-content').html('');
+        },
+        complete: function() {
+            // We don't stop loading here because it's a long process
+        },
+        success: function(json) {
+            if (json['error']) {
+                $('#crop-status').removeClass('alert-info alert-success').addClass('alert-danger').html(json['error']);
+                $('#button-crop').button('reset');
+            } else {
+                $('#crop-status').html(json['status']);
+                
+                timer = setInterval(function() {
+                    $.ajax({
+                        url: 'index.php?route=extension/module/ocimagecrop/checkStatus&user_token={{ user_token }}',
+                        type: 'get',
+                        dataType: 'json',
+                        success: function(json) {
+                            if (json['error']) {
+                                $('#crop-status').removeClass('alert-info alert-success').addClass('alert-danger').html(json['error']);
+                                clearInterval(timer);
+                                $('#button-crop').button('reset');
+                            } else if (json['success']) {
+                                $('#crop-status').removeClass('alert-info alert-danger').addClass('alert-success').html(json['success']);
+                                clearInterval(timer);
+                                $('#button-crop').button('reset');
+                            } else {
+                                $('#crop-status').html(json['status']);
+                            }
+                            
+                            if (json['progress']) {
+                                $('#progress-content').html(json['progress']);
+                                var d = $('#progress-content');
+                                d.scrollTop(d.prop("scrollHeight"));
+                            }
+                        },
+                        error: function(xhr, ajaxOptions, thrownError) {
+                            console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                        }
+                    });
+                }, 2000);
+            }
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            $('#button-crop').button('reset');
+        }
+    });
+});
+//--></script>
+{{ footer }}

@@ -1,0 +1,211 @@
+<div id="attribute" class="tab-pane">
+    <div class="form-group">
+        <div class="h3 header-title">{{text_default_attribute_settings}}</div>
+        <p>
+            {{text_default_setting}}
+        </p>
+        <a href="{{attribute_href}}" class="btn btn-success">{{button_edit_default}}</a>
+    </div>
+    <div class="form-group">
+        <div class="h3 header-title">{{text_attribute_setting}}</div>
+        <p>
+            {{text_attribute_default}}
+        </p>
+        <div>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-success {{attribute_default.status == 'default'?'active'}}">
+                    <input type="radio" name="module_setting[attribute_default][status]" value="default" {{attribute_default.status == 'default'?'checked="checked"'}} />
+                    {{text_global}}
+                </label>
+                <label class="btn btn-success {{attribute_default.status == '1'?'active'}}">
+                    <input type="radio" name="module_setting[attribute_default][status]" value="1" {{attribute_default.status == '1'?'checked="checked"'}} />
+                    {{text_on}}
+                </label>
+                <label class="btn btn-success {{attribute_default.status == '0'?'active'}}">
+                    <input type="radio" name="module_setting[attribute_default][status]" value="0" {{attribute_default.status == '0'?'checked="checked"'}} />
+                    {{text_off}}
+                </label>
+            </div>
+            <div class="container-fluid" id="attribute-default-setting" {{attribute_default.status in ['default', '0']? 'style="display:none;"'}}>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">{{entry_type}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="module_setting[attribute_default][type]">
+                                    {% for base_type_key, base_type_title in base_types %}
+                                        {% if base_type_key in default.allowed_types %}
+                                            {% if base_type_key == attribute_default.type %}
+                                                <option value="{{base_type_key}}" selected="selected">{{base_type_title}}</option>
+                                            {% else %}
+                                                <option value="{{base_type_key}}">{{base_type_title}}</option>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">{{entry_collapse}}</label>
+                            <div class="col-sm-10">
+                                <input type="hidden" name="module_setting[attribute_default][collapse]" value="0" />
+                                <input type="checkbox" class="form-control switcher" data-label-text="{{text_enabled}}" value="1"  name="module_setting[attribute_default][collapse]" {{attribute_default.collapse?'checked="checked"'}}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">{{entry_sort_order_values}}</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="module_setting[attribute_default][sort_order_values]">
+                                    {% for sort_order_type_key, sort_order_type_title in sort_order_types %}
+                                        {% if sort_order_type_key == attribute_default.sort_order_values %}
+                                            <option value="{{sort_order_type_key}}" selected="selected">{{sort_order_type_title}}</option>
+                                        {% else %}
+                                            <option value="{{sort_order_type_key}}">{{sort_order_type_title}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="h3 header-title">{{text_individual_setting}}</div>
+        <p>
+            {{text_warning_attribute_individual}}
+        </p>
+        <div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="select_attribute_name"/>
+                        <input type="hidden" name="select_attribute_id"/>
+                        <span class="input-group-btn">
+                            <a id="add-attribute" class="btn btn-default"><i class="fa fa-plus"></i></a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <br/>
+        <table class="table table-attribute-select {{attributes is empty ? 'hide'}}">
+            <thead>
+                <tr>
+                    <td></td>
+                    <td class="text-center">{{column_status}}</td>
+                    <td class="text-center">{{column_type}}</td>
+                    <td class="text-center">{{column_collapse}}</td>
+                    <td class="text-center">{{column_sort_order_values}}</td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+                {% if attributes %}
+                    {% for attribute_id, attribute in attributes %}
+                        <tr id="element-attributes-{{attribute_id}}" data-sort-order="{{attribute['sort_order']}}">
+                            <td style="max-width: 175px;">{{attribute.name}}</td>
+                            <td class="text-center {{attribute.status in ['default', '0']?'disabled-next'}}">
+                                <input type="hidden" name="module_setting[attributes][{{attribute_id}}][sort_order]"  class="sort-value" value="{{attribute.sort_order}}"/>
+                                <div class="btn-group" data-toggle="buttons">
+                                    <label class="btn btn-success btn-sm {{attribute.status == 'default' ? 'active'}}">
+                                        <input type="radio" name="module_setting[attributes][{{attribute_id}}][status]" value="default" {{attribute.status == 'default'?'checked="checked"'}} />
+                                        {{text_default}}
+                                    </label>
+                                    <label class="btn btn-success btn-sm {{attribute.status == '1' ? 'active'}}">
+                                        <input type="radio" name="module_setting[attributes][{{attribute_id}}][status]" value="1" {{attribute.status == '1'?'checked="checked"'}} />
+                                        {{text_yes}}
+                                    </label>
+                                    <label class="btn btn-success btn-sm {{attribute.status == '0' ? 'active'}}">
+                                        <input type="radio" name="module_setting[attributes][{{attribute_id}}][status]" value="0" {{attribute.status == '0'?'checked="checked"'}} />
+                                        {{text_no}}
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <select class="form-control" name="module_setting[attributes][{{attribute_id}}][type]">
+                                    {% for base_type_key, base_type_title in base_types %}
+                                        {% if base_type_key in default.allowed_types %}
+                                            {% if base_type_key == attribute.type %}
+                                                <option value="{{base_type_key}}" selected="selected">{{base_type_title}}</option>
+                                            {% else %}
+                                                <option value="{{base_type_key}}">{{base_type_title}}</option>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td class="text-center">
+                                <input type="hidden" name="module_setting[attributes][{{attribute_id}}][collapse]" value="0" />
+                                <input type="checkbox" class="form-control switcher" data-label-text="{{text_enabled}}" value="1"  name="module_setting[attributes][{{attribute_id}}][collapse]" {{attribute.collapse?'checked="checked"'}}/>
+                            </td>
+                            <td class="text-center">
+                                <select class="form-control" name="module_setting[attributes][{{attribute_id}}][sort_order_values]">
+                                    {% for sort_order_type_key, sort_order_type_title in sort_order_types %}
+                                        {% if sort_order_type_key == attribute.sort_order_values %}
+                                            <option value="{{sort_order_type_key}}" selected="selected">{{sort_order_type_title}}</option>
+                                        {% else %}
+                                            <option value="{{sort_order_type_key}}">{{sort_order_type_title}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td><a class="delete-element-button" onclick="$(this).closest('tr').remove()"><i class="fa fa-times" aria-hidden="true"></i></a></td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        $(document).ready(function(){
+            $(document).on('change', '[name=\'module_setting[attribute_default][status]\']', function(e){
+                if($(this).val() != '1'){
+                    $('#attribute-default-setting').slideUp();
+                }
+                else{
+                    $('#attribute-default-setting').slideDown();
+                }
+            });
+            $(document).on('click', '#add-attribute', function(){
+                var attribute_id = $('input[name="select_attribute_id"]').val();
+                var attribute_name = $('input[name="select_attribute_name"]').val();
+                if(attribute_id !== ''){
+                    $('.table-attribute-select').removeClass('hide');
+                    d_ajax_filter.addElement(attribute_id, attribute_name, 'attributes', '.table-attribute-select > tbody', 'tr', {{default|json_encode}}, {{base_types|json_encode}});
+                    d_ajax_filter.updateSortOrder('table.table-attribute-select > tbody','tr');
+                    $(".switcher").bootstrapSwitch({
+                        'onColor': 'success',
+                        'onText': '{{text_yes}}',
+                        'offText': '{{text_no}}',
+                    });
+                }
+            });
+            $('[name="select_attribute_name"]').autocomplete({
+                'source': function(request, response) {
+                    $.ajax({
+                        url: 'index.php?route=extension/d_ajax_filter/attribute/autocomplete&{{token}}&filter_name=' +  encodeURIComponent(request),
+                        dataType: 'json',
+                        success: function(json) {
+                            response($.map(json, function(item) {
+                                return {
+                                    label: item['name'],
+                                    value: item['attribute_id']
+                                }
+                            }));
+                        }
+                    });
+                },
+                'select': function(item) {
+                    $('input[name=\'select_attribute_name\']').val(item['label']);
+                    $('input[name=\'select_attribute_id\']').val(item['value']);
+                }
+            });
+            d_ajax_filter.createSortable('table.table-attribute-select > tbody','tr');
+        });
+    </script>
+</div>

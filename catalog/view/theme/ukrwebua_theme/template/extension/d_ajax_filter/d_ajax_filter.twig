@@ -1,0 +1,53 @@
+
+<!-- Куди буде вставлено FilterComponent -->
+{% if is_mobile %}
+  <div class="filter">
+    <div id="filter-content">
+      <div class="filter-fix-top-line">
+        <div class="cart-fix-top">
+          <div class="cart-fix-close">
+            <img width="25px" height="25px" src="/image/close.svg" onclick="custom_filter.close()" alt="close">
+          </div>
+          <div class="cart-fix-title"><span class="text-21 bl-bold">Фільтр товарів</span></div>
+        </div>
+      </div>
+      <div class="filter-chips-bl">
+        <div id="filter-container"></div>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div id="filter-container"></div>
+{% endif %}
+
+<script defer src="/catalog/view/javascript/react/react-main.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const filterData = {{ react_data|json_encode(constant('JSON_HEX_APOS'))|raw }};
+    if (window.ReactApp) {
+      ReactApp.init({
+        groups: filterData.groups,
+        initialQuantities: filterData.initialQuantities,
+        initialTotal: filterData.initialTotal,
+        apiUrls: {
+          ajax: filterData.apiUrls.ajax
+        }
+      }, { text_total: "Знайдено" });
+
+      ReactApp.renderComponent('ViewSwitcher', {}, 'view-switcher-container');
+    } else {
+      // на випадок дуже повільної мережі/динамічних імпортів
+      window.addEventListener('load', function () {
+        ReactApp.init({
+          groups: filterData.groups,
+          apiUrls: {
+            ajax: filterData.apiUrls.ajax
+          }
+        }, { text_total: "Знайдено" });
+
+        ReactApp.renderComponent('ViewSwitcher', {}, 'view-switcher-container');
+      });
+    }
+  });
+</script>

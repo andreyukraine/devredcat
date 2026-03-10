@@ -1,0 +1,379 @@
+<div id="cartview-content">
+  <div class="cart-fix-top">
+    <div class="cart-fix-close">
+      <img width="25px" src="/image/close.svg" onclick='custom_cart.close()' alt="close">
+    </div>
+    <div class="cart-fix-title"><span class="text-21 bl-bold">{{ text_cart }}</span></div>
+    {% if not config_is_catalog %}
+      {% if products or store %}
+        <div class="clear-cart" onclick="custom_cart.clear()">{{ clear_cart }}</div>
+      {% endif %}
+    {% endif %}
+  </div>
+  <div class="cart-fix-block">
+    {% if config_is_catalog > 0 %}
+      <div class="cart-fix-list-products">
+        <div class="cart-empty p-15">
+          <div class="is-catalog text-center">
+            <img alt="no_image" src="/image/no_image.png" width="200">
+            <div class="bl-is-catalog-info">
+              <p class="text-21 bl-bold">Наразі сайт функціонує у форматі каталогу.</p>
+              <p class="text-16" style="color: #777">Ми працюємо над запуском оформлення замовлення</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      {% if store %}
+        <div class="cart-fix-list-products">
+          {% for warehouse_id,  store in stores %}
+            {% if store.products %}
+              <div class="has-scroll">
+                {% if store.products %}
+                  {% for product in store.products %}
+                    <div id="product-cart-{{ product.cart_id }}" class="cart-line">
+                      <div class="cart-line-lg">
+                        <div class="text-center cart-fix-image">
+
+                          {% if product.percent %}
+                            <div class="label-product label_sale">
+                              <div class="bg-special"><span>-{{ product.percent }}%</span></div>
+                            </div>
+                          {% endif %}
+
+                          <a title="{{ product.name }}" href="{{ product.href }}">
+                            <img class="cart-image img-responsive" src="{{ product.image }}" alt="{{ product.name }}" width="150" height="150"
+                                 title="{{ product.name }}"/>
+                          </a>
+                        </div>
+                        <div class="text-left info-item">
+                          {% if product.store %}
+                            <div class="store-item">
+                              Магазин: {{ product.store.name }}
+                            </div>
+                          {% endif %}
+                          <div class="hj-cart">
+                            <a title="{{ product.name }}" href="{{ product.href }}"><span class="bl-bold">{{ product.name }}</span></a>
+                            <div class="text-right cart-close">
+                              <img width="20" height="20" src="/image/trash-icon.svg"
+                                   onclick="custom_cart.remove('{{ product.product_id }}', '{{ product.cart_id }}');"
+                                   title="{{ button_remove }}"
+                                   alt="close">
+                            </div>
+                          </div>
+                          <div class="opts">
+                            {% if product.option %}
+                              {% for option in product.option %}
+                                <small><b>{{ option.name }}</b> : {{ option.value }}</small>
+                              {% endfor %}
+                            {% endif %}
+                          </div>
+                          <div id="product-{{ product.product_id }}" class="cart-fix-line">
+                            <div class="cart-price">
+                              {% if not product.special_view %}
+                                <div class="price-box box-regular">
+                                  <div class="regular-price">
+                                    <span class="price">{{ product.price_view }}</span>
+                                  </div>
+                                </div>
+                              {% else %}
+                                <div class="price-box box-special">
+                                  <div class="old-price"><span class="price">{{ product.price_view }}</span></div>
+                                  <div class="special-price"><span class="price">{{ product.special_view }}</span></div>
+                                </div>
+                              {% endif %}
+                            </div>
+
+                            <div class="cart-quantity">
+                              <div class="btn-card">
+                                <div class="cart-right-btns in-cart">
+                                  <div class="minus {% if product.quantity == 1 %}not-available{% endif %}"
+                                       data-key="{{ product.product_id }}"
+                                       data-cart="{{ product.cart_id }}"
+                                       data-store="{{ product.warehouse_id }}"
+                                       {% if product.quantity > 0 %}onclick="custom_cart.handleClickInCart(this, 'minus')"{% endif %}>-
+                                  </div>
+
+                                  <input id="qty-{{ product.product_id }}-{{ product.cart_id }}"
+                                         data-key="{{ product.product_id }}"
+                                         data-cart="{{ product.cart_id }}"
+                                         data-store="{{ product.warehouse_id }}"
+                                         type="number"
+                                         name="quantity" value="{{ product.quantity }}"
+                                         class="quantity-input"/>
+
+                                  <div class="plus {% if not product.is_buy %}not-available{% endif %}"
+                                       data-key="{{ product.product_id }}"
+                                       data-cart="{{ product.cart_id }}"
+                                       data-store="{{ product.warehouse_id }}"
+                                       {% if product.is_buy %}onclick="custom_cart.handleClickInCart(this, 'plus')"{% endif %}></div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="cart-price-total">
+                              {% if not product.special %}
+                                <div class="price-box box-regular">
+                                  <div class="regular-price">
+                                    <span class="price">{{ product.price_total_item_view }}</span>
+                                  </div>
+                                </div>
+                              {% else %}
+                                <div class="price-box box-special">
+                                  <div class="old-price"><span class="price">{{ product.price_total_item_view }}</span></div>
+                                  <div class="special-price"><span class="price">{{ product.special_total_item_view }}</span></div>
+                                </div>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            {% else %}
+              <li class="text-center">
+                <svg class="icon-empty-cart" id="icon-empty-shop-cart" xmlns="http://www.w3.org/2000/svg" width="195"
+                     height="151" fill="none" viewBox="0 0 195 151">
+                  <path fill="#9CA9BC"
+                        d="m170.452 109.713 1.98.273-1.49 10.798-1.982-.274 1.492-10.797ZM38 45h2v32h-2V45Zm0 39h2v9h-2v-9Zm107.8 42.7c.2.3.5.4.8.4.2 0 .4-.1.6-.2 1.5-1 3.6-1.1 5.2-.1.5.3 1.1.2 1.4-.3.3-.5.2-1.1-.3-1.4-2.2-1.4-5.2-1.4-7.4.1-.5.4-.6 1-.3 1.5ZM70 113h9v2h-9v-2ZM5 144h13v2H5v-2Z"></path>
+                  <path fill="#9CA9BC"
+                        d="m173 144 .3-.9 5-39.1h.7c2.2 0 4-1.4 4-3.2v-1.5c0-1.8-1.8-3.2-4-3.2h-34.7l9.1-22c.8-2-.1-4.4-2.2-5.2-1-.4-2.1-.4-3.1 0s-1.8 1.2-2.2 2.2L136.5 94c-1.2.4-2.1 1.1-2.9 2H132V37c0-3.3-2.7-6-5.9-6-6.3 0-12.6-.7-18.9-.9-4-14.7-14-25.1-25.7-25.1S59.8 15.4 55.8 30c-6.4.2-12.7.5-18.8 1-3.3 0-6 2.7-6 6v75.9L27.1 144H23v2h167v-2h-17Zm-1.7-1.2c-.1.9-.9 1.2-1.6 1.2h-33.8l-3.9-31.1V104h2.2c1.1 1 2.3 1.7 3.9 1.7s2.9-.6 3.9-1.7h34.3l-5 38.8Zm9.7-43.6v1.5c0 .6-.8 1.2-2 1.2h-35.1c.3-.7.5-1.5.5-2.3 0-.6-.1-1.1-.2-1.7H179c1.2.1 2 .8 2 1.3Zm-33.2-27.5c.2-.5.6-.9 1.1-1.1.5-.2 1-.2 1.5 0 1 .4 1.5 1.6 1.1 2.6l-9.1 22c-1.1-1-2.4-1.5-3.6-1.7l9-21.8Zm-9.5 24c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4Zm-5.7 2.3c-.2.5-.2 1.1-.2 1.7 0 .8.2 1.6.5 2.3h-.9v-4h.6ZM81.5 7c10.7 0 19.8 9.5 23.6 23-16.1-.5-31.9-.5-47.2 0 3.8-13.5 13-23 23.6-23ZM32.8 115H59v-2H33V37c0-2.2 1.8-4 4.1-4 6-.4 12.1-.7 18.3-.9-.5 2.3-.9 4.7-1.1 7.2-2.3.4-4.1 2.4-4.1 4.8 0 2.7 2.2 4.9 4.9 4.9s4.9-2.2 4.9-4.9c0-2.3-1.6-4.1-3.6-4.7.2-2.5.6-5 1.2-7.3 15.6-.5 31.7-.5 48.2.1.6 2.3.9 4.8 1.2 7.3-2.1.5-3.6 2.4-3.6 4.7 0 2.7 2.2 4.9 4.9 4.9s4.9-2.2 4.9-4.9c0-2.4-1.8-4.4-4.1-4.8-.2-2.4-.6-4.8-1.1-7.1 6.1.2 12.2.5 18.3.9 2.2 0 4 1.8 4 4v76H89v2h41.2l3.6 29H29.1l3.7-29.2Zm23.3-73.6c1 .4 1.8 1.5 1.8 2.6 0 1.6-1.3 2.9-2.9 2.9-1.6 0-2.9-1.3-2.9-2.9 0-1.3.8-2.3 1.9-2.7 0 .9-.1 1.8-.1 2.7h2c.1-.9.1-1.8.2-2.6ZM107 44h2c0-.9 0-1.8-.1-2.7 1.1.4 1.9 1.4 1.9 2.7 0 1.6-1.3 2.9-2.9 2.9-1.6 0-2.9-1.3-2.9-2.9 0-1.2.7-2.2 1.8-2.6.2.8.2 1.7.2 2.6Z"></path>
+                  <path fill="#9CA9BC"
+                        d="M145.6 120.2a2 2 0 1 0 .001-3.999 2 2 0 0 0-.001 3.999Zm8 0a2 2 0 1 0 .001-3.999 2 2 0 0 0-.001 3.999Zm-67-40.9c-2.8-1.8-6.7-1.8-9.4.2-.5.3-.6.9-.3 1.4.2.3.5.4.8.4.2 0 .4-.1.6-.2 2.1-1.5 5.1-1.5 7.2-.1.5.3 1.1.2 1.4-.3.3-.5.1-1.1-.3-1.4Zm-12.9-5.9a2.7 2.7 0 1 0 0-5.4 2.7 2.7 0 0 0 0 5.4Zm16 0a2.7 2.7 0 1 0 0-5.4 2.7 2.7 0 0 0 0 5.4Z"></path>
+                </svg>
+              </li>
+              <li>
+                <p class="text-21 bl-bold text-center">{{ text_empty }}</p>
+                <p class="cart-empty-info-text text-center">{{ text_empty_marketing }}</p>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="cart-fix-list-products">
+          {% if products or vouchers %}
+            <div class="has-scroll">
+              {% for product in products %}
+                <div id="product-cart-{{ product.cart_id }}" class="cart-line">
+                  <div class="cart-line-lg">
+                    <div class="text-center cart-fix-image">
+
+                      {% if product.percent %}
+                        <div class="label-product label_sale">
+                          <div class="bg-special"><span>-{{ product.percent }}%</span></div>
+                        </div>
+                      {% endif %}
+
+                      <a title="{{ product.name }}" href="{{ product.href }}">
+                        <img class="cart-image" src="{{ product.image }}" alt="{{ product.name }}"
+                             title="{{ product.name }}"/>
+                      </a>
+                    </div>
+                    <div class="text-left info-item">
+                      {% if product.store %}
+                        <div class="store-item">
+                          Магазин: {{ product.store.name }}
+                        </div>
+                      {% endif %}
+                      <div class="hj-cart">
+                        <a title="{{ product.name }}" class="cart-name" href="{{ product.href }}">{{ product.name }}</a>
+                        <div class="text-right cart-close">
+                          <img width="25" height="25" src="/image/close.svg"
+                               onclick="custom_cart.remove('{{ product.product_id }}', '{{ product.cart_id }}');"
+                               title="{{ button_remove }}"
+                               alt="close">
+                        </div>
+                      </div>
+                      <div class="opts">
+                        {% if product.option %}
+                          {% for option in product.option %}
+                            <small><b>{{ option.name }}</b> : {{ option.value }}</small>
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                      <div id="product-{{ product.product_id }}" class="cart-fix-line hidden-xs">
+                        <div class="cart-price">
+                          {% if not product.special %}
+                            <div class="price-box box-regular">
+                              <div class="regular-price">
+                                <span class="price">{{ product.price }}</span>
+                              </div>
+                            </div>
+                          {% else %}
+                            <div class="price-box box-special">
+                              <div class="old-price"><span class="price">{{ product.price }}</span></div>
+                              <div class="special-price"><span class="price">{{ product.special }}</span></div>
+                            </div>
+                          {% endif %}
+                        </div>
+
+                        <div class="cart-quantity">
+                          <div class="btn-card">
+                            <div class="cart-right-btns in-cart">
+                              <div class="minus {% if product.quantity == 1 %}not-available{% endif %}"
+                                   data-key="{{ product.product_id }}"
+                                   data-cart="{{ product.cart_id }}"
+                                   data-store="{{ product.warehouse_id }}"
+                                   {% if product.quantity > 1 %}onclick="custom_cart.handleClickInCart(this, 'minus')"{% endif %}>-
+                              </div>
+
+                              <input id="qty-{{ product.product_id }}-{{ product.cart_id }}"
+                                     data-key="{{ product.product_id }}"
+                                     data-cart="{{ product.cart_id }}"
+                                     data-store="{{ product.warehouse_id }}"
+                                     type="number"
+                                     name="quantity" value="{{ product.quantity }}"
+                                     class="quantity-input"/>
+
+                              <div class="plus {% if not product.is_buy %}not-available{% endif %}"
+                                   data-key="{{ product.product_id }}"
+                                   data-cart="{{ product.cart_id }}"
+                                   data-store="{{ product.warehouse_id }}"
+                                   {% if product.is_buy %}onclick="custom_cart.handleClickInCart(this, 'plus')"{% endif %}></div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="cart-price-total">
+                          {% if not product.special %}
+                            <div class="price-box box-regular">
+                              <div class="regular-price">
+                                <span class="price">{{ product.price_total_item_view }}</span>
+                              </div>
+                            </div>
+                          {% else %}
+                            <div class="price-box box-special">
+                              <div class="old-price"><span class="price">{{ product.price_total_item_view }}</span></div>
+                              <div class="special-price"><span class="price">{{ product.special_total_item_view }}</span></div>
+                            </div>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="product-{{ product.product_id }}" class="cart-fix-line hidden-sm hidden-md hidden-lg">
+                    <div class="cart-price">
+                      {% if not product.special %}
+                        <div class="price-box box-regular">
+                          <div class="regular-price">
+                            <span class="price">{{ product.price }}</span>
+                          </div>
+                        </div>
+                      {% else %}
+                        <div class="price-box box-special">
+                          <div class="old-price"><span class="price">{{ product.price }}</span></div>
+                          <div class="special-price"><span class="price">{{ product.special }}</span></div>
+                        </div>
+                      {% endif %}
+                    </div>
+
+                    <div class="cart-quantity">
+                      <div class="btn-card">
+                        <div class="cart-right-btns in-cart">
+                          <div class="minus {% if product.quantity == 1 %}not-available{% endif %}"
+                               data-key="{{ product.product_id }}"
+                               data-cart="{{ product.cart_id }}"
+                               data-store="{{ product.warehouse_id }}"
+                               {% if product.quantity > 1 %}onclick="custom_cart.handleClickInCart(this, 'minus')"{% endif %}>-
+                          </div>
+
+                          <input id="qty-{{ product.product_id }}-{{ product.cart_id }}"
+                                 data-key="{{ product.product_id }}"
+                                 data-cart="{{ product.cart_id }}"
+                                 data-store="{{ product.warehouse_id }}"
+                                 type="number"
+                                 name="quantity" value="{{ product.quantity }}"
+                                 class="quantity-input"/>
+
+                          <div class="plus {% if not product.is_buy %}not-available{% endif %}"
+                               data-key="{{ product.product_id }}"
+                               data-cart="{{ product.cart_id }}"
+                               data-store="{{ product.warehouse_id }}"
+                               {% if product.is_buy %}onclick="custom_cart.handleClickInCart(this, 'plus')"{% endif %}></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="cart-price-total">
+                      {% if not product.special %}
+                        <div class="price-box box-regular">
+                          <div class="regular-price">
+                            <span class="price">{{ product.price_total_item_view }}</span>
+                          </div>
+                        </div>
+                      {% else %}
+                        <div class="price-box box-special">
+                          <div class="old-price"><span class="price">{{ product.price_total_item_view }}</span></div>
+                          <div class="special-price"><span class="price">{{ product.special_total_item_view }}</span></div>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <li class="text-center">
+              <svg class="icon-empty-cart" id="icon-empty-shop-cart" xmlns="http://www.w3.org/2000/svg" width="195"
+                   height="151" fill="none" viewBox="0 0 195 151">
+                <path fill="#9CA9BC"
+                      d="m170.452 109.713 1.98.273-1.49 10.798-1.982-.274 1.492-10.797ZM38 45h2v32h-2V45Zm0 39h2v9h-2v-9Zm107.8 42.7c.2.3.5.4.8.4.2 0 .4-.1.6-.2 1.5-1 3.6-1.1 5.2-.1.5.3 1.1.2 1.4-.3.3-.5.2-1.1-.3-1.4-2.2-1.4-5.2-1.4-7.4.1-.5.4-.6 1-.3 1.5ZM70 113h9v2h-9v-2ZM5 144h13v2H5v-2Z"></path>
+                <path fill="#9CA9BC"
+                      d="m173 144 .3-.9 5-39.1h.7c2.2 0 4-1.4 4-3.2v-1.5c0-1.8-1.8-3.2-4-3.2h-34.7l9.1-22c.8-2-.1-4.4-2.2-5.2-1-.4-2.1-.4-3.1 0s-1.8 1.2-2.2 2.2L136.5 94c-1.2.4-2.1 1.1-2.9 2H132V37c0-3.3-2.7-6-5.9-6-6.3 0-12.6-.7-18.9-.9-4-14.7-14-25.1-25.7-25.1S59.8 15.4 55.8 30c-6.4.2-12.7.5-18.8 1-3.3 0-6 2.7-6 6v75.9L27.1 144H23v2h167v-2h-17Zm-1.7-1.2c-.1.9-.9 1.2-1.6 1.2h-33.8l-3.9-31.1V104h2.2c1.1 1 2.3 1.7 3.9 1.7s2.9-.6 3.9-1.7h34.3l-5 38.8Zm9.7-43.6v1.5c0 .6-.8 1.2-2 1.2h-35.1c.3-.7.5-1.5.5-2.3 0-.6-.1-1.1-.2-1.7H179c1.2.1 2 .8 2 1.3Zm-33.2-27.5c.2-.5.6-.9 1.1-1.1.5-.2 1-.2 1.5 0 1 .4 1.5 1.6 1.1 2.6l-9.1 22c-1.1-1-2.4-1.5-3.6-1.7l9-21.8Zm-9.5 24c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4Zm-5.7 2.3c-.2.5-.2 1.1-.2 1.7 0 .8.2 1.6.5 2.3h-.9v-4h.6ZM81.5 7c10.7 0 19.8 9.5 23.6 23-16.1-.5-31.9-.5-47.2 0 3.8-13.5 13-23 23.6-23ZM32.8 115H59v-2H33V37c0-2.2 1.8-4 4.1-4 6-.4 12.1-.7 18.3-.9-.5 2.3-.9 4.7-1.1 7.2-2.3.4-4.1 2.4-4.1 4.8 0 2.7 2.2 4.9 4.9 4.9s4.9-2.2 4.9-4.9c0-2.3-1.6-4.1-3.6-4.7.2-2.5.6-5 1.2-7.3 15.6-.5 31.7-.5 48.2.1.6 2.3.9 4.8 1.2 7.3-2.1.5-3.6 2.4-3.6 4.7 0 2.7 2.2 4.9 4.9 4.9s4.9-2.2 4.9-4.9c0-2.4-1.8-4.4-4.1-4.8-.2-2.4-.6-4.8-1.1-7.1 6.1.2 12.2.5 18.3.9 2.2 0 4 1.8 4 4v76H89v2h41.2l3.6 29H29.1l3.7-29.2Zm23.3-73.6c1 .4 1.8 1.5 1.8 2.6 0 1.6-1.3 2.9-2.9 2.9-1.6 0-2.9-1.3-2.9-2.9 0-1.3.8-2.3 1.9-2.7 0 .9-.1 1.8-.1 2.7h2c.1-.9.1-1.8.2-2.6ZM107 44h2c0-.9 0-1.8-.1-2.7 1.1.4 1.9 1.4 1.9 2.7 0 1.6-1.3 2.9-2.9 2.9-1.6 0-2.9-1.3-2.9-2.9 0-1.2.7-2.2 1.8-2.6.2.8.2 1.7.2 2.6Z"></path>
+                <path fill="#9CA9BC"
+                      d="M145.6 120.2a2 2 0 1 0 .001-3.999 2 2 0 0 0-.001 3.999Zm8 0a2 2 0 1 0 .001-3.999 2 2 0 0 0-.001 3.999Zm-67-40.9c-2.8-1.8-6.7-1.8-9.4.2-.5.3-.6.9-.3 1.4.2.3.5.4.8.4.2 0 .4-.1.6-.2 2.1-1.5 5.1-1.5 7.2-.1.5.3 1.1.2 1.4-.3.3-.5.1-1.1-.3-1.4Zm-12.9-5.9a2.7 2.7 0 1 0 0-5.4 2.7 2.7 0 0 0 0 5.4Zm16 0a2.7 2.7 0 1 0 0-5.4 2.7 2.7 0 0 0 0 5.4Z"></path>
+              </svg>
+            </li>
+            <li>
+              <p class="text-21 bl-bold text-center">{{ text_empty }}</p>
+              <p class="cart-empty-info-text text-center">{{ text_empty_marketing }}</p>
+            </li>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+  {% if config_is_catalog <= 0 %}
+    {% if products or store %}
+      <div class="cart-fix-total">
+        <div class="cart-total-bl">
+          <table class="table">
+            {% for total in totals %}
+              <tr>
+                <td class="text-left cart-text-bottom text-18 bl-bold">{{ total.title ~ " :" }}</td>
+                <td class="text-right cart-value-bottom text-18 bl-bold">{{ total.text }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+        <div class="text-center cart-button">
+          {% if module_custom_fastorder %}
+            <div class="button-fast-order visible-lg" onclick="custom_cart.fastorder()">{{ button_fastorder }}</div>
+          {% endif %}
+          {% if not logged %}
+            <a class="button button-cart" title="{{ button_checkout }}" href="javascript:void(0);" onclick="ocajaxlogin.appendLoginForm('{{ checkout }}');">{{ button_checkout }}</a>
+          {% else %}
+            <a class="button button-cart" title="{{ button_checkout }}" href="{{ checkout }}">{{ button_checkout }}</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+<div id="cartview-bg-block" onclick="custom_cart.close()">
+  <!-- Quick View deep background -->
+</div>
+
+<div class="cartview-load-img">
+  <img src="{{ ocquickview_loader_img }}" alt=""/>
+</div>
+
+<div class="lightbox-container lbo-quickview"></div>
+
+<input type="hidden" id="qv-text-close" value="{{ text_close }}"/>
+
+

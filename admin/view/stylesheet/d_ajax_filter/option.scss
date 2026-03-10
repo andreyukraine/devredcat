@@ -1,0 +1,30 @@
+table{
+    > tbody{
+        > tr{
+            > td{
+                &.disabled-next{
+                    &~td{
+                        select, input{
+                            pointer-events: none;
+                            background-color: #eee;
+                            opacity: 1;
+                        }
+                        div.bootstrap-switch-wrapper{
+                            pointer-events:none;
+                            > .bootstrap-switch-container{
+                                > span{
+                                    opacity:0.5;
+
+                                }
+                                input{
+                                    display:none;
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        }
+    }
+}

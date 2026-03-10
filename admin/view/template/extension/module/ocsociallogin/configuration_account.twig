@@ -1,0 +1,574 @@
+{{ header }} 
+<script src="view/javascript/ocsociallogin/velovalidation.js" type="text/javascript"></script>
+<!--<link rel="stylesheet" href="view/javascript/kbsales_coupon_enhancer/kbsales_coupon_enhancer.css">-->
+{{ column_left }} 
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button id="ocsociallogin_setting_save"  data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+            </div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %} 
+                    <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+                {% endfor %} 
+            </ul>
+            {% if (success is defined) %} 
+                <div id="message_success">
+                    <div class="alert alert-success">
+                        <i class="fa fa-check-circle"></i> {{ success }} 
+                    </div>
+                </div>    
+            {% endif %} 
+            {#
+            # Start Changes to show the Free Module Message
+            # @date 22-06-2024
+            # @modifier Nikhil Aggarwal
+            #}
+            <div class="alert alert-info"><i class="fa fa-info"></i> {{ free_module_link_google }}</div>
+            {# Changes end by Nikhil #}
+            <div id="error_message"></div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {{ storeSwticher }} 
+                    <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+                </div>
+                <div class="panel-body" style="clear: both">
+                    {{ tab_common }} 
+                    <div class="tab-content"> 
+                        <form  method="post" id="form-ocsocialloginsetting" class="form-horizontal">
+                            <div class="container-fluid">
+                                <ul class="nav nav-tabs">
+                                    <li id="tab-li-facebook"><a href="#tab-google" data-toggle="tab">{{ text_facebook }}</a></li>
+                                    <li id="tab-li-google" class="active"><a href="#tab-google" data-toggle="tab">{{ text_google }}</a></li>
+                                    <li id="tab-li-linkedin"><a href="#tab-google" data-toggle="tab">{{ text_linkedin }}</a></li>
+                                    <li id="tab-li-twitter"><a href="#tab-google" data-toggle="tab">{{ text_twitter }}</a></li>
+                                    <li id="tab-li-yahoo"><a href="#tab-google" data-toggle="tab">{{ text_yahoo }}</a></li>
+                                    <li id="tab-li-amazon"><a href="#tab-google" data-toggle="tab">{{ text_amazon }}</a></li>
+                                    <li id="tab-li-insta"><a href="#tab-google" data-toggle="tab">{{ text_instagram }}</a></li>
+                                    <li id="tab-li-paypal"><a href="#tab-google" data-toggle="tab">{{ text_paypal }}</a></li>
+                                </ul>
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-9">
+                                        <div class="tab-content">
+                                            <!--tab facebook -->
+                                            <div class="tab-pane" id="tab-facebook"> 
+                                                <div class="form-group"> 
+                                                    <label class="col-sm-2 control-label">
+                                                        <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ facebook_status_info }}">
+                                                            {{ entry_status }} 
+                                                        </span>
+                                                    </label> 
+                                                    <div class="col-sm-10">
+                                                        <select name="ocsociallogin_setting_facebook_status" id="ocsociallogin_facebook_status" class="form-control">
+                                                            {% if (ocsociallogin_facebook_status) %}
+                                                                <option value="0" selected="selected">{{ text_enabled }}</option>
+                                                                <option value="0">{{ text_disabled }}</option>
+                                                            {% else %} 
+                                                                <option value="0">{{ text_enabled }}</option>
+                                                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                                                            {% endif %} 
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" id="facebook_form" {% if (ocsociallogin_facebook_status == 0) %}
+                                                                    {{ 'style="display:none"' }}
+                                                                    {% endif %} >
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ facebook_api_id_info }}">
+                                                                {{ facebook_api_id }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_facebook_api_id" value="" placeholder="{{ facebook_api_id }}" id="ocsociallogin_facebook_api_id" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ facebook_api_secret_info }}">
+                                                                {{ facebook_api_secret }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_facebook_api_secret" value="" placeholder="{{ facebook_api_secret }}" id="ocsociallogin_facebook_api_secret" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                </div>   
+                                                
+                                             
+                                                
+                                                
+                                            </div>
+                                            <!--tab google -->
+                                            <div class="tab-pane active" id="tab-google"> 
+                                                <div class="form-group">
+                                                    <div class="col-sm-12"> 
+                                                        <p align="right"><a href="{{ get_google_id_link }}" target="_blank">{{ get_google_id }}</a></p>
+                                                    </div>
+                                                </div>   
+
+                                                <div class="form-group "> 
+                                                    <label class="col-sm-2 control-label">
+                                                        <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ google_status_info }}">
+                                                            {{ entry_status }} 
+                                                        </span>
+                                                    </label> 
+                                                    <div class="col-sm-10">
+                                                        <select name="ocsociallogin_setting_google_status" id="ocsociallogin_google_status" class="form-control">
+                                                            {% if (ocsociallogin_google_status) %}
+                                                                <option value="1" selected="selected">{{ text_enabled }}</option>
+                                                                <option value="0">{{ text_disabled }}</option>
+                                                            {% else %} 
+                                                                <option value="1">{{ text_enabled }}</option>
+                                                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                                                            {% endif %} 
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" id="google_form" {% if (ocsociallogin_google_status == 0) %}
+                                                            {{ 'style="display:none"' }}
+                                                            {% endif %} >
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ google_client_id_info }}">
+                                                                {{ google_client_id }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_google_client_id" value="{{ ocsociallogin_google_client_id }}" placeholder="{{ google_client_id }}" id="ocsociallogin_google_client_id" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ google_client_secret_info }}">
+                                                                {{ google_client_secret }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_google_client_secret" value="{{ ocsociallogin_google_client_secret }}" placeholder="{{ google_client_secret }}" id="ocsociallogin_google_client_secret" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                </div>   
+                                            </div>
+                                            <!--tab likedin -->
+                                            <div class="tab-pane" id="tab-linkedin">
+                                                <div class="form-group"> 
+                                                    <label class="col-sm-2 control-label">
+                                                        <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ linkedin_status_info }}">
+                                                            {{ entry_status }} 
+                                                        </span>
+                                                    </label> 
+                                                    <div class="col-sm-10">
+                                                        <select name="ocsociallogin_setting_linkedin_status" id="ocsociallogin_linkedin_status" class="form-control">
+                                                            {% if (ocsociallogin_linkedin_status) %}
+                                                                <option value="0" selected="selected">{{ text_enabled }}</option>
+                                                                <option value="0">{{ text_disabled }}</option>
+                                                            {% else %} 
+                                                                <option value="0">{{ text_enabled }}</option>
+                                                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                                                            {% endif %} 
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" id="linkedin_form" {% if (ocsociallogin_linkedin_status == 0) %}
+ {{ 'style="display:none"' }}
+ {% endif %} >
+                                                    <div class="form-group required">
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_linkedin_api_key" value="" placeholder="{{ linkedin_api_key }}" id="ocsociallogin_linkedin_api_key" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ linkedin_secret_key_info }}">
+                                                                {{ linkedin_secret_key }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_linkedin_secret_key" value="" placeholder="{{ linkedin_secret_key }}" id="ocsociallogin_linkedin_secret_key" class="form-control" />
+                                                        </div>
+                                                    </div>
+                                                </div>    
+                                            </div>
+                                            <!--tab live -->
+<!--                                            <div class="tab-pane" id="tab-live"> 
+                                                <div class="form-group">
+                                                    <div class="col-sm-12"> 
+                                                        <p align="right"><a href="{{ get_live_id_link }}" target="_blank">{{ get_live_id }}</a></p>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group"> 
+                                                    <label class="col-sm-2 control-label">
+                                                        <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ live_status_info }}">
+                                                            {{ entry_status }} 
+                                                        </span>
+                                                    </label> 
+                                                    <div class="col-sm-10">
+                                                        <select name="ocsociallogin_setting_live_status" id="ocsociallogin_live_status" class="form-control">
+                                                            {% if (ocsociallogin_live_status) %}
+                                                                <option value="1" selected="selected">{{ text_enabled }}</option>
+                                                                <option value="0">{{ text_disabled }}</option>
+                                                            {% else %} 
+                                                                <option value="1">{{ text_enabled }}</option>
+                                                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                                                            {% endif %} 
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" id="live_form" {% if (ocsociallogin_live_status == 0) %}
+ {{ 'style="display:none"' }}
+ {% endif %} >
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ live_client_id_info }}">
+                                                                {{ live_client_id }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_live_client_id" value="{{ ocsociallogin_live_client_id }}" placeholder="{{ live_client_id }}" id="ocsociallogin_live_client_id" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ live_client_secret_info }}">
+                                                                {{ live_client_secret }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_live_client_secret" value="{{ ocsociallogin_live_client_secret }}" placeholder="{{ live_client_secret }}" id="ocsociallogin_live_client_secret" class="form-control" />
+                                                        </div>
+                                                    </div>
+                                                </div>   
+                                            </div>-->
+                                            <!--tab twitter -->
+                                            <div class="tab-pane" id="tab-twitter"> 
+                                                <div class="form-group"> 
+                                                    <label class="col-sm-2 control-label">
+                                                        <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ twitter_status_info }}">
+                                                            {{ entry_status }} 
+                                                        </span>
+                                                    </label> 
+                                                    <div class="col-sm-10">
+                                                        <select name="ocsociallogin_setting_twitter_status" id="ocsociallogin_twitter_status" class="form-control">
+                                                            {% if (ocsociallogin_twitter_status) %}
+                                                                <option value="0" selected="selected">{{ text_enabled }}</option>
+                                                                <option value="0">{{ text_disabled }}</option>
+                                                            {% else %} 
+                                                                <option value="0">{{ text_enabled }}</option>
+                                                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                                                            {% endif %} 
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" id="twitter_form" {% if (ocsociallogin_twitter_status == 0) %}
+ {{ 'style="display:none"' }}
+ {% endif %} >
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ twitter_api_key_info }}">
+                                                                {{ twitter_api_key }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_twitter_api_key" value="" placeholder="{{ twitter_api_key }}" id="ocsociallogin_twitter_api_key" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ twitter_api_secret_info }}">
+                                                                {{ twitter_api_secret }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_twitter_api_secret" value="" placeholder="{{ twitter_api_secret }}" id="ocsociallogin_twitter_api_secret" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                </div>    
+                                            </div>
+                                            <!--tab yahoo -->
+                                            <div class="tab-pane" id="tab-yahoo"> 
+                                                <div class="form-group"> 
+                                                    <label class="col-sm-2 control-label">
+                                                        <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ yahoo_status_info }}">
+                                                            {{ entry_status }} 
+                                                        </span>
+                                                    </label> 
+                                                    <div class="col-sm-10">
+                                                        <select name="ocsociallogin_setting_yahoo_status" id="ocsociallogin_yahoo_status" class="form-control">
+                                                            {% if (ocsociallogin_yahoo_status) %}
+                                                                <option value="0" selected="selected">{{ text_enabled }}</option>
+                                                                <option value="0">{{ text_disabled }}</option>
+                                                            {% else %} 
+                                                                <option value="0">{{ text_enabled }}</option>
+                                                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                                                            {% endif %} 
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" id="yahoo_form" {% if (ocsociallogin_yahoo_status == 0) %}
+ {{ 'style="display:none"' }}
+ {% endif %} >
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ yahoo_consumer_key_info }}">
+                                                                {{ yahoo_consumer_key }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_yahoo_consumer_key" value="" placeholder="{{ yahoo_consumer_key }}" id="ocsociallogin_yahoo_consumer_key" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ yahoo_consumer_secret_info }}">
+                                                                {{ yahoo_consumer_secret }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_yahoo_consumer_secret" value="" placeholder="{{ yahoo_consumer_secret }}" id="ocsociallogin_yahoo_consumer_secret" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                </div>    
+                                            </div>
+                                            <!--tab amazon -->
+                                            <div class="tab-pane" id="tab-amazon">
+                                                <div class="form-group"> 
+                                                    <label class="col-sm-2 control-label">
+                                                        <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ amazon_status_info }}">
+                                                            {{ entry_status }} 
+                                                        </span>
+                                                    </label> 
+                                                    <div class="col-sm-10">
+                                                        <select name="ocsociallogin_setting_amazon_status" id="ocsociallogin_amazon_status" class="form-control">
+                                                            {% if (ocsociallogin_amazon_status) %}
+                                                                <option value="0" selected="selected">{{ text_enabled }}</option>
+                                                                <option value="0">{{ text_disabled }}</option>
+                                                            {% else %} 
+                                                                <option value="0">{{ text_enabled }}</option>
+                                                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                                                            {% endif %} 
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" id="amazon_form" {% if (ocsociallogin_amazon_status == 0) %}
+ {{ 'style="display:none"' }}
+ {% endif %} >
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ amazon_client_id_info }}">
+                                                                {{ amazon_client_id }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_amazon_client_id" value="" placeholder="{{ amazon_client_id }}" id="ocsociallogin_amazon_client_id" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ amazon_client_secret_info }}">
+                                                                {{ amazon_client_secret }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_amazon_client_secret" value="" placeholder="{{ amazon_client_secret }}" id="ocsociallogin_amazon_client_secret" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                </div>    
+                                            </div>
+                                            <!--tab instagram -->
+                                            <div class="tab-pane" id="tab-instagram"> 
+                                                <div class="form-group"> 
+                                                    <label class="col-sm-2 control-label">
+                                                        <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ instagram_status_info }}">
+                                                            {{ entry_status }} 
+                                                        </span>
+                                                    </label> 
+                                                    <div class="col-sm-10">
+                                                        <select name="ocsociallogin_setting_instagram_status" id="ocsociallogin_instagram_status" class="form-control">
+                                                            {% if (ocsociallogin_instagram_status) %}
+                                                                <option value="0" selected="selected">{{ text_enabled }}</option>
+                                                                <option value="0">{{ text_disabled }}</option>
+                                                            {% else %} 
+                                                                <option value="0">{{ text_enabled }}</option>
+                                                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                                                            {% endif %} 
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" id="insta_form" {% if (ocsociallogin_instagram_status == 0) %}
+ {{ 'style="display:none"' }}
+ {% endif %} >
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ instagram_client_id_info }}">
+                                                                {{ instagram_client_id }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_instagram_client_id" value="" placeholder="{{ instagram_client_id }}" id="ocsociallogin_instagram_client_id" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ instagram_client_secret_info }}">
+                                                                {{ instagram_client_secret }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_instagram_client_secret" value="" placeholder="{{ instagram_client_secret }}" id="ocsociallogin_instagram_client_secret" class="form-control" />
+                                                        </div>
+                                                    </div>
+                                                </div>    
+                                            </div>
+                                            <!--tab paypal -->
+                                            <div class="tab-pane" id="tab-paypal">
+                                                <div class="form-group"> 
+                                                    <label class="col-sm-2 control-label">
+                                                        <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ paypal_status_info }}">
+                                                            {{ entry_status }} 
+                                                        </span>
+                                                    </label> 
+                                                    <div class="col-sm-10">
+                                                        <select name="ocsociallogin_setting_paypal_status" id="ocsociallogin_paypal_status" class="form-control">
+                                                            {% if (ocsociallogin_paypal_status) %}
+                                                                <option value="0" selected="selected">{{ text_enabled }}</option>
+                                                                <option value="0">{{ text_disabled }}</option>
+                                                            {% else %} 
+                                                                <option value="0">{{ text_enabled }}</option>
+                                                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                                                            {% endif %} 
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" id="paypal_form" {% if (ocsociallogin_paypal_status == 0) %}
+ {{ 'style="display:none"' }}
+ {% endif %} >
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ paypal_client_id_info }}">
+                                                                {{ paypal_client_id }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_paypal_client_id" value="" placeholder="{{ paypal_client_id }}" id="ocsociallogin_paypal_client_id" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                    <div class="form-group required">
+                                                        <label class="col-sm-2 control-label">
+                                                            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ paypal_client_secret_info }}">
+                                                                {{ paypal_client_secret }} 
+                                                            </span>
+                                                        </label> 
+                                                        <div class="col-sm-10">
+                                                            <input type="text" name="ocsociallogin_setting_paypal_client_secret" value="" placeholder="{{ paypal_client_secret }}" id="ocsociallogin_paypal_client_secret" class="form-control" />
+                                                        </div>
+                                                    </div> 
+                                                </div>    
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>    
+                            </div>
+                        </form>
+                    </div>    
+                </div>    
+            </div>    
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function () {
+    var error_message = '{{ error_message }}';
+    var success_message = '{{ success_message }}';
+    
+    velovalidation.setErrorLanguage({
+     empty_field: '{{ error_empty_field }}',
+    });
+    
+    $("#facebook_form").hide();
+    
+    $("#ocsociallogin_google_status").change(function() {
+        if($(this).val() == 0) {
+            $("#google_form").hide();
+        } else {
+            $("#google_form").show();
+        }
+    });
+    
+    $("#linkedin_form").hide();
+    
+    $("#live_form").hide();
+    
+    $("#twitter_form").hide();
+    
+    $("#yahoo_form").hide();
+    
+    $("#amazon_form").hide();
+    
+    $("#insta_form").hide();
+    
+    $("#paypal_form").hide();
+  
+  
+    $("#ocsociallogin_setting_save").click(function() {
+        var error = false;
+        $(".has-error").removeClass("has-error");
+        $(".text-danger").remove();
+        $(".nav-tabs li").removeClass("kb-tab-error");
+
+        var google_client_id_mandatory = velovalidation.checkMandatory($('#ocsociallogin_google_client_id'));
+        var google_client_secret_mandatory = velovalidation.checkMandatory($('#ocsociallogin_google_client_secret'));
+        
+        if ($("#ocsociallogin_google_status").val() == 1 ) {
+
+            if (google_client_id_mandatory != true) {
+                error = true;
+                $("#ocsociallogin_google_client_id").parent().parent().addClass("has-error");
+                $("#ocsociallogin_google_client_id").after('<div class="text-danger">' + google_client_id_mandatory + '</span>');
+            }
+
+            if (google_client_secret_mandatory != true) {
+                error = true;
+                $("#ocsociallogin_google_client_secret").parent().parent().addClass("has-error");
+                $("#ocsociallogin_google_client_secret").after('<div class="text-danger">' + google_client_secret_mandatory + '</span>');
+            }
+            
+            if(google_client_id_mandatory !== true || google_client_secret_mandatory !== true ){ 
+               $('.nav-tabs li[id="tab-li-google"]').addClass("kb-tab-error");
+            }
+        } 
+        
+        if (error) {
+            $("#message_success").hide();
+            $('#error_message').html('<div class="alert alert-danger"><i class="fa fa-check-circle">' + error_message + '</i></div>');
+            return false;
+        } else {
+          $("#form-ocsocialloginsetting").submit();
+        }
+   
+    });
+});
+</script>
+<style>
+   .kb-tab-error a {
+    background: #ff3131 !important;
+    color: #fff !important;
+}
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#tab-li-facebook, #tab-li-linkedin, #tab-li-twitter, #tab-li-yahoo, #tab-li-amazon, #tab-li-insta, #tab-li-paypal').on('click', function(event) {
+          event.preventDefault();
+          $(this).addClass('active');
+        });
+    });
+</script>
+
+{{ footer }} 
+
+
+

@@ -1,0 +1,1030 @@
+{{ header }}
+<div class="fluid-width">
+  <div id="product-product" class="container">
+
+    <div class="top-cat">
+      <h1 class="product-name bl-bold">{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a title="{{ breadcrumb.text }}" href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+        {{ schema_breadcrumbs }}
+      </ul>
+    </div>
+
+    <div class="row">
+      {% if column_left and column_right %}
+        {% set class = 'col-sm-6' %}
+      {% elseif column_left or column_right %}
+        {% set class = 'col-md-9 col-sm-12' %}
+      {% else %}
+        {% set class = 'col-sm-12' %}
+      {% endif %}
+      <div id="content" class="{{ class }}">
+        {{ content_top }}
+        <div class="column-main">
+
+            <div class="product-info-detailed" id="product-{{ product_id }}">
+              <div class="row">
+                <div class="product-image-main-{{ product_id }} col-sm-4">
+
+                  <div class="rm-product-images">
+
+                    <div class="detail-img">
+                      <div class="box-label">
+                        <div class="label-product label-sale-{{ product_id }}">
+                          {% if special %}
+                            <div class="bg-special"><span>{{ '-' ~ rate_special ~ '%' ~ text_label_sale }}</span>
+                            </div>{% endif %}
+                          <div class="statuses-product statuses-{{ product_id }}">
+                            {% for status in statuses %}
+                              <div class="status-product label_{{ status.code }}"
+                                   style="background-color: {{ status.color }}"><span>{{ status.name }}</span></div>
+                            {% endfor %}
+                          </div>
+                        </div>
+
+                      </div>
+                      {% if thumb or images or image_dop %}
+                        <div class="slider-for-{{ product_id }} slider">
+                          {% if images|length > 0 %}
+                            {% for i, image in images %}
+                              <div
+                                class="item product-image-options-{{ image.product_option_value_id }} img-slick-block {% if image.select %}select{% endif %}"
+                                data-pos="{{ i }}">
+
+                                <a href="{{ image.popup }}" title="{{ heading_title }}" class="main-image-popup">
+
+                                  <img
+                                    class="img-responsive"
+                                    width="{{ image.width }}"
+                                    height="{{ image.height }}"
+                                    src="{{ image.thumb }}"
+                                    alt="{{ heading_title }}"
+                                    title="{{ heading_title }}"
+
+                                    {% if i == 0 %}
+                                      fetchpriority="high"
+                                      loading="eager"
+                                      decoding="async"
+                                    {% else %}
+                                      fetchpriority="auto"
+                                      loading="lazy"
+                                      decoding="async"
+                                    {% endif %}
+                                  />
+
+                                </a>
+                              </div>
+                            {% endfor %}
+                          {% endif %}
+                          {% if image_dop|length > 0 %}
+                            {% for i, image_d in image_dop %}
+                              <div class="item product-image-dop img-slick-block" data-pos="{{ images|length + i }}">
+                                <a href="{{ image_d.popup }}" title="{{ heading_title }}" class="main-image-popup">
+                                  <img
+                                    class="img-responsive"
+                                    width="{{ image_d.width }}"
+                                    height="{{ image_d.height }}"
+                                    src="{{ image_d.thumb }}"
+                                    alt="{{ heading_title }}"
+                                    title="{{ heading_title }}"
+                                    loading="lazy"
+                                    decoding="async"/>
+                                </a>
+                              </div>
+                            {% endfor %}
+                          {% endif %}
+                        </div>
+                      {% endif %}
+                    </div>
+
+                    {% if thumb or images or image_dop %}
+                      <div id="more-imgs" class="slider-nav-{{ product_id }} slider hidden-xs">
+                        {% if images|length > 0 %}
+                          {% for i, image in images %}
+                            <div class="item-slick product-image-options-{{ image.product_option_value_id }}"
+                                 data-pos="{{ i }}">
+                              <img height="150px" width="150px" class="img-responsive" src="{{ image.thumb }}" title="{{ heading_title }}"
+                                   alt="{{ heading_title }}"/>
+                            </div>
+                          {% endfor %}
+                        {% endif %}
+                        {% if image_dop|length > 0 %}
+                          {% for i, image_d in image_dop %}
+                            <div class="item-slick product-image-dop" data-pos="{{ images|length + i }}">
+                              <img height="150px" width="150px" class="img-responsive" src="{{ image_d.thumb }}" title="{{ heading_title }}" alt="{{ heading_title }}"/>
+                            </div>
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="product-info-main col-sm-8">
+                  <div class="bl-detail-info">
+                    <div class="product-container" data-product="{{ product_id }}">
+
+                      <div class="bl-attribs">
+                        <div class="title-stock-warehouses">Характеристики:</div>
+                        <div class="top-right-detail-product-sku text-16">
+                          <span class="bl-bold">Код товару:</span>
+                          <span
+                            class="sku-{{ product_id }}">{% if sku is not empty %}{{ sku }}{% else %}-{% endif %}</span>
+                        </div>
+
+                        <div class="top-right-detail-product-ean text-16">
+                          <span class="bl-bold">{{ text_model }}</span>
+                          <span
+                            class="model-{{ product_id }}">{% if model is not empty %}{{ model }}{% else %}-{% endif %}</span>
+                        </div>
+
+                        {% if manufacturer %}
+                          <div class="manufacture text-16">
+                            <span class="bl-bold">{{ text_manufacturer }}</span>
+                            <a title="{{ manufacturer }}" href="{{ manufacturers }}">{{ manufacturer }}</a>
+                          </div>
+                        {% endif %}
+
+                        {% if model is not empty %}
+                          <div class="ean visible-xs">
+                            <span class=" bl-bold">{{ text_model }}</span>
+                            <span class="model-{{ product_id }}">&nbsp;{{ model }}</span></div>
+                        {% endif %}
+
+                        {% if attribute_groups %}
+                          <div class="attr-block">
+                            {% for attribute_group in attribute_groups %}
+                              <div class="row">
+                                <div class="attr-grp-bl col-lg-10 col-md-12 col-xs-12">
+                                  {% for attribute in attribute_group.attribute %}
+                                    <div class="attr-line text-16">
+                                      <div class="attr-name bl-bold">{{ attribute.name }}:</div>
+                                      <div class="attr-val">{{ attribute.text }}</div>
+                                    </div>
+                                  {% endfor %}
+                                </div>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+                      </div>
+
+                      <div class="bl-prices">
+                        <div class="title-stock-warehouses">Ціна:</div>
+                        <div data-product-id="{{ product_id }}">
+                        {% if price %}
+                          {% if special %}
+                            {% if date_end %}
+                              <div class="bl-countdown">
+                                <div class="text-discont-countdown">{{ text_discont_countdown }}</div>
+                                <div id="countdown{{ product_id }}" class="box-timer"></div>
+                                <script type="text/javascript">
+                                  // Передаем дату окончания и ID элемента
+                                  initializeCountdown("{{ date_end|date('Y-m-d H:i:s') }}", "countdown{{ product_id }}");
+                                </script>
+                              </div>
+                            {% endif %}
+                          {% endif %}
+
+                          <div class="btn-card">
+                            <div class="price-box-{{ product_id }} bl-price-catalog">
+                              {% if not special %}
+                                <div class="box-regular">
+                                  <div class="regular-price"><span class="price">{{ price }}</span></div>
+                                </div>
+                              {% else %}
+                                <div class="box-special">
+                                  <div class="old-price"><span class="price">{{ price }}</span></div>
+                                  <div class="special-price"><span class="price">{{ special }}</span></div>
+                                </div>
+                              {% endif %}
+
+                              <div class="stock-status">{% if on_stock %}<span
+                                  class="in-stock">В наявності</span>{% else %}
+                                <span class="out-stock">Під замовлення</span>{% endif %}</span>
+                              </div>
+                            </div>
+
+                            {% if config_is_catalog < 1 %}
+                              <div class="form-group product-cart-block">
+                                <div id="prod-bl-qty-{{ product_id }}" class="group-quantity">
+                                  <input id="key-{{ product_id }}" type="hidden" name="product_id"
+                                         value="{{ product_id }}"/>
+
+                                  {% if quantity == 0 %}
+                                    <div class="bl-add-in-cart cart-btns-{{ uniq_id }}" data-key="{{ product_id }}" data-cart="0" {% if is_buy %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                      {% if not on_stock %}
+                                        <div class="notify" data-product="{{ product_id }}" data-opt="{{ uniq_id }}" onclick="notify.open(this)">Повідомити про наявність</div>
+                                      {% else %}
+                                        <div class="minus-add"></div>
+                                        <div class="plus-add-text">Додати до кошика</div>
+                                        <div class="plus-add {% if not on_stock %}not-available{% endif %}"></div>
+                                      {% endif %}
+                                    </div>
+                                  {% else %}
+                                    <div class="bl-add-in-cart cart-btns-{{ uniq_id }}" data-key="{{ product_id }}" data-cart="{{ cart_id }}">
+                                      <div class="minus {% if quantity == 0 %}not-available{% endif %}"
+                                           data-key="{{ product_id }}"
+                                           data-cart="{{ cart_id }}"
+                                           {% if quantity > 0 %}onclick="custom_cart.handleClickMinus(this)"{% endif %}>-
+                                      </div>
+                                      <input id="qty-{{ product_id }}-{{ cart_id }}" data-key="{{ product_id }}"
+                                             data-cart="{{ cart_id }}"
+                                             type="number"
+                                             name="quantity" value="{{ quantity }}" size="3"
+                                             {% if not on_stock %}disabled="disabled"{% endif %}
+                                             class="quantity-input{% if not on_stock %} not-available{% endif %}"/>
+
+                                      <div class="plus {% if not is_buy %}not-available{% endif %}"
+                                           data-key="{{ product_id }}"
+                                           data-cart="{{ cart_id }}"
+                                           {% if is_buy %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                      </div>
+                                    </div>
+                                  {% endif %}
+                                </div>
+
+                                {% if module_custom_fastorder > 0 %}
+                                  <div class="button-fast-order visible-lg" onclick='custom_cart.fastorder()'>{{ button_fastorder }}</div>
+                                {% endif %}
+
+                              </div>
+                            {% endif %}
+
+                          </div>
+
+                        {% endif %}
+                        <div data-options-id="{{ product_id }}" class="options-box">
+                          {% if options %}
+                            <div class="title-stock-warehouses">
+                              {{ text_option }}
+                              <div class="tooltip-container">
+                                <span class="tooltip-trigger"><img width="20px" height="20px" src="/image/info.svg" alt="info"/></span>
+                                <div class="tooltip">
+                                  <p class="bl-bold">Наявність на складі</p>
+                                  <div class="option-qty">
+                                    <div class="stock-i-row"><span class="stock-more"></span> - достатньо</div>
+                                    <div class="stock-i-row"><span class="stock-end"></span> - закінчується</div>
+                                    <div class="stock-i-row"><span class="stock-small"></span> - мало</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                              <div class="form-group required option-block" data-id="{{ product_id }}">
+                                {% for option in options %}
+                                  <div id="input-option{{ option.option_value_id }}"
+                                       class="option-item{% if option.qty <= 0 %} not-available{% endif %}">
+                                    <div class="radio">
+
+                                      <label class="custom-radio">
+                                        <input
+                                          type="radio"
+                                          name="option[{{ product_id }}]"
+                                          {% if option.selected %} checked="checked"{% endif %}
+                                          data-product-option="{{ option.product_option_id }}"
+                                          data-product="{{ product_id }}"
+                                          value="{{ option.product_option_id }}-{{ option.product_option_value_id }}"/>
+                                        <span class="radio-control{% if option.selected %} check{% endif %}">
+
+                                          {% if option.percent > 0 %}<span class="opt-discont">%</span>{% endif %}
+
+                                          {{ option.name }}
+
+                                          <div class="option-qty">
+                                            {% if option.qty >= 20 %}
+                                              <span class="stock-more"></span>
+                                            {% elseif option.qty < 20 and option.qty >= 10 %}
+                                              <span class="stock-end"></span>
+                                            {% elseif option.qty < 10 and option.qty > 0 %}
+                                              <span class="stock-small"></span>
+                                            {% endif %}
+                                          </div>
+
+                                        </span>
+                                      </label>
+
+                                    </div>
+                                  </div>
+                                {% endfor %}
+                              </div>
+                          {% endif %}
+                        </div>
+                      </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bl-detail-more bl-login-bg bl-stick">
+
+                    <div class="top-right-detail-product">
+                      {% if review_status %}
+                        <div class="ratings">
+                          <div class="rating-box">
+                            {% if product.rating > 0 %}
+                              {% for i in 1..5 %}
+                                {% if i <= rating %}
+                                  <div class="active"></div>
+                                {% else %}
+                                  <div class="deactive"></div>
+                                {% endif %}
+                              {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                      {% endif %}
+
+                      <div class="bl-share-right">
+                        <img width="25px" height="25px" alt="share" src="/image/share.svg" onclick="custom_share.open()">
+
+                        <div
+                        class="wishlist btn-wishlist-{{ product_id }}{% if in_wishlist %} is-check{% endif %}"
+                        onclick="toggleWishlist('{{ product_id }}', '{{ in_wishlist }}')"></div>
+
+                      </div>
+                    </div>
+
+                    <div class="stocks-{{ product_id }}">
+                        {{ stock }}
+                    </div>
+
+                    <div class="p-d-block">
+                      <div class="custom-block-product">
+                        <div class="image">
+                          <img src="/image/payment.svg" width="31" height="25" alt="Оплата">
+                        </div>
+                        <div class="text">
+                          <div class="custom-block-title bl-bold">Оплата</div>
+                          <div class="custom-block-desc">
+                            <div>-Оплата на розрахунковий рахунок</div>
+                            <div class="custom-block-more">{{ text_more_delivery_payment }}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="custom-block-product">
+                        <div class="image">
+                          <img src="/image/delivery.svg" width="34" height="24" alt="Доставка">
+                        </div>
+                        <div class="text">
+                          <div class="custom-block-title bl-bold">Доставка</div>
+                          <div class="custom-block-desc">
+                            <div>- Ми здійснюємо доставку по Києву та найближчих населених пунктах</div>
+                            <div>- Доставка по Україні здійснюється «Новою Поштою»</div>
+                            <div class="custom-block-more">{{ text_more_delivery_payment }}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="p-review-block">
+                      <h2 class="title-stock-warehouses">Вам є що розповісти про товар?</h2>
+                      {% if review_guest %}
+                        <span class="btn_review" onclick="custom_review.add({{ product_id }})">Залишити відгук</span>
+                      {% else %}
+                        <span class="btn_review" onclick="ocajaxlogin.appendLoginForm();">Для написання свого коментаря увійдіть в особистий кабінет</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bl-prod-content">
+
+                <h2 class="bl-bold">{{ tab_description }}</h2>
+
+                <div class="col-lg-12 description-product">
+                  {% if description is not empty %}
+                    {{ description }}
+                  {% else %}
+                    {{ text_empty_description }}
+                  {% endif %}
+                </div>
+              </div>
+
+              {% if composition is not empty %}
+                <div class="bl-prod-content">
+                  <h2 class="bl-bold">Склад</h2>
+                  <div class="col-lg-12 composition-product">
+                    {{ composition }}
+                  </div>
+                </div>
+              {% endif %}
+
+              {% if calc is not empty %}
+                {{ calc_template }}
+              {% endif %}
+
+              {% if review_status %}
+                {% if count_reviews > 0 %}
+                  <div class="bl-prod-content">
+                    <h2 class="bl-bold">{{ tab_review }}</h2>
+
+                    <div class="row">
+                      <div class="col-lg-8">
+                        <div id="review"></div>
+                      </div>
+                      <div class="col-lg-4 bl-stick">
+                        <div class="bl-send-review bl-login-bg">
+                          <h2 class="title-stock-warehouses">Вам є що розповісти про товар?</h2>
+                          {% if review_guest %}
+                            <span class="btn_review" onclick="custom_review.add({{ product_id }})">Залишити відгук</span>
+                          {% else %}
+                            <span class="btn_review" onclick="ocajaxlogin.appendLoginForm();">Для написання свого коментаря увійдіть в особистий кабінет</span>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              {% endif %}
+
+              <div id="top-buy-product" class="fluid-width {% if is_mobile %}is-mobile{% endif %}">
+                <div class="bl-top-buy-product container">
+
+{#                  <div class="text-21 bl-bold hidden-xs">{{ heading_title }}</div>#}
+
+                  <div class="contex-top-buy-product">
+                    <div class="bl-left-top-buy-product">
+                      <div data-options-id="{{ product_id }}" class="options-box">
+                        <div class="bl-opts-item">
+                          {% if options %}
+                            <div class="title-stock-warehouses">
+                              {{ text_option }}
+                              <div class="tooltip-container">
+                                <span class="tooltip-trigger"><img width="20px" height="20px" src="/image/info.svg" alt="info"/></span>
+                                <div class="tooltip">
+                                  <p class="bl-bold">Наявність на складі</p>
+                                  <div class="option-qty">
+                                    <div class="stock-i-row"><span class="stock-more"></span> - достатньо</div>
+                                    <div class="stock-i-row"><span class="stock-end"></span> - закінчується</div>
+                                    <div class="stock-i-row"><span class="stock-small"></span> - мало</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                              <div class="required option-block" data-id="{{ product_id }}">
+                                {% for option in options %}
+
+                                  <div id="input-option{{ option.option_value_id }}"
+                                       class="option-item{% if option.qty <= 0 %} not-available{% endif %}">
+                                    <div class="radio">
+
+                                      <label class="custom-radio">
+                                        <input
+                                          type="radio"
+                                          name="option[{{ product_id }}]"
+                                          {% if option.selected %}checked="checked"{% endif %}
+                                          data-product-option="{{ option.product_option_id }}"
+                                          data-product="{{ product_id }}"
+                                          value="{{ option.product_option_id }}-{{ option.product_option_value_id }}"/>
+                                        <span class="radio-control{% if option.selected %} check{% endif %}">
+
+                                          {% if option.percent > 0 %}<span class="opt-discont">%</span>{% endif %}
+
+                                          {{ option.name }}
+
+                                          <div class="option-qty">
+                                            {% if option.qty >= 20 %}
+                                              <span class="stock-more"></span>
+                                            {% elseif option.qty < 20 and option.qty >= 10 %}
+                                              <span class="stock-end"></span>
+                                            {% elseif option.qty < 10 and option.qty > 0 %}
+                                              <span class="stock-small"></span>
+                                            {% endif %}
+                                          </div>
+
+                                        </span>
+                                      </label>
+                                    </div>
+
+                                  </div>
+                                {% endfor %}
+                              </div>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="bl-right-top-buy-product">
+                      {% if price %}
+                        {% if special %}
+                          {% if date_end %}
+                            <div class="bl-countdown">
+                              <div class="text-discont-countdown">{{ text_discont_countdown }}</div>
+                              <div id="countdown{{ product_id }}" class="box-timer"></div>
+                              <script type="text/javascript">
+                                // Передаем дату окончания и ID элемента
+                                initializeCountdown("{{ date_end|date('Y-m-d H:i:s') }}", "countdown{{ product_id }}");
+                              </script>
+                            </div>
+                          {% endif %}
+                        {% endif %}
+
+                        <div class="btn-card">
+                          <div class="price-box-{{ product_id }} bl-price-catalog">
+                            {% if not special %}
+                              <div class="box-regular">
+                                <div class="regular-price"><span class="price">{{ price }}</span></div>
+                              </div>
+                            {% else %}
+                              <div class="box-special">
+                                <div class="old-price"><span class="price">{{ price }}</span></div>
+                                <div class="special-price"><span class="price">{{ special }}</span></div>
+                              </div>
+                            {% endif %}
+                          </div>
+                        </div>
+
+                      {% endif %}
+
+                      {% if config_is_catalog < 1 %}
+                        <div class="product-cart-block">
+                          <div id="prod-bl-qty-{{ product_id }}" class="group-quantity">
+                            <input id="key-{{ product_id }}" type="hidden" name="product_id"
+                                   value="{{ product_id }}"/>
+
+                            {% if quantity == 0 %}
+                              <div class="bl-add-in-cart cart-btns-{{ uniq_id }}" data-key="{{ product_id }}" data-cart="0" {% if is_buy %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                {% if not on_stock %}
+                                  <div class="notify" data-product="{{ product_id }}" data-opt="{{ uniq_id }}" onclick="notify.open(this)">Повідомити про наявність</div>
+                                {% else %}
+                                  <div class="minus-add"></div>
+                                  <div class="plus-add-text">Додати до кошика</div>
+                                  <div class="plus-add {% if not on_stock %}not-available{% endif %}"></div>
+                                {% endif %}
+                              </div>
+                            {% else %}
+                              <div class="bl-add-in-cart cart-btns-{{ uniq_id }}" data-key="{{ product_id }}" data-cart="{{ cart_id }}">
+                                <div class="minus {% if quantity == 0 %}not-available{% endif %}"
+                                     data-key="{{ product_id }}"
+                                     data-cart="{{ cart_id }}"
+                                     {% if quantity > 0 %}onclick="custom_cart.handleClickMinus(this)"{% endif %}>-
+                                </div>
+                                <input id="qty-{{ product_id }}-{{ cart_id }}" data-key="{{ product_id }}"
+                                       data-cart="{{ cart_id }}"
+                                       type="number"
+                                       name="quantity" value="{{ quantity }}"
+                                       {% if not on_stock %}disabled="disabled"{% endif %}
+                                       class="quantity-input{% if not on_stock %} not-available{% endif %}"/>
+
+                                <div class="plus {% if not is_buy %}not-available{% endif %}"
+                                     data-key="{{ product_id }}"
+                                     data-cart="{{ cart_id }}"
+                                     {% if is_buy %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                </div>
+                              </div>
+                            {% endif %}
+                          </div>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                </div>
+                <script>
+                  $("#top-buy-product").hide();
+                  var is_mobile = '{{ is_mobile }}';
+
+                  $(function () {
+                    $(window).scroll(function () {
+                      var $topBuy = $('#top-buy-product');
+                      var scrollP = $(window).scrollTop();
+                      var $detailInfo = $('.bl-detail-info');
+
+                      if ($detailInfo.length) {
+                        var headerHeight = (window.headerFunctions && window.headerFunctions.headerHeight) ? window.headerFunctions.headerHeight : 0;
+                        var triggerOffset = $detailInfo.offset().top + $detailInfo.outerHeight() - headerHeight;
+
+                        if (scrollP > triggerOffset) {
+                          $topBuy.fadeIn();
+                        } else {
+                          $topBuy.fadeOut();
+                        }
+                      }
+                    });
+                  });
+                </script>
+              </div>
+
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+  {% if products %}
+    <div class="row">
+      <div class="related-products col-lg-12" style="position: relative; z-index: 10">
+        <div class="module-title">
+          <h2>{{ text_related }}</h2>
+          {% if module_description %}
+            <div class="module-description">
+              <p>{{ module_description }}</p>
+            </div>
+          {% endif %}
+          <div class="navigation-slick-block">
+            <div class="slick_navigation">
+              <div class="slick_arrow" tabindex="0" role="button" aria-label="Previous slide">
+                <i class="slick-arrow-left" aria-hidden="true"></i>
+              </div>
+              <div class="slick_arrow" tabindex="0" role="button" aria-label="Next slide">
+                <i class="slick-arrow-right" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slick-container">
+          <div class="related-slick">
+            {% for product in products %}
+              <div class="product-slider-item grid-style">
+                <div class="product-thumb transition">
+
+                  <div class="item">
+
+                    <div class="label-product label-sale-{{ product.product_id }}">
+                      {% if product.special %}
+                        <div class="bg-special">
+                          <span>{{ '-' ~ product.rate_special ~ '%' ~ text_label_sale }}</span>
+                        </div>
+                      {% endif %}
+                    </div>
+
+                    <div class="box-label">
+                      <div class="statuses-product statuses-{{ product.product_id }}">
+                        {% for status in product.statuses %}
+                          <div class="status-product label_{{ status.code }}"
+                               style="background-color: {{ status.color }}"><span>{{ status.name }}</span></div>
+                        {% endfor %}
+                      </div>
+                    </div>
+
+                    <div class="image images-container">
+                      <a href="{{ product.href }}" class="product-image">
+                        <div id="product-{{ product.product_id }}" class="image">
+                          {% if product.images|length > 0 %}
+                            <div class="slider-for-{{ product.product_id }} slider">
+                              {% for i, image in product.images %}
+                                <div class="item product-image-options-{{ image.product_option_value_id }}"
+                                     data-pos="{{ i }}">
+                                  <img class="img-responsive"
+                                       loading="lazy"
+                                       height="200px"
+                                       width="200px"
+                                       src="{{ image.thumb }}"
+                                       title="{{ heading_title }}"
+                                       alt="{{ heading_title }}"
+                                      {% if loop.first and loop.parent.loop.first %}
+                                        fetchpriority="high"
+                                        decoding="async"
+                                      {% else %}
+                                        fetchpriority="auto"
+                                        loading="lazy"
+                                        decoding="async"
+                                      {% endif %}
+                                  />
+                                </div>
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                        </div>
+                      </a>
+
+                      <div class="action-links">
+                        <div class="inner">
+                          <div
+                            class="wishlist btn-wishlist-{{ product.product_id }}{% if product.in_wishlist %} is-check{% endif %}"
+                            onclick="toggleWishlist('{{ product.product_id }}', '{{ product.in_wishlist }}')"></div>
+                          </div>
+                          <div class="btn-quickview" title="{{ button_quickview }}"
+                               onclick="ocquickview.open('{{ product.href }}')">
+                            <span>{{ button_quickview }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- caption -->
+                  <div class="caption">
+                    <div class="ratings">
+                      <div class="rating-box">
+                        {% for i in 1..5 %}
+                          {% if i <= product.rating %}
+                            <div class="active"></div>
+                          {% else %}
+                            <div class="deactive"></div>
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                      <h4 class="product-name"><a href="{{ product.href }}">{{ product.name }}</a></h4>
+                    </div>
+
+                    <div data-product-id="{{ product_id }}">
+                      {% if product.price %}
+                        <div class="btn-card">
+                          <div class="price-box-{{ product.product_id }} bl-price-catalog">
+                            {% if not product.special %}
+                              <div class="box-regular">
+                                <div class="regular-price"><span class="price">{{ product.price }}</span></div>
+                              </div>
+                            {% else %}
+                              <div class="box-special">
+                                <div class="old-price"><span class="price">{{ product.price }}</span></div>
+                                <div class="special-price"><span class="price">{{ product.special }}</span></div>
+                              </div>
+                            {% endif %}
+                            <div class="stock-status">{% if product.on_stock %}<span
+                                class="in-stock">В наявності</span>{% else %}<span
+                                class="out-stock">Під замовлення</span>{% endif %}</span>
+                            </div>
+                          </div>
+                          <div class="visible-xs">
+                            <a href="{{ product.href }}">
+                              <div class="plus btn"></div>
+                            </a>
+                          </div>
+                          <div class="product-cart-block hidden-xs">
+                            <div id="prod-bl-qty-{{ product.product_id }}" class="group-quantity">
+                              <input id="key-{{ product.product_id }}" type="hidden" name="product_id"
+                                     value="{{ product.product_id }}"/>
+
+                              {% if product.quantity == 0 %}
+                                <div class="bl-add-in-cart cart-btns-{{ product.uniq_id }}" data-key="{{ product.product_id }}" data-cart="0" {% if product.is_buy %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                  {% if not product.on_stock %}
+                                    <div class="notify" data-product="{{ product.product_id }}" data-opt="{{ product.uniq_id }}" onclick="notify.open(this)">Повідомити про наявність</div>
+                                  {% else %}
+                                    <div class="minus-add"></div>
+                                    <div class="plus-add-text">Додати до кошика</div>
+                                    <div class="plus-add {% if not product.on_stock %}not-available{% endif %}"></div>
+                                  {% endif %}
+                                </div>
+                              {% else %}
+                                <div class="bl-add-in-cart cart-btns-{{ product.uniq_id }}" data-key="{{ product.product_id }}" data-cart="{{ product.cart_id }}">
+                                  <div class="minus {% if product.quantity == 0 %} not-available{% endif %}"
+                                       data-key="{{ product.product_id }}"
+                                       data-cart="{{ product.cart_id }}"
+                                       {% if product.quantity > 0 %}onclick="custom_cart.handleClickMinus(this)"{% endif %}>
+                                    -
+                                  </div>
+                                  <input id="qty-{{ product.product_id }}-{{ product.cart_id }}"
+                                         data-key="{{ product.product_id }}"
+                                         data-cart="{{ product.cart_id }}"
+                                         type="number"
+                                         name="quantity" value="{{ product.quantity }}" size="3"
+                                         {% if not product.on_stock %}disabled="disabled"{% endif %}
+                                         class="quantity-input{% if not product.on_stock %} not-available{% endif %}"/>
+
+                                  <div class="plus {% if not product.is_buy %} not-available{% endif %}"
+                                       data-key="{{ product.product_id }}"
+                                       data-cart="{{ product.cart_id }}"
+                                       {% if product.is_buy %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                  </div>
+                                </div>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                      {% endif %}
+
+                      <div data-options-id="{{ product_id }}" class="options-box hidden-xs">
+                        {% if product.options %}
+                          <div class="title-stock-warehouses">
+                            {{ text_option }}
+                            <div class="tooltip-container">
+                              <span class="tooltip-trigger"><img width="20px" height="20px" src="/image/info.svg" width="" alt="info"/></span>
+                              <div class="tooltip">
+                                <p class="bl-bold">Наявність на складі</p>
+                                <div class="option-qty">
+                                  <div class="stock-i-row"><span class="stock-more"></span> - достатньо</div>
+                                  <div class="stock-i-row"><span class="stock-end"></span> - закінчується</div>
+                                  <div class="stock-i-row"><span class="stock-small"></span> - мало</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                            <div class="option-block required" data-id="{{ product.product_id }}">
+                              {% for option in product.options %}
+                                <p>{{ option.qty }} - count</p>
+                                <div id="input-option{{ option.option_value_id }}"
+                                     class="option-item{% if option.qty <= 0 %} not-available{% endif %}">
+                                  <div class="radio">
+                                    <label class="custom-radio">
+                                      <input
+                                        type="radio"
+                                        name="option[{{ product.product_id }}]"
+                                        {% if option.selected %} checked="checked"{% endif %}
+                                        data-product-option="{{ option.product_option_id }}"
+                                        data-product="{{ product.product_id }}"
+                                        data-cart="{{ product.cart_id }}"
+                                        value="{{ option.product_option_id }}-{{ option.product_option_value_id }}"/>
+                                      <span
+                                        class="radio-control{% if option.selected %} check{% endif %}">{{ option.name }}</span>
+                                    </label>
+                                  </div>
+                                </div>
+                              {% endfor %}
+                            </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        <script>
+          $(document).ready(function () {
+
+            var relatedNavSlider = $('.related-slick');
+
+            // Функція для визначення кількості слайдів, що показуються в залежності від ширини вікна
+            function getSlidesToShow() {
+              var windowWidth = $(window).width();
+              if (windowWidth < 375) {
+                return 2;
+              } else if (windowWidth < 480) {
+                return 2;
+              } else if (windowWidth < 768) {
+                return 3;
+              } else if (windowWidth < 992) {
+                return 5;
+              } else if (windowWidth < 1200) {
+                return 5;
+              } else {
+                return 5; // значення за замовчуванням
+              }
+            }
+
+            var itemsToShow = getSlidesToShow();
+
+            relatedNavSlider.on('init', function (slick) {
+              relatedNavSlider.css('opacity', 1);
+            });
+
+            relatedNavSlider.not('.slick-initialized').slick({
+              slidesToShow: itemsToShow,
+              slidesToScroll: itemsToShow,
+              initialSlide: 0,
+              dots: false,
+              focusOnSelect: false,
+              vertical: false,
+              arrows: false,
+              slide: "div",
+              infinite: false
+            });
+
+            // Якщо кількість елементів менша або дорівнює кількості показуваних слайдів, приховуємо навігацію
+            var totalItems2 = relatedNavSlider.slick('getSlick').slideCount;
+            if (totalItems2 <= itemsToShow) {
+              $('.related-products .navigation-slick-block').hide();
+            } else {
+              $('.related-products .navigation-slick-block').show();
+            }
+
+            // Обробник для кнопки Prev
+            $('.related-products .slick-arrow-left').on('click', function () {
+              relatedNavSlider.slick('slickPrev');
+            });
+
+            // Обробник для кнопки Next
+            $('.related-products .slick-arrow-right').on('click', function () {
+              relatedNavSlider.slick('slickNext');
+            });
+
+          });
+        </script>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+</div>
+
+{{ content_bottom }}
+
+{{ footer }}
+
+<script src="/catalog/view/javascript/jquery/magnific/jquery.magnific-popup.min.js"></script>
+<link href="/catalog/view/javascript/jquery/magnific/magnific-popup.css" rel="stylesheet" type="text/css"/>
+
+<script type="text/javascript">
+
+  var product_id = '{{ product_id }}';
+  var contextSelector = '#product-product #product-' + product_id;
+
+  $(document).ready(function () {
+
+    var mainSlider = $(contextSelector + " .slider-for-" + product_id);
+
+    mainSlider.css('opacity', 0);
+
+    mainSlider.on('init', function (slick) {
+      mainSlider.css('opacity', 1);
+    });
+
+    var initialSlideIndex = 0; // значення за замовчуванням
+    var $activeSlide = $(contextSelector + " .slider-for-" + product_id + " .select");
+    if ($activeSlide.length) {
+      initialSlideIndex = $activeSlide.data('pos') || 0;
+    }
+
+    var is_mobile = '{{ is_mobile }}' == '1';
+
+    mainSlider.not('.slick-initialized').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      speed: 500,
+      arrows: true,
+      dots: is_mobile,
+      fade: true,
+      centerMode: true,
+      asNavFor: contextSelector + " .slider-nav-" + product_id,
+      initialSlide: initialSlideIndex, // встановлюємо початковий слайд
+      prevArrow: '<button type="button" class="slick-prev slick_arrow"><i class="slick-arrow-left"></i></button>',
+      nextArrow: '<button type="button" class="slick-next slick_arrow"><i class="slick-arrow-right"></i></button>'
+    });
+
+    mainSlider.on('afterChange', function(event, slick, currentSlide) {
+      var $slide = $(slick.$slides[currentSlide]);
+      var className = $slide.attr('class');
+      var match = className.match(/product-image-options-([0-9-]+)/);
+
+      if (match && match[1]) {
+        var optionValue = match[1];
+        var $input = $('input[name="option[' + product_id + ']"][value="' + optionValue + '"]');
+        if ($input.length && !$input.prop('checked')) {
+          $input.closest('.options-box').first().trigger('click');
+          $input.first().trigger('click');
+        }
+      }
+    });
+
+    var mainNavSlider = $(contextSelector + " .slider-nav-" + product_id);
+
+    mainNavSlider.css('opacity', 0);
+
+    mainNavSlider.on('init', function (slick) {
+      mainNavSlider.css('opacity', 1);
+    });
+
+    mainNavSlider.not('.slick-initialized').slick({
+      slidesToShow: 3,
+      slidesToScroll: 1,
+      speed: 500,
+      asNavFor: contextSelector + " .slider-for-" + product_id,
+      arrows: true,
+      dots: false,
+      centerMode: false,
+      focusOnSelect: true,
+      // slide: "div",
+      initialSlide: initialSlideIndex, // встановлюємо початковий слайд
+      prevArrow: '<button type="button" class="slick-prev slick_arrow"><i class="slick-arrow-left"></i></button>',
+      nextArrow: '<button type="button" class="slick-next slick_arrow"><i class="slick-arrow-right"></i></button>'
+    });
+
+    $(contextSelector + ' .slider-for-' + product_id).magnificPopup({
+      type: 'image',
+      delegate: 'a.main-image-popup',
+      gallery: {
+        enabled: true
+      }
+    });
+
+    // Функція для завантаження відгуків
+    function loadReviews(page) {
+      $('#review').load('index.php?route=product/product/review&product_id={{ product_id }}&page=' + page);
+    }
+
+    // Початкове завантаження відгуків
+    loadReviews(1);
+
+    // Обробка кліків по пагінації
+    $(document).on('click', '#review .bl-pagination a', function (e) {
+      e.preventDefault();
+      var href = $(this).attr('href');
+
+      // Якщо параметр page відсутній, це перша сторінка (page=1)
+      var page = 1;
+      var pageMatch = href.match(/page=(\d+)/);
+      if (pageMatch) {
+        page = pageMatch[1];
+      }
+
+      loadReviews(page);
+    });
+
+  });
+
+</script>
+
+
+{{ schema_product }}
+{{ ecommerce_view_item }}

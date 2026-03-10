@@ -1,0 +1,11 @@
+
+{% if (ocsociallogin_status and status) %}
+  {% if (ocsociallogin_setting_google_status and ('google' in button_layout_setting['choose_login'])) %}
+    {% if (title_status) %}
+      <div class="box-heading"><span onclick="ocajaxlogin.loginGoogle('index.php?route=extension/module/ocsociallogin/loginProcess&loginvia=google')">{{ title }}</span>
+      </div>
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+

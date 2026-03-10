@@ -1,0 +1,29 @@
+{% if send_ga4 %}
+  {% for order in orders %}
+    <script>
+      // Отправляем событие purchase для каждого заказа
+      sendGA4Event("purchase", {
+        transaction_id: "{{ order.order_id }}",
+        affiliation: "{{ order.site|default('site') }}",
+        value: {{ order.total_value }},
+        tax: {{ order.tax_value|default(0) }},
+        shipping: {{ order.shipping_value|default(0) }},
+        currency: "{{ order.currency|default('UAH') }}",
+        coupon: "{{ order.coupon|default('')|escape('js') }}",
+        items: [
+          {% for product in order.products %}
+          {
+            item_name: "{{ product.name|escape('js') }}",
+            item_id: "{{ product.product_id }}",
+            price: {{ product.price }},
+            item_brand: "{{ product.manufacturer|default('not set')|escape('js') }}",
+            item_category: "{{ product.category|default('not set') }}",
+            quantity: {{ product.quantity }}
+          }{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ]
+      });
+    </script>
+
+  {% endfor %}
+{% endif %}

@@ -1,0 +1,12 @@
+{% if modules or use_layered %}
+<div id="column-left" class="col-md-3 col-sm-12 bl-bg-detta">
+  <div class="col-order-inner">
+  {% if use_layered %}
+    {{ layered_section }}
+  {% endif %}
+  {% for module in modules %}
+  {{ module }}
+  {% endfor %}
+  </div>
+</div>
+{% endif %}

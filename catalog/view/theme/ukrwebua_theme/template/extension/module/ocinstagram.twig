@@ -1,0 +1,127 @@
+<div id="blog_instagram" class="menu-recent">
+    <div>
+      <div class="blog-title module-title">
+        <div class="title-text">
+          <div class="elementor-icon-box-icon">
+          <span class="elementor-icon elementor-animation">
+            <i aria-hidden="true" class="fab fa-instagram"></i>
+          </span>
+          </div>
+          <h2 class="bl-bold">{{ text_heading_title }}</h2>
+        </div>
+
+        {% if module_description %}
+          <div class="module-description">
+            <p>{{ module_description }}</p>
+          </div>
+        {% endif %}
+
+        <div class="navigation-slick-block">
+          <div class="slick_navigation">
+            <div class="slick_arrow slick-arrow-left" tabindex="0" role="button" aria-label="Previous slide">
+              <img alt="next" src="/image/chevron-left.svg">
+            </div>
+            <div class="slick_arrow slick-arrow-right" tabindex="0" role="button" aria-label="Next slide">
+              <img alt="prev" src="/image/chevron-right.svg">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-style">
+        {% if instagrams %}
+          <div class="articles-instagram slider">
+            {% for instagram in instagrams %}
+              <div class="articles-blog">
+                <div class="articles-image">
+                  <a target="_blank" href="{{ instagram.link }}"style="display: block;" title="{{ instagram.caption }}">
+                    <img width="{{ instagram.width }}" height="{{ instagram.height }}" src="{{ instagram.image }}" alt="{{ instagram.title }}" title="{{ instagram.title }}" class="img-responsive"/>
+                  </a>
+                  <p class="date-time-post">
+                    <span class="year-post">{{ instagram.date_added_y }}</span>
+                    <span class="month-post">{{ instagram.date_added_m }}</span>
+                    <span class="date-post">{{ instagram.date_added_d }}</span>
+                  </p>
+                </div>
+
+                <div class="aritcles-content">
+                  <div class="content-inner">
+                    {% if instagram.caption %}
+                      <div class="articles-intro">{{ instagram.title }}</div>
+                      <div class="read-more">{{ button_read_more }}</div>
+                    {% endif %}
+
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p>{{ text_empty }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <script>
+    $(document).ready(function () {
+      var windowWidth = $(window).width();
+
+      setTimeout(function () {
+
+        var bloghomeNavSlider = $(".articles-instagram");
+
+        bloghomeNavSlider.on('init', function (slick) {
+          bloghomeNavSlider.css('opacity', 1);
+        });
+
+        // Функція для визначення кількості слайдів, що показуються в залежності від ширини вікна
+        function getSlidesToShow() {
+
+          if (windowWidth < 375) {
+            return 2;
+          } else if (windowWidth < 480) {
+            return 2;
+          } else if (windowWidth < 768) {
+            return 3;
+          } else if (windowWidth < 992) {
+            return 2;
+          } else if (windowWidth < 1200) {
+            return 4;
+          } else {
+            return 4; // значення за замовчуванням
+          }
+        }
+
+        var itemsToShow = getSlidesToShow();
+
+        bloghomeNavSlider.not('.slick-initialized').slick({
+          slidesToShow: itemsToShow,
+          slidesToScroll: itemsToShow,
+          speed: 500,
+          arrows: false,
+          slide: "div",
+          fade: false,
+          dots: false
+        });
+
+        // Якщо кількість елементів менша або дорівнює кількості показуваних слайдів, приховуємо навігацію
+        var totalItems2 = bloghomeNavSlider.slick('getSlick').slideCount;
+        if (totalItems2 <= itemsToShow) {
+          $('#blog_instagram .navigation-slick-block').hide();
+        } else {
+          $('#blog_instagram .navigation-slick-block').show();
+        }
+
+        // Обробник для кнопки Prev
+        $('#blog_instagram .slick-arrow-left').on('click', function () {
+          bloghomeNavSlider.slick('slickPrev');
+        });
+
+        // Обробник для кнопки Next
+        $('#blog_instagram .slick-arrow-right').on('click', function () {
+          bloghomeNavSlider.slick('slickNext');
+        });
+
+      }, 200);
+    });
+  </script>
+

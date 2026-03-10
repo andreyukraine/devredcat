@@ -1,0 +1,317 @@
+<div class="bl-prod-content">
+  <h2 class="bl-bold">Калькулятор годування</h2>
+  <div class="row">
+    <div class="col-lg-12">
+      {% if calc is not empty %}
+        <div class="calculator row">
+
+          <div class="col-md-4">
+            <img class="img-responsive" src="/image/food_calc.png">
+          </div>
+
+          <div class="col-md-4 bl-ranges">
+            <span class="title-stock-warehouses">Дізнайтесь ідеальний розмір порції корму:</span>
+
+            <div class="form-group">
+              <div class="row-range">
+                <div class="bl-range">
+                  <span class="text-16">Вкажіть вік вихованця: </span>
+                  <div class="range-container">
+                    <input type="range" id="age" min="0" max="3" step="1" value="1">
+                    <div class="range-fill"></div>
+                  </div>
+                </div>
+                <div class="bl-range-value">
+                  <span id="age-value">1 рік</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="row-range">
+                <div class="bl-range">
+                  <span class="text-16">Вкажіть вагу вихованця:</span>
+                  <div class="range-container">
+                    <input type="range" id="weight" min="1" max="15" step="1" value="7">
+                    <div class="range-fill"></div>
+                  </div>
+                </div>
+                <div class="bl-range-value">
+                  <span id="weight-value">7 кг</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <span class="text-16">Виберіть розмір упаковки:</span>
+              <div class="pack-buttons">
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="calculator-result">
+              <span class="text-21 bl-bold">Результат розрахунків:</span>
+              <div class="bl-result-calc">
+                <div class="text-18">
+                  <div>Добова кількість*:</div>
+                  <div><span id="dailyAmount" class="text-27 bl-bold">85</span><span
+                      class="bl-bold">г</span></div>
+                </div>
+                <div class="text-18">
+                  <div>Упаковки вистачить:</div>
+                  <div><span id="daysCount" class="text-27 bl-bold">8</span><span
+                      class="bl-bold">ДНІВ</span></div>
+                </div>
+              </div>
+              <span class="description_calculation_result">{{ text_description_calculation_result }}</span>
+            </div>
+          </div>
+
+        </div>
+
+        <script>
+
+          const packButtonsContainer = document.querySelector('.pack-buttons');
+
+          // Динамічні дані
+          const calculatorData = JSON.parse('{{ calc }}');
+          //console.log('Parsed calculatorData:', calculatorData);
+
+          if (!calculatorData || !calculatorData.length) {
+            console.error('calculatorData is empty or invalid');
+          }
+
+          const productData = calculatorData[0];
+          //console.log('Product data:', productData);
+
+          // Поточна обрана упаковка
+          let selectedPack = null;
+
+          // Заповнюємо кнопки для вибору упаковки
+          if (productData.packs && Array.isArray(productData.packs)) {
+            productData.packs.sort((a, b) => a - b).forEach((pack, index) => {
+              const button = document.createElement('button');
+              button.textContent = `${pack} кг`;
+              button.dataset.value = pack;
+
+              // Перша кнопка активна за замовчуванням
+              if (index === 0) {
+                button.classList.add('active');
+                selectedPack = pack;
+              }
+
+              button.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Видаляємо активний клас у всіх кнопок
+                document.querySelectorAll('.pack-buttons button').forEach(btn => {
+                  btn.classList.remove('active');
+                });
+                // Додаємо активний клас до поточної кнопки
+                button.classList.add('active');
+                selectedPack = pack;
+                calculate();
+              });
+
+              packButtonsContainer.appendChild(button);
+            });
+          } else {
+            console.error('productData.packs is missing or invalid');
+          }
+
+          document.addEventListener('DOMContentLoaded', () => {
+            const packButtons = document.querySelectorAll('.pack-buttons button');
+            let selectedPack = parseFloat(document.querySelector('.pack-buttons .active').textContent.replace(',', '.')) || 0.7;
+
+            function updateFill(slider, fillElement) {
+              const percent = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+              fillElement.style.width = `${percent}%`;
+            }
+
+            function updateLabel(slider, label) {
+              if (slider.id === 'age') {
+                const ageTexts = ['0 років', '1 рік', '2 роки', '3 роки'];
+                label.textContent = ageTexts[slider.value] || `${slider.value} років`;
+              } else if (slider.id === 'weight') {
+                label.textContent = `${slider.value} кг`;
+              }
+            }
+
+            function calculate() {
+              const age = parseInt(document.getElementById('age')?.value || 0);
+              const weight = parseInt(document.getElementById('weight')?.value || 1);
+              const dailyAmount = weight * 10 + age * 5;
+              const daysCount = Math.round((selectedPack * 1000) / dailyAmount);
+              document.getElementById('dailyAmount').textContent = dailyAmount;
+              document.getElementById('daysCount').textContent = daysCount;
+            }
+
+            // Ініціалізація range-повзунків
+            document.querySelectorAll('.range-container').forEach(container => {
+              const slider = container.querySelector('input[type="range"]');
+              const fill = container.querySelector('.range-fill');
+              const label = container.closest('.form-group')?.querySelector('span[id$="-value"]');
+
+              const onInput = () => {
+                updateFill(slider, fill);
+                if (label) updateLabel(slider, label);
+                calculate();
+              };
+
+              slider.addEventListener('input', onInput);
+              onInput(); // ініціалізація значень
+            });
+
+            // Обробка натискань на кнопки упаковки
+            packButtons.forEach(button => {
+              button.addEventListener('click', (e) => {
+                e.preventDefault();
+                packButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                selectedPack = parseFloat(button.textContent.replace(',', '.'));
+                calculate();
+              });
+            });
+
+            calculate();
+          });
+        </script>
+
+        <style>
+          .range-container {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            display: flex;
+            align-items: center;
+          }
+
+          input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: transparent;
+            position: relative;
+            z-index: 2;
+            margin: 0;
+          }
+
+          .range-fill {
+            position: absolute;
+            height: 8px;
+            background: #003f40;
+            border-radius: 4px;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 3;
+            pointer-events: none;
+          }
+
+          input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            background: #ddd;
+            border-radius: 4px;
+          }
+
+          input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #003f40;
+            cursor: pointer;
+            margin-top: -6px;
+            position: relative;
+            z-index: 3;
+          }
+
+          input[type="range"]::-moz-range-track {
+            width: 100%;
+            height: 8px;
+            background: #ddd;
+            border-radius: 4px;
+          }
+
+          input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #003f40;
+            cursor: pointer;
+            border: none;
+            position: relative;
+            z-index: 3;
+          }
+
+          input[type="range"]::-moz-range-progress {
+            height: 8px;
+            background: #003f40;
+            border-radius: 4px;
+          }
+
+          input[type="range"]::-ms-track {
+            width: 100%;
+            height: 8px;
+            background: transparent;
+            border-color: transparent;
+            color: transparent;
+          }
+
+          input[type="range"]::-ms-fill-lower {
+            background: #003f40;
+            border-radius: 4px;
+          }
+
+          input[type="range"]::-ms-fill-upper {
+            background: #ddd;
+            border-radius: 4px;
+          }
+
+          input[type="range"]::-ms-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #003f40;
+            cursor: pointer;
+            border: none;
+          }
+
+          .pack-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+          }
+
+          .pack-buttons button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: #f5f5f5;
+            cursor: pointer;
+            transition: all 0.3s;
+          }
+
+          .pack-buttons button.active {
+            background: #003f40;
+            color: white;
+            border-color: #003f40;
+          }
+
+          .bl-result-calc {
+            display: flex;
+            align-items: start;
+            flex-direction: column;
+            margin-top: 30px;
+          }
+
+          #age-value, #weight-value {
+            font-weight: normal;
+            color: #003f40;
+          }
+        </style>
+      {% endif %}
+
+    </div>
+  </div>
+</div>

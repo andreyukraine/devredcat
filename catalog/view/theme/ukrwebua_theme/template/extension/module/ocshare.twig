@@ -1,0 +1,41 @@
+<div id="share-content">
+  <div class="share-fix-top">
+    <div class="share-fix-close">
+      <img width="25px" height="25px" src="/image/close.svg" onclick='custom_share.close()' alt="close">
+    </div>
+    <div class="cart-fix-title"><span class="text-21 bl-bold">{{ heading_title }}</span></div>
+  </div>
+  <div class="share-fix-block">
+    <p>{{ text }}</p>
+    <div class="share-buttons">
+      <div class="item-soc">
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ url }}" target="_blank">
+          <div class="bl-soc">
+            <img width="30px" title="{{ text_facebook }}" alt="{{ text_facebook }}" src="/catalog/view/theme/ukrwebua_theme/image/facebook.svg">
+            {{ text_facebook }}
+          </div>
+        </a>
+      </div>
+      <div class="item-soc">
+        <a href="https://twitter.com/intent/tweet?url={{ url }}" target="_blank">
+          <div class="bl-soc">
+            <img width="30px" title="{{ text_twitter }}" alt="{{ text_twitter }}" src="/catalog/view/theme/ukrwebua_theme/image/twitter.svg">
+            {{ text_twitter }}
+          </div>
+         </a>
+      </div>
+      <div class="item-soc">
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ url }}" target="_blank">
+          <div class="bl-soc">
+            <img width="30px" title="{{ text_linkedin }}" alt="{{ text_linkedin }}" src="/catalog/view/theme/ukrwebua_theme/image/linkedin.svg">
+            {{ text_linkedin }}
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="share-bg-block" onclick="custom_share.close()">
+  <!-- Quick View deep background -->
+</div>

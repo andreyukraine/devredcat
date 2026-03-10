@@ -1,0 +1,15 @@
+<script>
+  sendGA4Event("view_item", {
+    items: [{
+      item_name: '{{ item_name|escape('js') }}',
+      item_id: '{{ item_id }}',
+      price: {{ price }},
+      item_brand: '{{ manufacturer ? manufacturer|escape('js') : 'not set' }}',
+      item_category: '{{ item_category }}',
+      item_category2: '{{ item_category2 }}',
+      item_category3: '{{ item_category3 }}',
+      item_variant: '{{ select_opt ? select_opt|escape('js') : 'not set' }}',
+      quantity: 1
+    }]
+  });
+</script>

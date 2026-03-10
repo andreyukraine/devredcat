@@ -1,0 +1,133 @@
+{% if (options) %} 
+<div id="sets-popup-{{ modal_id }}" class="modal fade set-options" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">{{ modal_title }}</h4>
+            </div>
+            <div class="modal-body">
+
+                {% for option in options %} 
+                {% if (option['type'] == 'select') %} 
+                <div class="form-group{{ option['required'] ? ' required' : '' }}">
+                    <label class="control-label" for="input-option{{ option['product_option_id'] }}">{{ option['name'] }}</label>
+                    <select name="option[{{ option['product_option_id'] }}]" id="set-input-option{{ option['product_option_id'] }}" class="form-control">
+                        <option data-prefix="+" data-price="0" value="">{{ text_select }}</option>
+                        {% for option_value in option['product_option_value'] %} 
+                        <option data-prefix="{{ option_value['price_prefix'] }}" data-price="{{ option_value['cprice'] }}" value="{{ option_value['product_option_value_id'] }}">{{ option_value['name'] }} 
+                            {% if (option_value['price']) %} 
+                            ({{ option_value['price_prefix'] }}{{ option_value['price'] }})
+                            {% endif %} 
+                        </option>
+                        {% endfor %} 
+                    </select>
+                </div>
+                {% endif %} 
+                {% if (option['type'] == 'radio') %} 
+                <div class="form-group{{ option['required'] ? ' required' : '' }}">
+                    <label class="control-label">{{ option['name'] }}</label>
+                    <div id="set-input-option{{ option['product_option_id'] }}">
+                        {% for option_value in option['product_option_value'] %} 
+                        <div class="radio">
+                            <label>
+                                <input data-prefix="{{ option_value['price_prefix'] }}" data-price="{{ option_value['cprice'] }}" type="radio" name="option[{{ option['product_option_id'] }}]" value="{{ option_value['product_option_value_id'] }}" />
+                                {{ option_value['name'] }} 
+                                {% if (option_value['price']) %} 
+                                ({{ option_value['price_prefix'] }}{{ option_value['price'] }})
+                                {% endif %} 
+                            </label>
+                        </div>
+                        {% endfor %} 
+                    </div>
+                </div>
+                {% endif %} 
+                {% if (option['type'] == 'checkbox') %} 
+                <div class="form-group{{ option['required'] ? ' required' : '' }}">
+                    <label class="control-label">{{ option['name'] }}</label>
+                    <div id="set-input-option{{ option['product_option_id'] }}">
+                        {% for option_value in option['product_option_value'] %} 
+                        <div class="checkbox">
+                            <label>
+                                <input data-prefix="{{ option_value['price_prefix'] }}" data-price="{{ option_value['cprice'] }}" type="checkbox" name="option[{{ option['product_option_id'] }}][]" value="{{ option_value['product_option_value_id'] }}" />
+                                {% if (option_value['image']) %} 
+                                <img src="{{ option_value['image'] }}" alt="{{ option_value['name'] ~ option_value['price'] ? ' ' ~ option_value['price_prefix'] ~ option_value['price'] : '' }}" class="img-thumbnail" /> 
+                                {% endif %} 
+                                {{ option_value['name'] }} 
+                                {% if (option_value['price']) %} 
+                                ({{ option_value['price_prefix'] }}{{ option_value['price'] }})
+                                {% endif %} 
+                            </label>
+                        </div>
+                        {% endfor %} 
+                    </div>
+                </div>
+                {% endif %} 
+                {% if (option['type'] == 'image') %} 
+                <div class="form-group{{ option['required'] ? ' required' : '' }}">
+                    <label class="control-label">{{ option['name'] }}</label>
+                    <div id="set-input-option{{ option['product_option_id'] }}">
+                        {% for option_value in option['product_option_value'] %} 
+                        <div class="radio">
+                            <label>
+                                <input data-prefix="{{ option_value['price_prefix'] }}" data-price="{{ option_value['cprice'] }}" type="radio" name="option[{{ option['product_option_id'] }}]" value="{{ option_value['product_option_value_id'] }}" />
+                                <img src="{{ option_value['image'] }}" alt="{{ option_value['name'] ~ option_value['price'] ? ' ' ~ option_value['price_prefix'] ~ option_value['price'] : '' }}" class="img-thumbnail" /> {{ option_value['name'] }} 
+                                {% if (option_value['price']) %} 
+                                ({{ option_value['price_prefix'] }}{{ option_value['price'] }})
+                                {% endif %} 
+                            </label>
+                        </div>
+                        {% endfor %} 
+                    </div>
+                </div>
+                {% endif %} 
+                {% if (option['type'] == 'text') %} 
+                <div class="form-group{{ option['required'] ? ' required' : '' }}">
+                    <label class="control-label" for="input-option{{ option['product_option_id'] }}">{{ option['name'] }}</label>
+                    <input type="text" name="option[{{ option['product_option_id'] }}]" value="{{ option['value'] }}" placeholder="{{ option['name'] }}" id="set-input-option{{ option['product_option_id'] }}" class="form-control" />
+                </div>
+                {% endif %} 
+                {% if (option['type'] == 'textarea') %} 
+                <div class="form-group{{ option['required'] ? ' required' : '' }}">
+                    <label class="control-label" for="input-option{{ option['product_option_id'] }}">{{ option['name'] }}</label>
+                    <textarea name="option[{{ option['product_option_id'] }}]" rows="5" placeholder="{{ option['name'] }}" id="set-input-option{{ option['product_option_id'] }}" class="form-control">{{ option['value'] }}</textarea>
+                </div>
+                {% endif %} 
+                {% if (option['type'] == 'file') %} 
+                <div class="form-group{{ option['required'] ? ' required' : '' }}">
+                    <label class="control-label">{{ option['name'] }}</label>
+                    <input type="text" name="option[{{ option['product_option_id'] }}]" class='form-control' id="set-input-option{{ option['product_option_id'] }}" />
+                </div>
+                {% endif %} 
+                {% if (option['type'] == 'date') %} 
+                <div class="form-group{{ option['required'] ? ' required' : '' }}">
+                    <label class="control-label" for="input-option{{ option['product_option_id'] }}">{{ option['name'] }}</label>
+                    <input type="date" name="option[{{ option['product_option_id'] }}]" value="{{ option['value'] }}"  id="set-input-option{{ option['product_option_id'] }}" class="form-control" />
+
+                </div>
+                {% endif %} 
+                {% if (option['type'] == 'datetime') %} 
+                <div class="form-group{{ option['required'] ? ' required' : '' }}">
+                    <label class="control-label" for="input-option{{ option['product_option_id'] }}">{{ option['name'] }}</label>
+                    <input type="datetime" name="option[{{ option['product_option_id'] }}]" value="{{ option['value'] }}" id="set-input-option{{ option['product_option_id'] }}" class="form-control" />
+
+                </div>
+                {% endif %} 
+                {% if (option['type'] == 'time') %} 
+                <div class="form-group{{ option['required'] ? ' required' : '' }}">
+                    <label class="control-label" for="input-option{{ option['product_option_id'] }}">{{ option['name'] }}</label>
+                    <input type="time" name="option[{{ option['product_option_id'] }}]" value="{{ option['value'] }}" id="set-input-option{{ option['product_option_id'] }}" class="form-control" />
+                </div>
+                {% endif %} 
+                {% endfor %} 
+                <button class='btn btn-success apply-options pull-right'><i class="fa fa-check"></i></button>
+                <div class='clearfix'></div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endif %}

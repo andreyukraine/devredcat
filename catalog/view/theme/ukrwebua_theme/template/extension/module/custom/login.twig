@@ -1,0 +1,6 @@
+{% if not is_login %}
+  {#по замовчуванню рееструємо кліента#}
+  <input type="hidden" name="account" value="register" checked="checked"/>
+  <div href="javascript:void(0);" onclick="ocajaxlogin.appendLoginForm();">{{ text_auth }}</div>
+{% endif %}
+

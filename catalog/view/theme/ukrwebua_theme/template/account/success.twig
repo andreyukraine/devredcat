@@ -1,0 +1,54 @@
+{{ header }}
+<div class="fluid-width">
+  <div id="account-login" class="container">
+    <div class="top-cat">
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          {% if breadcrumb.href is not empty %}
+            <li><a href="{{ breadcrumb.href }}" title="{{ breadcrumb.text }}">{{ breadcrumb.text }}</a></li>
+          {% else %}
+            <li>{{ breadcrumb.text }}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% if success %}
+      <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
+    {% endif %}
+    {% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      </div>
+    {% endif %}
+    <div class="bl-content bl-login-bg">
+        <div class="d-flex row">
+          <div class="col-lg-7 col-md-5 hidden-xs hidden-sm"
+               style="background-image: url('{{ image }}'); background-repeat: no-repeat; background-size: cover;">
+            <div class="account-bg"></div>
+          </div>
+          <div class="col-lg-5 col-md-7 col-xs-12">
+            <div class="p-50">
+              <h1 class="bl-bold">{{ text_message_title }}</h1>
+              <br>
+              {% if is_proof %}
+                {{ text_message }}
+                <br>
+                <p><a href="{{ account }}" title="{{ text_account }}">
+                    <span class="btn-logout text-18 bl-bold">
+                    <img width="35" src="/image/user-reg.svg">
+                    {{ text_account }}
+                    </span>
+                  </a>
+                </p>
+              {% else %}
+                <div class="approved-warning">
+                  {{ text_message }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

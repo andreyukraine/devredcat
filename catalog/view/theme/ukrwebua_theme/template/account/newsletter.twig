@@ -1,0 +1,44 @@
+{{ header }}
+<div class="fluid-width">
+  <div id="account-newsletter" class="container">
+    <div class="row">
+      <div class="col-sm-3">
+        {{ menu }}
+      </div>
+
+      <div class="bl-account col-sm-9">
+        <span class="text-21 bl-bold">{{ text_newsletter }}</span>
+
+        <form action="{{ action }}" method="post" enctype="multipart/form-data">
+          <div class="bl-form-content">
+            <div class="form-group">
+              <div class="d-flex">
+                {% if newsletter %}
+                  <label class="radio-inline">
+                    <input type="radio" name="newsletter" value="1" checked="checked"/>
+                    {{ text_yes }} </label>
+                  <label class="radio-inline">
+                    <input type="radio" name="newsletter" value="0"/>
+                    {{ text_no }}</label>
+                {% else %}
+                  <label class="radio-inline">
+                    <input type="radio" name="newsletter" value="1"/>
+                    {{ text_yes }} </label>
+                  <label class="radio-inline">
+                    <input type="radio" name="newsletter" value="0" checked="checked"/>
+                    {{ text_no }}</label>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <br>
+          <br>
+          <div class="buttons clearfix">
+            <div class="pull-left"></div>
+            <div class="pull-right"><input type="submit" value="{{ button_save }}" class="button"/></div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {{ footer }}

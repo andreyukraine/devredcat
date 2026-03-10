@@ -1,0 +1,21 @@
+<div class="confirm-burron-checkout">
+
+  <div id="button-custom-order">
+    {% if is_create_order %}
+      <input type="button" value="{{ button_checkout }}" id="button-create-order"
+             data-loading-text="{{ text_loading }}" class="button" onclick="handleCreateOrderClick()"/>
+    {% else %}
+      <div class="for-error error-warning">
+        <span class="text-16">{{ text_min_order }}</span>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if text_agree %}
+    <div class="checkout-agree">
+      <input type="checkbox" name="agree" value="1" checked="checked" />
+      <label for="input-agree" class="control-label">{{ text_agree }}</label>
+    </div>
+  {% endif %}
+
+</div>

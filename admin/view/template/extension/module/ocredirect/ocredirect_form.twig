@@ -1,0 +1,104 @@
+{{ header }}{{ column_left }} 
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %} 
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %} 
+    </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="panel panel-default">
+      <div class="panel-body">
+      {% if (error is defined and error) %} 
+      <div class="alert alert-danger">
+      {{ error }} 
+      </div>
+      {% endif %} 
+      <form action="{{ action }}" method="post" enctype="multipart/form-data" class="form-horizontal">
+        <div class="form-group required {{ errors.from_url is defined? 'has-error': '' }}">
+          <label class="col-sm-3 control-label">{{ entry_from_url }}</label>
+          <div class="col-sm-9">
+            <input type="text" name="from_url" value="{{ from_url }}" class="form-control"  />
+            {% if (errors.from_url is defined) %} 
+            <div class="alert alert-danger" style="margin-top: 5px">
+              {{ errors.from_url }} 
+            </div>
+            {% endif %} 
+			<br>
+            <div class="col-sm-12 input-group">
+              <span class="input-group-addon"><i class="fa fa-info " aria-hidden="true"></i></span>
+              <span class="form-control">
+                {{ help_from_url }} 
+              </span>
+            </div>            
+          </div>
+        </div>
+
+        <div class="form-group required {{ errors.to_url is defined? 'has-error': '' }}">
+          <label class="col-sm-3 control-label" >{{ entry_to_url }}</label>
+          <div class="col-sm-9">
+            <input type="text" name="to_url" value="{{ to_url }}" class="form-control"  />
+            {% if (errors.to_url is defined) %} 
+            <div class="alert alert-danger" style="margin-top: 5px">
+              {{ errors.to_url }} 
+            </div>
+            {% endif %} 
+			<br>
+            <div class="col-sm-12 input-group">
+              <span class="input-group-addon"><i class="fa fa-info " aria-hidden="true"></i></span>
+              <span class="form-control">
+                {{ help_to_url }} 
+              </span>
+            </div>            
+          </div>
+        </div>
+      
+        <div class="form-group required {{ errors.code is defined? 'has-error': '' }}">
+          <label class="col-sm-3 control-label" for="enabled">{{ entry_code }}</label>
+          <div class="col-sm-9">
+            <select name="code" class="form-control">
+              {% for c,text in codes %} 
+              <option value="{{ c }}" {{ code == c? 'selected="selected"': '' }}>{{ c }} - {{ text }}</option>
+              {% endfor %} 
+            </select>
+            {% if (errors.code is defined) %} 
+            <div class="alert alert-danger" style="margin-top: 5px">
+            {{ errors.code }} 
+            </div>
+            {% endif %} 
+          </div>
+        </div>
+      
+        <div class="form-group required {{ errors.enabled is defined? 'has-error': '' }}">
+          <label class="col-sm-3 control-label" for="status">{{ entry_status }}</label>
+          <div class="col-sm-9">
+            <select name="status" class="form-control">
+              <option value="0" {{ status == 0? 'selected="selected"':'' }}>{{ text_disabled }}</option>
+              <option value="1" {{ status == 1? 'selected="selected"':'' }}>{{ text_enabled }}</option>
+            </select>
+            {% if (errors.enabled is defined) %} 
+            <div class="alert alert-danger" style="margin-top: 5px">
+              {{ errors.enabled }} 
+            </div>
+            {% endif %} 
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-9 col-sm-offset-3">
+            <button type="submit" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-success"><i class="fa fa-save"></i>&nbsp;&nbsp;{{ button_save }}</button>
+          </div>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{ footer }}

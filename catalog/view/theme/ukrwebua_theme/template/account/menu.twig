@@ -1,0 +1,139 @@
+<div class="bl-account-l">
+  <div class="text-32 bl-bold">Мій кабінет</div>
+  <div class="menu-account visible-xs" onclick="custom_customer_menu.open()"><img width="30px" height="30px" alt="Меню" src="/image/menu_main.svg"></div>
+</div>
+
+{% if is_mobile %}
+  <div class="bl-account-menu-fixed">
+    <div id="menu-account">
+      <div class="filter-fix-top-line">
+        <div class="cart-fix-top">
+          <div class="cart-fix-close">
+            <img width="25px" height="25px" src="/image/close.svg" onclick="custom_customer_menu.close()" alt="close">
+          </div>
+          <div class="cart-fix-title"><span class="text-21 bl-bold">Мій кабінет</span></div>
+        </div>
+      </div>
+
+      <div id="update-info-account">
+        <div class="upd-info">
+          <img width="30px" height="30px" src="/image/update.svg"/><span class="upd-text">Синхронізувати</span>
+          <span id="sync-timer" style="display:none; margin-left: 5px; font-weight: bold; color: #666;"></span>
+        </div>
+      </div>
+
+      <div class="mobile-menu-bl-account">
+        <div id="account-menu-container">
+          <ul class="bl-account-menu">
+            <li{% if route == "account/account" %} class="active"{% endif %}>
+              <a title="Мої знижки та бонуси" href="{{ back }}">
+                <span class="acc-item"><img width="30" src="/image/account_bonus.svg">Мої знижки та бонуси</span>
+              </a>
+            </li>
+            <li{% if route == "account/order" %} class="active"{% endif %}>
+              <a href="{{ order }}">
+                <span class="acc-item"><img width="30" src="/image/account_ord.svg">{{ text_order }}
+                <span class="count-prod-menu" style="background-color: #f6f7f7">{{ order_total }}</span>
+                </span>
+              </a>
+            </li>
+            {% if delivery %}
+              <li{% if route == "account/delivery" %} class="active"{% endif %}>
+                <a title="{{ text_edit }}" href="{{ delivery }}">
+                  <span class="acc-item"><img width="30" src="/image/delivery.svg">Умови доставки і оплати</span>
+                </a>
+              </li>
+            {% endif %}
+            <li{% if route == "account/edit" %} class="active"{% endif %}>
+              <a title="{{ text_edit }}" href="{{ edit }}">
+                <span class="acc-item"><img width="30" src="/image/account_edit.svg">{{ text_edit }}</span>
+              </a>
+            </li>
+            <li{% if route == "account/address" %} class="active"{% endif %}>
+              <a title="{{ text_address }}" href="{{ address }}">
+                <span class="acc-item"><img width="30" src="/image/account_address.svg">{{ text_address }}</span>
+              </a>
+            </li>
+            <li{% if route == "account/password" %} class="active"{% endif %}>
+              <a href="{{ password }}">
+                <span class="acc-item"><img width="30" src="/image/account_pass.svg">{{ text_password }}</span>
+              </a>
+            </li>
+            <li{% if route == "account/wishlist" %} class="active"{% endif %}>
+              <a href="{{ wishlist }}">
+                <span class="acc-item"><img width="30" src="/image/account_wishlist.svg">{{ text_wishlist }}</span>
+              </a>
+            </li>
+{#            <li{% if route == "account/newsletter" %} class="active"{% endif %}>#}
+{#              <a href="{{ newsletter }}">#}
+{#                <span class="acc-item"><img width="30" height="25" src="/image/account_review.svg">{{ text_newsletter }}</span>#}
+{#              </a>#}
+{#            </li>#}
+          </ul>
+          <ul class="list-unstyled">
+            <li>
+              <a href="{{ logout }}" title="{{ text_logout }}">
+        <span class="acc-item"><img width="30" height="25" title="{{ text_logout }}"
+                                    src="/image/logout.svg">{{ text_logout }}</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <ul class="bl-account-menu">
+    <li{% if route == "account/account" %} class="active"{% endif %}>
+      <a title="Мої знижки та бонуси" href="{{ back }}">
+        <span class="acc-item"><img width="30" src="/image/account_bonus.svg">Мої знижки та бонуси</span>
+      </a>
+    </li>
+    <li{% if route == "account/order" %} class="active"{% endif %}>
+      <a href="{{ order }}">
+        <span class="acc-item"><img width="30" src="/image/account_ord.svg">{{ text_order }}
+        <span class="count-prod-menu" style="background-color: #f6f7f7">{{ order_total }}</span></span>
+      </a>
+    </li>
+    {% if delivery %}
+      <li{% if route == "account/delivery" %} class="active"{% endif %}>
+        <a title="{{ text_edit }}" href="{{ delivery }}">
+          <span class="acc-item"><img width="30" src="/image/delivery.svg">Умови доставки і оплати</span>
+        </a>
+      </li>
+    {% endif %}
+    <li{% if route == "account/edit" %} class="active"{% endif %}>
+      <a title="{{ text_edit }}" href="{{ edit }}">
+        <span class="acc-item"><img width="30" src="/image/account_edit.svg">{{ text_edit }}</span>
+      </a>
+    </li>
+    <li{% if route == "account/address" %} class="active"{% endif %}>
+      <a title="{{ text_address }}" href="{{ address }}">
+        <span class="acc-item"><img width="30" src="/image/account_address.svg">{{ text_address }}</span>
+      </a>
+    </li>
+    <li{% if route == "account/password" %} class="active"{% endif %}>
+      <a href="{{ password }}">
+        <span class="acc-item"><img width="30" src="/image/account_pass.svg">{{ text_password }}</span>
+      </a>
+    </li>
+    <li{% if route == "account/wishlist" %} class="active"{% endif %}>
+      <a href="{{ wishlist }}">
+        <span class="acc-item"><img width="30" src="/image/account_wishlist.svg">{{ text_wishlist }}</span>
+      </a>
+    </li>
+{#    <li{% if route == "account/newsletter" %} class="active"{% endif %}>#}
+{#      <a href="{{ newsletter }}">#}
+{#        <span class="acc-item"><img width="30" height="25" src="/image/account_review.svg">{{ text_newsletter }}</span>#}
+{#      </a>#}
+{#    </li>#}
+  </ul>
+  <ul class="list-unstyled">
+    <li>
+      <a href="{{ logout }}" title="{{ text_logout }}">
+        <span class="acc-item"><img width="30" height="25" title="{{ text_logout }}"
+                                    src="/image/logout.svg">{{ text_logout }}</span>
+      </a>
+    </li>
+  </ul>
+{% endif %}

@@ -1,0 +1,431 @@
+<div id="map" class="bl-map" style="width: auto; height: 550px; position: relative; overflow: hidden;"></div>
+
+<script>
+
+  var locations = [];
+  var markers = [];
+  var marker, i;
+  var salons = {{ warehouses }};
+  var map;
+  var service;
+
+  $(document).load(function () {
+    initAutocomplete();
+  });
+
+  $('body').on("click", "#view_map_point", function () {
+    activateStore($(this).attr('data-id'));
+  });
+
+  function initAutocomplete() {
+
+    // Проходження по кожному об'єкту в масиві salons
+    salons.forEach(function (sal, index) {
+
+    var mblock = document.getElementById("map");
+    map = new google.maps.Map(mblock, {
+      zoom: 12,
+      fullscreenControl: true,
+      center: new google.maps.LatLng(50.4086314,30.3851186),
+      mapTypeId: "roadmap",
+    });
+
+      var place_id = 0;
+
+      // Створення масиву з потрібними даними
+      var mar = [
+        sal.name,
+        sal.lat,
+        sal.lon,
+        index,
+        sal.address,
+        sal.working_hours,
+        sal.uid,
+        place_id
+      ];
+      // Додавання масиву mar до масиву locations
+      locations.push(mar);
+    });
+
+    // ниже задаются стили, можете использовать https://mapstyle.withgoogle.com/ или https://snazzymaps.com/ для быстрого создания стиля,
+    // var styles = [
+    //   {
+    //     "elementType": "geometry",
+    //     "stylers": [
+    //       {
+    //         "color": "#dcdde2"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "elementType": "labels.icon",
+    //     "stylers": [
+    //       {
+    //         "visibility": "off"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "elementType": "labels.text.fill",
+    //     "stylers": [
+    //       {
+    //         "color": "#757575"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "elementType": "labels.text.stroke",
+    //     "stylers": [
+    //       {
+    //         "color": "#dcdde2"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "administrative",
+    //     "elementType": "geometry",
+    //     "stylers": [
+    //       {
+    //         "color": "#757575"
+    //       },
+    //       {
+    //         "visibility": "off"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "administrative.country",
+    //     "elementType": "labels.text.fill",
+    //     "stylers": [
+    //       {
+    //         "color": "#9e9e9e"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "administrative.locality",
+    //     "elementType": "labels.text.fill",
+    //     "stylers": [
+    //       {
+    //         "color": "#bdbdbd"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "poi",
+    //     "stylers": [
+    //       {
+    //         "visibility": "off"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "poi",
+    //     "elementType": "labels.text.fill",
+    //     "stylers": [
+    //       {
+    //         "color": "#757575"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "poi.park",
+    //     "elementType": "geometry",
+    //     "stylers": [
+    //       {
+    //         "color": "#181818"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "poi.park",
+    //     "elementType": "labels.text.fill",
+    //     "stylers": [
+    //       {
+    //         "color": "#616161"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "poi.park",
+    //     "elementType": "labels.text.stroke",
+    //     "stylers": [
+    //       {
+    //         "color": "#1b1b1b"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "road",
+    //     "elementType": "geometry.fill",
+    //     "stylers": [
+    //       {
+    //         "color": "#c3c8ce"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "road",
+    //     "elementType": "labels.icon",
+    //     "stylers": [
+    //       {
+    //         "visibility": "off"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "road",
+    //     "elementType": "labels.text.fill",
+    //     "stylers": [
+    //       {
+    //         "color": "#8a8a8a"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "road.arterial",
+    //     "elementType": "geometry",
+    //     "stylers": [
+    //       {
+    //         "color": "#c3c8ce"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "road.highway",
+    //     "elementType": "geometry",
+    //     "stylers": [
+    //       {
+    //         "color": "#c3c8ce"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "road.highway.controlled_access",
+    //     "elementType": "geometry",
+    //     "stylers": [
+    //       {
+    //         "color": "#c3c8ce"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "road.local",
+    //     "elementType": "labels.text.fill",
+    //     "stylers": [
+    //       {
+    //         "color": "#616161"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "transit",
+    //     "stylers": [
+    //       {
+    //         "visibility": "off"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "transit",
+    //     "elementType": "labels.text.fill",
+    //     "stylers": [
+    //       {
+    //         "color": "#757575"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "water",
+    //     "elementType": "geometry",
+    //     "stylers": [
+    //       {
+    //         "color": "#c3c8ce"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "featureType": "water",
+    //     "elementType": "labels.text.fill",
+    //     "stylers": [
+    //       {
+    //         "color": "#3d3d3d"
+    //       }
+    //     ]
+    //   }
+    // ];
+    //
+    // // тут мы применяем описанные выше стили к карте
+    // map.setOptions({styles: styles});
+
+    // Create the search box and link it to the UI element.
+    const input = document.getElementById("pac-input33");
+    const searchBox = new google.maps.places.SearchBox(input);
+
+    map.addListener("bounds_changed", () => {
+      searchBox.setBounds(map.getBounds());
+    });
+
+    var infowindow = new google.maps.InfoWindow;
+
+    for (i = 0; i < locations.length; i++) {
+      marker = new google.maps.Marker({
+        name: locations[i][0],
+        position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+        address: locations[i][4],
+        working_hours: locations[i][5],
+        slug: locations[i][6],
+        place_id: locations[i][7],
+        reiting: "",
+        icon: {
+          width: 50,
+          height: 50,
+          url: '/image/location.svg',
+          scaledSize: new google.maps.Size(50, 50), // Размер иконки
+          anchor: new google.maps.Point(15, 50) // Центрирование иконки (настройте под ваши нужды)
+
+        },
+        map: map
+      });
+
+      markers.push(marker);
+
+      google.maps.event.addListener(marker, 'click', (function (marker, i) {
+        return function () {
+          // Встановлюємо контент для інформаційного вікна
+          infowindow.setContent('<div id="adress_map_view">{{ text_working_hours }}</br>' + this.working_hours + '</div>');
+          infowindow.open(map, marker);
+
+          const detailsService = new google.maps.places.PlacesService(map);
+          detailsService.getDetails({
+            placeId: marker.place_id,
+            fields: ['name', 'rating', 'user_ratings_total', 'formatted_address']
+          }, function (place, status) {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+              infowindow.setContent(`
+                  <div style="font-size:14px;">
+                    <strong>${place.name}</strong><br />
+                    ${place.formatted_address}<br />
+                    <span style="color: #ffa500;">★ ${place.rating}</span> (${place.user_ratings_total} відгуків)
+                  </div>
+                `);
+            }
+          });
+
+          // Після відкриття вікна змінюємо вміст елемента з класом gm-style-iw-ch
+          google.maps.event.addListener(infowindow, 'domready', function () {
+            document.querySelector('.gm-style-iw-ch').innerHTML = '<div>' + marker.address + '</div>';
+          });
+        }
+      })(marker, i));
+    }
+
+    searchBox.addListener("places_changed", () => {
+      const places = searchBox.getPlaces();
+      const bounds = new google.maps.LatLngBounds();
+
+      if (places.length == 0) {
+        return;
+      }
+
+      places.forEach((place) => {
+        if (!place.geometry || !place.geometry.location) {
+          // console.log("Returned place contains no geometry");
+          return;
+        }
+
+        if (place.geometry.viewport) {
+          // Only geocodes have viewport.
+          bounds.union(place.geometry.viewport);
+        } else {
+          bounds.extend(place.geometry.location);
+        }
+      });
+      map.fitBounds(bounds);
+    });
+
+    var stylesCluster = [
+      {
+        width: 50,
+        height: 50,
+        className: "custom-clustericon-1",
+        url: '/image/location.svg',
+        color: '#fff',
+      },
+      {
+        width: 50,
+        height: 50,
+        className: "custom-clustericon-2",
+        url: '/image/location.svg',
+        color: '#fff',
+      },
+      {
+        width: 50,
+        height: 50,
+        className: "custom-clustericon-3",
+        url: '/image/location.svg',
+        color: '#fff',
+      },
+    ];
+
+    new MarkerClusterer(map, markers, {
+        styles: stylesCluster,
+        clusterClass: "custom-clustericon",
+      }
+    );
+  }
+
+  function activateStore(store_id) {
+    const marker = markers.find(m => m.slug === store_id);
+    if (!marker) return;
+
+    const service = new google.maps.places.PlacesService(map);
+
+    // Пошук місця за запитом
+    service.findPlaceFromQuery({
+      query: `${marker.name} ${marker.address}`,
+      fields: ['place_id', 'name', 'geometry']
+    }, (results, status) => {
+      if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.[0]) {
+        console.error('Place not found:', status);
+        return;
+      }
+
+      // Центруємо карту
+      map.setCenter(results[0].geometry.location);
+      map.setZoom(15);
+
+      // Отримання деталей місця
+      service.getDetails({
+        placeId: results[0].place_id, // Без жодних лапок!
+        fields: ['name', 'rating', 'user_ratings_total', 'formatted_address']
+      }, (place, detailsStatus) => {
+        if (detailsStatus !== google.maps.places.PlacesServiceStatus.OK) {
+          console.error('Failed to get details:', detailsStatus);
+          return;
+        }
+
+        const rating = place.rating ? `★ ${place.rating}` : 'Без оцінки';
+        const reviews = place.user_ratings_total ? `(${place.user_ratings_total} відгуків)` : '';
+
+        marker.reiting = `
+                <div style="font-size:14px;">
+                    <span style="color: #ffa500;">${rating}</span> ${reviews}
+                </div>
+            `;
+
+        // Відкриття інфовікна
+        if (marker.infoWindow) {
+          marker.infoWindow.setContent(marker.reiting);
+        }
+        google.maps.event.trigger(marker, 'click');
+      });
+    });
+  }
+
+
+</script>
+
+<script async type="text/javascript"
+        src="https://maps.google.com/maps/api/js?key=AIzaSyDOByDDJtXvfnZt-rXbnpeG6KTR3BMusRc&callback=initAutocomplete&libraries=places&v=weekly&language=uk"></script>
+<script src="https://googlemaps.github.io/js-markerclustererplus/dist/index.min.js"></script>

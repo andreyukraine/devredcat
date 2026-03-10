@@ -1,0 +1,10 @@
+<table class="table">
+  {% for total in totals %}
+      <tr>
+        <td class="text-left cart-text-bottom b-bold">{{ total.title ~ " :" }}</td>
+        <td class="text-right cart-value-bottom b-bold">{{ total.text }}</td>
+      </tr>
+  {% endfor %}
+</table>
+
+

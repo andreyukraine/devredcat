@@ -1,0 +1,72 @@
+{
+    "codename": "d_elfinder",
+    "version": "2.0.3",
+    "name": "Elfinder",
+    "description": "Elfinder provides a very large number of possibilities for web file manager",
+    "author": {
+        "name": "Dreamvention",
+        "email": "info@dreamvention.com",
+        "url": "https://dreamvention.com"
+    },
+    "opencart_version": [
+        "2.0.1.0",
+        "2.0.1.1",
+        "2.0.2.0",
+        "2.0.3.1",
+        "2.1.0.1",
+        "2.1.0.2",
+        "2.2.0.0",
+        "2.3.0.0",
+        "2.3.0.1",
+        "2.3.0.2",
+        "3.0.0.0",
+        "3.0.1.1",
+        "3.0.1.2",
+        "3.0.2.0",
+        "3.0.3.1"
+    ],
+    "type": "library",
+    "license": {
+        "type": "free",
+        "url": "https://shopunity.net/licenses/free"
+    },
+    "support": {
+        "email": "support@dreamvention.com",
+        "url": "https:/dreamvention.com/support"
+    },
+    "required": {
+        "d_opencart_patch": ">= 1.0.0",
+        "d_twig_manager": ">= 1.5.0"
+    },
+    "files": [
+        "system/library/d_shopunity/extension/d_elfinder.json",
+
+        "admin/controller/extension/d_elfinder/d_elfinder.php",
+        "admin/view/template/extension/d_elfinder/d_elfinder.twig"
+    ],
+    "dirs": [
+        "system/library/d_elfinder",
+
+        "admin/view/image/d_elfinder",
+        "admin/view/stylesheet/d_elfinder",
+        "admin/view/javascript/d_elfinder"
+    ],
+    "changelog": [
+        {
+            "version": "2.0.3",
+            "change": "Added support for OC v3.0.3.1"
+        },
+        {
+            "version": "2.0.2",
+            "change": "change type to lib"
+        },
+        {
+            "version": "2.0.1",
+            "change": "1.Added preview SVG and ICO. <br>2.Added image selection when double-clicking"
+        },
+        {
+            "version": "2.0.0",
+            "change": "Initial commit"
+        }
+    ]
+}

@@ -1,0 +1,44 @@
+{{ header }}
+<div class="top-cat fluid-width">
+  <div class="breadcrumbs container">
+    <h1 class="akcii-name bl-bold">{{ heading_title }}</h1>
+    <ul class="breadcrumb">
+      {% for breadcrumb in breadcrumbs %}
+        <li><a title="{{ breadcrumb.text }}" href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+<div class="fluid-width">
+  <div id="information-information" class="container">
+    <div class="bl-content">
+        {% if akcii %}
+          <div class="akcia-page">
+            {% for akcia in akcii %}
+              {# Открываем новую строку для каждого первого элемента в группе из 4 #}
+{#              {% if loop.index0 % 4 == 0 %}#}
+                <div class="akcia-row">
+{#              {% endif %}#}
+
+              <div class="akcia-item {% if akcia.is_expired %} is_expired{% endif %}">
+                <a class="akcia-info" title="{{ akcia.name }}" href="{{ akcia.href }}">
+                    <img class="img-responsive" title="{{ akcia.name }}" src="{{ akcia.image }}" width="{{ akcia.width }}" height="{{ akcia.height }}" alt="{{ akcia.name }}"/>
+                </a>
+              </div>
+
+              {# Закрываем строку после каждого 4-го элемента или последнего элемента #}
+{#              {% if loop.index % 4 == 0 or loop.last %}#}
+                </div>
+{#              {% endif %}#}
+            {% endfor %}
+          </div>
+          <div class="toolbar toolbar-bottom">
+            <div class="pages">{{ pagination }}</div>
+          </div>
+        {% else %}
+          <p>{{ text_empty }}</p>
+        {% endif %}
+    </div>
+  </div>
+</div>
+{{ footer }}

@@ -1,0 +1,64 @@
+{{ header }}
+<div class="fluid-width">
+  <div id="account-order" class="container layer-category">
+    <div class="row">
+      <div class="col-sm-3">
+        {{ menu }}
+      </div>
+      <div class="bl-account col-sm-9">
+        <span class="text-21 bl-bold">{{ text_order }}</span>
+        <div class="bl-form-content">
+          {% if orders %}
+            <div class="table-responsive">
+              <table class="table table-list-order">
+                <thead>
+                <tr>
+                  <td class="text-left">{{ column_date_added }}</td>
+                  <td class="text-left">{{ text_invoice_no }}</td>
+                  <td class="text-left" style="width: 50%">Доставка</td>
+                  <td class="text-left">{{ column_status }}</td>
+                  <td class="text-right">{{ column_total }}</td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for order in orders %}
+
+                  <tr>
+
+                    <td class="text-left">
+                      <a href="{{ order.view }}" data-toggle="tooltip" title="{{ button_view }}">{{ order.date_added }}</a>
+                    </td>
+                    <td class="text-left">
+                      <a href="{{ order.view }}" data-toggle="tooltip" title="{{ button_view }}">{{ order.invoice_no }}</a>
+                    </td>
+                    <td class="text-left" style="width: 50%"><a href="{{ order.view }}" data-toggle="tooltip" title="{{ button_view }}">{{ order.address }}</a></td>
+                    <td class="text-left">
+                      <a href="{{ order.view }}" data-toggle="tooltip" title="{{ button_view }}">{{ order.status }}</a>
+                    </td>
+                    <td class="text-right">
+                      <a href="{{ order.view }}" data-toggle="tooltip" title="{{ button_view }}">{{ order.total }}</a>
+                    </td>
+
+                  </tr>
+
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="toolbar toolbar-bottom">
+              <div class="row">
+                <div class="col-sm-12">{{ pagination }}</div>
+              </div>
+            </div>
+          {% else %}
+            <p>{{ text_empty }}</p>
+          {% endif %}
+        </div>
+        <div class="buttons clearfix">
+          <div class="pull-left"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

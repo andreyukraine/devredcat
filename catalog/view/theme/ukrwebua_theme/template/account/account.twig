@@ -1,0 +1,486 @@
+{{ header }}
+<div class="fluid-width">
+  <div id="account-account" class="container layer-category">
+    {% if success %}
+      <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    <div class="row">
+      <div class="col-sm-3">
+        {{ menu }}
+      </div>
+      <div class="bl-account col-sm-9">
+
+        <div class="text-21 bl-bold">Мої знижки та бонуси</div>
+
+        <div id="update-info-account" class="hidden-xs">
+          <div class="upd-info">
+            <img width="30px" height="30px" src="/image/update.svg"/><span class="upd-text">Синхронізувати</span>
+            <span id="sync-timer" style="display:none; margin-left: 5px; font-weight: bold; color: #666;"></span>
+          </div>
+        </div>
+
+        {% if customer_address %}
+          <div id="address_groups" class="custom-field">
+            <fieldset>
+
+              <div id="bl-customer-type">
+                {% if customer_address|length > 1 %}
+                  {% for addres in customer_address %}
+                    {% if addres.address_id == select_address %}
+                      {% if addres.customer_type > 0 %}<span
+                        class="customer-type">статус юридичної особи</span>{% endif %}
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+
+              <div class="form-group">
+                <label class="control-label" for="address_id">Торгова точка</label>
+                {% if customer_address|length > 1 %}
+                  <select name="address_id" id="address_id" class="form-control">
+                    <option value="">{{ text_select }}</option>
+                    {% for addres in customer_address %}
+                      {% if addres.address_id == select_address %}
+                        <option selected="selected" value="{{ addres.address_id }}">{{ addres.firstname }}</option>
+                      {% else %}
+                        <option value="{{ addres.address_id }}">{{ addres.firstname }}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                {% else %}
+                  {% for addres in customer_address %}
+                    <input type="hidden" name="address_id" value="{{ addres.address_id }}">
+                    <div class="form-control-static form-control">{{ addres.firstname }}</div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </fieldset>
+          </div>
+          <br>
+          <script>
+            // виклик зміни select
+            $('#address_id').on('change', function () {
+              var selectedAddressId = $(this).val();
+
+              // Проверяем, что выбрано какое-то значение (не пустое)
+              if (selectedAddressId) {
+                // Отправляем AJAX-запрос
+                $.ajax({
+                  url: 'index.php?route=account/account/change_address', // Замените на ваш URL
+                  type: 'post',
+                  data: {address_id: selectedAddressId},
+                  dataType: 'json',
+                  beforeSend: function () {
+                    // Можно добавить индикатор загрузки
+                    $('#account-ajax').addClass('custom_lock');
+                    $('#address_id').prop('disabled', true);
+                  },
+                  complete: function () {
+                    $('#address_id').prop('disabled', false);
+                  },
+                  success: function (json) {
+                    if (json.status) {
+                      setTimeout(function () {
+                        $('#bl-customer-type').html(json.customer_type);
+                        $('#account-ajax').html(json.html).removeClass('custom_lock');
+                      }, 200);
+                    }
+                  },
+                  error: function (xhr, ajaxOptions, thrownError) {
+                    alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                    $('#account-ajax').removeClass('custom_lock');
+                  }
+                });
+              }
+            });
+          </script>
+        {% endif %}
+
+        <script>
+          // оновлення інформації про клієнта
+          $(document).ready(function () {
+            var lastSyncTime = {{ last_sync|default(0) }};
+            // ЧАС ОНОВЛЕННЯ В СЕКУНДАХ (наприклад: 120 для 2 хв, 300 для 5 хв, 1800 для 30 хв)
+            var syncInterval = {{ sync_interval|default(60) }};
+            var timerInterval;
+
+            function updateTimer() {
+              var currentTime = Math.floor(Date.now() / 1000);
+              var timeLeft = (lastSyncTime + syncInterval) - currentTime;
+
+              if (timeLeft > 0) {
+                var minutes = Math.floor(timeLeft / 60);
+                var seconds = timeLeft % 60;
+                $('#sync-timer').text('(' + minutes + ':' + (seconds < 10 ? '0' : '') + seconds + ')').show();
+                $('#update-info-account').css({'opacity': '0.5', 'pointer-events': 'none', 'cursor': 'not-allowed'});
+                $('.upd-text').text('Оновлення...');
+              } else {
+                $('#sync-timer').hide();
+                $('#update-info-account').css({'opacity': '1', 'pointer-events': 'auto', 'cursor': 'pointer'});
+                $('.upd-text').text('Синхронізувати');
+                clearInterval(timerInterval);
+              }
+            }
+
+            if (lastSyncTime > 0) {
+              updateTimer();
+              timerInterval = setInterval(updateTimer, 1000);
+            }
+
+            $(document).on('click', '#update-info-account', function () {
+              var $button = $(this);
+              if ($button.css('pointer-events') === 'none') return;
+
+              custom_customer_menu.hide();
+
+              $.ajax({
+                url: 'index.php?route=account/account/update_info_account',
+                type: 'post',
+                data: {ajax: true},
+                dataType: 'json',
+                beforeSend: function () {
+                  $('.bl-account').addClass('custom_lock');
+                  $button.prop('disabled', true);
+                },
+                success: function (json) {
+                  if (json.status) {
+                    console.log("Успішна відповідь");
+                    window.location.reload(true);
+                  } else {
+                    $('.bl-account').removeClass('custom_lock');
+                    $button.prop('disabled', false);
+                    if (json.error) {
+                      alert(json.error);
+                      if (json.next_sync) {
+                        lastSyncTime = json.next_sync - syncInterval;
+                        updateTimer();
+                        timerInterval = setInterval(updateTimer, 1000);
+                      }
+                    }
+                  }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                  $('.bl-account').removeClass('custom_lock');
+                  $button.prop('disabled', false);
+                  $('.upd-text').text('Синхронізувати');
+
+                  // Перевіряємо, чи відповідь містить HTML
+                  if (xhr.responseText.trim().startsWith('{') && xhr.responseText.trim().endsWith('}')) {
+                    // Спроба парсити як JSON
+                    try {
+                      const response = JSON.parse(xhr.responseText);
+                      if (response.error) {
+                        alert('Помилка: ' + response.error);
+                      } else {
+                        alert('Невідома помилка');
+                      }
+                    } catch (e) {
+                      alert('Помилка обробки відповіді: ' + thrownError);
+                    }
+                  } else {
+                    // Це HTML помилка
+                    alert('Серверна помилка. Будь ласка, спробуйте пізніше.');
+                    console.error('HTML response:', xhr.responseText);
+                  }
+                }
+              });
+            });
+          });
+        </script>
+
+        <div class="bl-form-content">
+
+          <div id="account-ajax" class="row">
+            <div class="col-lg-6 bl-card-l">
+
+              <div class="bl-conditions">
+                <div class="text-18 bl-bold">Додатково:</div>
+                <br>
+                <div class="conditions-groups">
+                  <div class="debit-total">
+                    <div class="debit-title-line">
+                      <div class="text-18">Відтермінування оплати (днів):</div>
+                      <div class="text-32 sum-debit-total">{{ delay_pay }}</div>
+                    </div>
+                    <div class="debit-title-line">
+                      <div class="text-18">Термін резервування (днів):</div>
+                      <div class="text-21 sum-bonus-total">{{ delay_reserv }}</div>
+                    </div>
+                  </div>
+                </div>
+                <br>
+              </div>
+
+              <div class="bl-bots">
+                <div class="bonus-card">
+                  <div class="bl-bottom-card">
+                    <div class="bl-code">
+                      <div class="bl-code-c">
+                        <div class="text-code">{{ text_code }}</div>
+                        <div class="bonus-card-code">{{ card_code }}</div>
+                      </div>
+                      <p class="text-phone">{{ text_phone }} : {{ telephone }}</p>
+                      <p class="card-sum">{{ text_sum }}: &nbsp; {{ sum }}</p>
+                    </div>
+                  </div>
+                </div>
+               <img class="bg-card img-responsive" src="/image/discount-card.svg">
+              </div>
+
+              {% if customer_address %}
+                <div class="bl-pricelist hidden-xs hidden-sm">
+                  <span class="text-18 bl-bold">Прайс-лист</span>
+                  <br>
+                  <div id="generate-pricelist" class="button">Завантажити прайс з моєю ціною</div>
+                  <script>
+                    // генерація прайс-листа
+                    $(document).on('click', '#generate-pricelist', function () {
+
+                      const button = $(this);
+                      const originalText = button.text();
+
+                      // Змінюємо текст кнопки
+                      button.text('Формуємо, зачекайте...').prop('disabled', true);
+
+                      // Відправляємо AJAX запит
+                      $.ajax({
+                        url: 'index.php?route=account/account/generate_pricelist',
+                        type: 'post',
+                        data: {ajax: true},
+                        dataType: 'json',
+                        xhr: function () {
+                          var xhr = new XMLHttpRequest();
+
+                          // Відстежуємо прогрес завантаження
+                          xhr.addEventListener('progress', function (e) {
+                            if (e.lengthComputable) {
+                              var percentComplete = (e.loaded / e.total) * 100;
+                            }
+                          });
+
+                          return xhr;
+                        },
+                        beforeSend: function () {
+                          // Можна додати спінер або інший індикатор
+                        },
+                        success: function (json) {
+                          if (json.status) {
+                            // Якщо файл успішно створено, завантажуємо його
+                            if (json.download_url) {
+                              window.location.href = json.download_url;
+                            }
+                            button.text('Завантажити прайс з моєю ціною').prop('disabled', false);
+                          } else {
+                            // Помилка
+                            alert('Помилка при генерації прайс-листа: ' + json.error);
+                            button.text(originalText).prop('disabled', false);
+                          }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                          // Перевіряємо, чи відповідь містить HTML
+                          if (xhr.responseText.trim().startsWith('{') && xhr.responseText.trim().endsWith('}')) {
+                            // Спроба парсити як JSON
+                            try {
+                              const response = JSON.parse(xhr.responseText);
+                              if (response.error) {
+                                alert('Помилка: ' + response.error);
+                              } else {
+                                alert('Невідома помилка');
+                              }
+                            } catch (e) {
+                              alert('Помилка обробки відповіді: ' + thrownError);
+                            }
+                          } else {
+                            // Це HTML помилка
+                            alert('Серверна помилка. Будь ласка, спробуйте пізніше.');
+                            console.error('HTML response:', xhr.responseText);
+                          }
+
+                          button.text(originalText).prop('disabled', false);
+                        },
+                        complete: function () {
+                          // Автоматично скидаємо через 5 секунд, якщо ще не змінено
+                          setTimeout(function () {
+                            if (button.text() === 'Формуємо, зачекайте...') {
+                              button.text('Завантажити прайс з моєю ціною').prop('disabled', false);
+                            }
+                          }, 5000);
+                        }
+                      });
+                    });
+                  </script>
+                </div>
+              {% endif %}
+            </div>
+            <div class="col-lg-6">
+
+              <div class="bl-debit">
+                <div class="text-18 bl-bold">Заборгованість:</div>
+                <br>
+                <div class="debit-groups{% if debit_total >= 0 %}-not{% endif %}">
+                  <div class="debit-total">
+                    <div class="debit-title-line">
+                      <div class="text-18">Загалом</div>
+                      <div class="text-32 sum-debit-total">{{ debit_total }}</div>
+                    </div>
+                    <div class="debit-title-line">
+                      <div class="text-18">Бонусний рахунок</div>
+                      <div class="text-21 sum-bonus-total">{{ bonus_total }}</div>
+                    </div>
+                  </div>
+                  {% if orders %}
+                    <div class="debit-list">
+                      <p>Список незакритих рахунків:</p>
+                      <div>
+                        {% for ord in orders %}
+                            <div class="debit-line">
+                              <div class="debit-line-order">{{ ord.number }} від {{ ord.date }}</div>
+                              <div class="debit-line-sum">- {{ ord.sum_debit }} ₴</div>
+                            </div>
+                        {% endfor %}
+
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+                <br>
+              </div>
+
+              {% if customer_status %}
+                <div class="text-18 bl-bold">Мої персональні знижки</div>
+                <br>
+                {% if price_groups %}
+                  <div id="price_groups">
+                    {% for price_group in price_groups %}
+                      <p>{{ price_group.name }} - {{ price_group.percent }}%</p>
+                    {% endfor %}
+                  </div>
+                {% elseif loyalty_list %}
+                  <div id="price_groups">
+                    {% for loyalty in loyalty_list %}
+                      {% if loop.first %}
+                        {# пропускаємо перший елемент #}
+                      {% else %}
+                        {% set prev_loyalty = loyalty_list[loop.index0 - 1] %}
+                        {% set discount_value = prev_loyalty.discount|number_format(0) %}
+                        <p {% if discount_value == discount_select %}class="selected-discount"{% endif %}>
+                          {% if discount_value == discount_select %}<strong>{% endif %}
+                            {{ prev_loyalty.sum }} - {{ loyalty.sum }} грн - {{ discount_value }}%
+                            {% if discount_value == discount_select %}</strong>{% endif %}
+                        </p>
+                      {% endif %}
+
+                      {% if loop.last %}
+                        {% set last_discount = loyalty.discount|number_format(0) %}
+                        <p {% if last_discount == discount_select %}class="selected-discount"{% endif %}>
+                          {% if last_discount == discount_select %}<strong>{% endif %}
+                            від {{ loyalty.sum }} грн - {{ last_discount }}%
+                            {% if last_discount == discount_select %}</strong>{% endif %}
+                        </p>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <p>{{ text_discont_empty }}</p>
+                {% endif %}
+              {% else %}
+                <p>{{ customer_status_text }}</p>
+              {% endif %}
+            </div>
+
+            {% if customer_address %}
+              <div class="bl-pricelist hidden-md hidden-lg">
+                <div class="col-xs-12 col-sm-12">
+                  <span class="text-18 bl-bold">Прайс-лист</span>
+                  <br>
+                  <div id="generate-pricelist" class="button">Завантажити прайс з моєю ціною</div>
+                  <script>
+                    // генерація прайс-листа
+                    $(document).on('click', '#generate-pricelist', function () {
+
+                      const button = $(this);
+                      const originalText = button.text();
+
+                      // Змінюємо текст кнопки
+                      button.text('Формуємо, зачекайте...').prop('disabled', true);
+
+                      // Відправляємо AJAX запит
+                      $.ajax({
+                        url: 'index.php?route=account/account/generate_pricelist',
+                        type: 'post',
+                        data: {ajax: true},
+                        dataType: 'json',
+                        xhr: function () {
+                          var xhr = new XMLHttpRequest();
+
+                          // Відстежуємо прогрес завантаження
+                          xhr.addEventListener('progress', function (e) {
+                            if (e.lengthComputable) {
+                              var percentComplete = (e.loaded / e.total) * 100;
+                            }
+                          });
+
+                          return xhr;
+                        },
+                        beforeSend: function () {
+                          // Можна додати спінер або інший індикатор
+                        },
+                        success: function (json) {
+                          if (json.status) {
+                            // Якщо файл успішно створено, завантажуємо його
+                            if (json.download_url) {
+                              window.location.href = json.download_url;
+                            }
+                            button.text('Завантажити прайс з моєю ціною').prop('disabled', false);
+                          } else {
+                            // Помилка
+                            alert('Помилка при генерації прайс-листа: ' + json.error);
+                            button.text(originalText).prop('disabled', false);
+                          }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                          // Перевіряємо, чи відповідь містить HTML
+                          if (xhr.responseText.trim().startsWith('{') && xhr.responseText.trim().endsWith('}')) {
+                            // Спроба парсити як JSON
+                            try {
+                              const response = JSON.parse(xhr.responseText);
+                              if (response.error) {
+                                alert('Помилка: ' + response.error);
+                              } else {
+                                alert('Невідома помилка');
+                              }
+                            } catch (e) {
+                              alert('Помилка обробки відповіді: ' + thrownError);
+                            }
+                          } else {
+                            // Це HTML помилка
+                            alert('Серверна помилка. Будь ласка, спробуйте пізніше.');
+                            console.error('HTML response:', xhr.responseText);
+                          }
+
+                          button.text(originalText).prop('disabled', false);
+                        },
+                        complete: function () {
+                          // Автоматично скидаємо через 5 секунд, якщо ще не змінено
+                          setTimeout(function () {
+                            if (button.text() === 'Формуємо, зачекайте...') {
+                              button.text('Завантажити прайс з моєю ціною').prop('disabled', false);
+                            }
+                          }, 5000);
+                        }
+                      });
+                    });
+                  </script>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

@@ -1,0 +1,57 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="panel-title-discont">
+      <a href="#collapse-voucher" data-toggle="collapse" data-parent="#accordion" class="accordion-toggle">
+        {{ heading_title }} <i class="fa fa-caret-down"></i>
+      </a>
+    </div>
+  </div>
+  <div id="collapse-voucher" class="block-voucher collapse">
+    <div class="block-voucher-line">
+      <div class="t-voucher">
+        <input type="text" name="voucher" value="{{ voucher }}" placeholder="{{ entry_voucher }}" id="input-voucher"
+               class="form-control"/>
+      </div>
+      <div class="input-group text-right">
+        <span class="input-group-btn">
+          <input type="submit" value="{{ button_voucher }}" id="button-voucher" data-loading-text="{{ text_loading }}"
+                 class="btn btn-primary"/>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  <!--
+  $('#button-voucher').on('click', function () {
+    $.ajax({
+      url: 'index.php?route=extension/total/voucher/voucher',
+      type: 'post',
+      data: 'voucher=' + encodeURIComponent($('input[name=\'voucher\']').val()),
+      dataType: 'json',
+      beforeSend: function () {
+        $('#button-voucher').button('loading');
+      },
+      complete: function () {
+        $('#button-voucher').button('reset');
+      },
+      success: function (json) {
+        $('.alert-dismissible').remove();
+
+        if (json['error']) {
+          $('.checkout-cart').after('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+
+          //$('html, body').animate({ scrollTop: 0 }, 'slow');
+        }
+
+        if (json['redirect']) {
+          location = json['redirect'];
+        }
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+  });
+  //--></script>

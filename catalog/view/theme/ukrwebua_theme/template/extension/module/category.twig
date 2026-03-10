@@ -1,0 +1,54 @@
+{% if (categories is not empty) %}
+  <div class="mod-categories hidden-xs">
+    <ul class="list-unstyled mod-cat-list-items">
+      {% for category in categories %}
+        <li class="mc-item{% if all_active %} is-open{% else %}{% if (category.category_id == category_id) %} is-active-item is-open{% endif %}{% endif %}">
+			<span class="dflex justify-content-between">
+				<a class="bl-bold text-18" href="{{ category.href }}">{{ category.name }}</a>
+
+			</span>
+          {% if (category.children is not empty) %}
+            <ul class="list-unstyled mc-children children-2-lv">
+              {% for child in category.children %}
+                <li class="mc-child-item child-2-lv{% if all_active %} is-open{% else %}{% if (child.category_id == child_id) %} is-active-item is-open{% endif %}{% endif %}">
+						<span class="dflex justify-content-between">
+							<a href="{{ child.href }}">{{ child.name }}</a>
+							{% if (child.children is not empty) %}
+                  <div class="icon-mc-down"></div>
+              {% else %}
+                <div class="icon-mc-empty"></div>
+              {% endif %}
+						</span>
+                  {% if (child.children is not empty) %}
+                    <ul class="list-unstyled mc-children children-3-lv">
+                      {% for child_3lv in child['children'] %}
+                        <li class="mc-child-item child-3-lv{% if all_active %} is-open{% else %}{% if (child_3lv.category_id == child_3lv_id) %} is-active-item{% endif %}{% endif %}">
+                          <a href="{{ child_3lv.href }}">{{ child_3lv.name }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <script>
+    $(document).on('click', '.icon-mc-down', function(e){
+      e.preventDefault();
+
+      if ( $(this).closest('li').is('.is-open') ) {
+        $(this).parent().next().slideUp('fast', function () {
+          $(this).closest('li').removeClass('is-open');
+        });
+      } else {
+        $(this).parent().next().slideDown('fast', function () {
+          $(this).closest('li').addClass('is-open')
+        });
+      }
+    });
+  </script>
+{% endif %}

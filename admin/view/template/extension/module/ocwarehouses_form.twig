@@ -1,0 +1,152 @@
+{{ header }}{{ column_left }}
+	{% set token_random = random() %}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-html" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary">
+          <i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i
+            class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+
+          {#Status#}
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+            <div class="col-sm-2">
+              <select name="status" id="input-status" class="form-control">
+                {% if status %}
+                  <option value="1" selected="selected">{{ text_enabled }}</option>
+                  <option value="0">{{ text_disabled }}</option>
+                {% else %}
+                  <option value="1">{{ text_enabled }}</option>
+                  <option value="0" selected="selected">{{ text_disabled }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+
+          {#Address#}
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-name">Name</label>
+            <div class="col-sm-10">
+              {% for language in  languages %}
+                <input type="text" name="lang[{{language['language_id']}}][name]" value="{{ name }}" placeholder="Name" id="input-name" class="form-control"/>
+                {% if error_name %}
+                  <div class="text-danger">{{ error_name }}</div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+
+          {#LatLon#}
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-lat">Lat</label>
+            <div class="col-sm-2">
+                <input type="text" name="lat" value="{{ lat }}" placeholder="lat" id="input-lat" class="form-control"/>
+            </div>
+            <label class="col-sm-1 control-label" for="input-lon">Lon</label>
+            <div class="col-sm-2">
+                <input type="text" name="lon" value="{{ lon }}" placeholder="lon" id="input-lon" class="form-control"/>
+            </div>
+          </div>
+
+          {#Uid#}
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-name">Uid</label>
+            <div class="col-sm-10">
+                <input type="text" name="uid" value="{{ uid }}" placeholder="uid" id="input-uid" class="form-control"/>
+                {% if error_uid %}
+                  <div class="text-danger">{{ error_uid }}</div>
+                {% endif %}
+            </div>
+          </div>
+
+          {#Phone#}
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-name">Phone</label>
+            <div class="col-sm-10">
+              <input type="text" name="phone" value="{{ phone }}" placeholder="phone" id="input-phone" class="form-control"/>
+              {% if error_phone %}
+                <div class="text-danger">{{ error_phone }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          {#Image#}
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-image">Image</label>
+            <div class="col-sm-10">
+              <a href="" id="thumb-image" data-toggle="image" class="img-thumbnail">
+                  <img src="{{ thumb }}" alt="" title="" data-placeholder="{{ placeholder }}"/></a>
+                <input type="hidden" name="image" value="{{ image }}" id="input-image"/>
+            </div>
+          </div>
+
+          {#Working hours#}
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-name">Working hours</label>
+            <div class="col-sm-10">
+              {% for language in  languages %}
+                <textarea data-toggle="ckeditor" data-lang="{{ summernote }}" name="lang[{{language['language_id']}}][working_hours]" placeholder="Working_hours" id="input-working-hours" class="form-control">
+                  {{ working_hours }}
+                </textarea>
+                {% if error_working_hours %}
+                  <div class="text-danger">{{ error_working_hours }}</div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+
+          {#Address#}
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-name">Address</label>
+            <div class="col-sm-10">
+              {% for language in  languages %}
+              <input type="text" name="lang[{{language['language_id']}}][address]" value="{{ address }}" placeholder="Address" id="input-address" class="form-control"/>
+              {% if error_address %}
+                <div class="text-danger">{{ error_address }}</div>
+              {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="view/javascript/summernote/opencart.js"></script>
+
+<script type="text/javascript" src="view/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="view/javascript/ckeditor/adapters/jquery.js"></script>
+
+<script type="text/javascript">
+  //++Andrey
+  $(document).ready(function () {
+    $('textarea[data-toggle=\'ckeditor\']').ckeditor({
+      language: '{{ ckeditor }}'
+    });
+  });
+</script>
+
+{{ footer }}

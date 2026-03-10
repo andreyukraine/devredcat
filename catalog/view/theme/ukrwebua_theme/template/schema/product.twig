@@ -1,0 +1,57 @@
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Product",
+  "name": "{{ heading_title }}",
+  "image": [
+  {% for image in images %}
+    "{{ image.thumb }}"
+    {% if not loop.last %},{% endif %}
+  {% endfor %}
+  ],
+  "description": "{{ schema_desc|striptags|slice(0, 5000)|e('html') }}",
+  "sku": "{{ model }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "{{ schema_brand }}"
+  },
+  "offers": {
+    "@type": "Offer",
+    "availability": "{{ can_buy ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}",
+    "url": "{{ schema_url }}",
+    "price": "{{ schema_price }}",
+    "priceCurrency": "UAH",
+    "priceValidUntil": "{{ 'now'|date_modify('+1 year')|date('Y-m-d') }}"
+  }
+  {% if total_reviews > 0 %}
+  ,
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ rating }}",
+    "ratingCount": {{ total_reviews }},
+    "bestRating": 5,
+    "worstRating": 1
+  },
+  "review": [
+    {% for r in reviews_detail %}
+    {
+      "@type": "Review",
+      "author": {
+        "@type": "Person",
+        "name": "{{ r.author }}"
+      },
+      "datePublished": "{{ r.date_added }}",
+      "description": "{{ r.text }}",
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "{{ r.rating }}",
+        "bestRating": 5,
+        "worstRating": 1
+      }
+    }
+    {% if not loop.last %},{% endif %}
+  {% endfor %}
+  ]
+  {% endif %}
+}
+</script>

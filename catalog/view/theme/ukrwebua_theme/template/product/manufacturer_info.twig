@@ -1,0 +1,552 @@
+{{ header }}
+<div class="fluid-width">
+
+  {% if banner is not empty %}
+    <div class="container">
+      <div class="banner">
+        {{ banner }}
+      </div>
+    </div>
+  {% endif %}
+
+
+  <div id="product-manufacturer" data-manufacturer-id="{{ manufacturer_id }}" class="container">
+
+    <div class="top-cat row fluid-width">
+      <div class="breadcrumbs container">
+        <h1 class="category-name">{{ heading_title }}</h1>
+        <ul class="breadcrumb">
+          {% for breadcrumb in breadcrumbs %}
+            <li><a title="{{ breadcrumb.text }}" href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+          {% endfor %}
+          <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement":
+              [
+                {% for breadcrumb in breadcrumbs %}
+            {% if loop.first %}
+          {% else %}
+                  {
+                    "@type": "ListItem",
+                    "position": {{ loop.index -1 }},
+                    "item":
+                    {
+                      "@id": "{{ breadcrumb.href }}",
+                      "name": "{{ breadcrumb.text }}"
+                    }
+                  }{% if not loop.last %}{% endif %}
+            {% endif %}
+            {% endfor %}
+              ]
+            }
+
+          </script>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Блок для вибраних фільтрів -->
+    <div class="toolbar toolbar-products">
+
+      <div id="af_selected_filter">
+        <!-- Контейнер для обраних фільтрів -->
+        <div id="active-filters-container"></div>
+      </div>
+
+      <div class="sort-bl">
+        <div class="count-prods">
+        </div>
+        <div class="right-sort">
+          <!-- Контейнер для переключателя вида -->
+          <div id="view-switcher-container"
+               data-react-component="ViewSwitcher">
+          </div>
+          <script
+            defer
+            src="/catalog/view/javascript/react/react-main.js"
+            onload="ReactApp && ReactApp.renderComponent('ViewSwitcher', {}, 'view-switcher-container')">
+          </script>
+
+          <div class="sorter btn-group">
+            <div class="dropdown-toggle sort-button" data-toggle="dropdown">
+              <div class="sort_text"><img width="30px" height="30px" alt="sort" src="/image/sort.svg"></div>
+              <div class="sort_val">
+                {% for sorts in sorts %}
+                  {% if sorts.value == '%s-%s'|format(sort, order) %}
+                    {{ sorts.text }}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            <div class="dropdown-menu sort-content">
+              {% for sorts in sorts %}
+                <a href="{{ sorts.href }}"
+                   class="dropdown-item {% if sorts.value == '%s-%s'|format(sort, order) %} active {% endif %}">
+                  {{ sorts.text }}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="bl-content row">
+
+
+      <div class="col-md-3 col-sm-12 bl-bg-detta">
+        <div class="bl-cat-tree-mod">
+          {{ category_tree }}
+        </div>
+      </div>
+
+      <div id="content" class="col-md-9 col-sm-12">
+
+        <div id="ajax-filter-container" class="custom-category">
+          {% if products %}
+            <div class="category-product-list">
+              {% for product in products %}
+                <div id="product-{{ product.product_id }}"
+                     class="product-layout product-grid grid-style col-lg-4 col-md-4 col-sm-4 col-xs-12 product-item">
+                  <div class="product-thumb{% if not product.on_stock %} not-stock{% endif %}">
+                    <div class="item">
+                      <div class="images-container">
+                        <div class="inner">
+
+                          <div class="label-product label-sale-{{ product.product_id }}">
+                            {% if product.special %}
+                              <div class="bg-special">
+                                <span>{{ '-' ~ product.rate_special ~ '%' ~ text_label_sale }}</span></div>
+                            {% endif %}
+                            <div class="box-label">
+                              <div class="statuses-product statuses-{{ product.product_id }}">
+                                {% for status in product.statuses %}
+                                  <div class="status-product label_{{ status.code }}"
+                                       style="background-color: {{ status.color }}"><span>{{ status.name }}</span></div>
+                                {% endfor %}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="image">
+                            {% if product.images|length > 0 %}
+                              <a href="{{ product.href }}">
+                                <div class="slider-for-{{ product.product_id }} slider">
+                                  {% for i, image in product.images %}
+                                    <div
+                                      class="item product-image-options-{{ image.product_option_value_id }} {% if image.select %}select{% endif %}"
+                                      data-pos="{{ i }}">
+                                      <img class="img-responsive" width="{{ image.width }}" height="{{ image.height }}"
+                                           src="{{ image.thumb }}" title="{{ product.name }}" alt="{{ product.name }}"/>
+                                    </div>
+                                  {% endfor %}
+                                </div>
+                              </a>
+                            {% endif %}
+                          </div>
+
+                          <div class="button-group action-links">
+                            <div class="inner">
+                              <div
+                                class="wishlist btn-wishlist-{{ product.product_id }}{% if product.in_wishlist %} is-check{% endif %}"
+                                onclick="toggleWishlist('{{ product.product_id }}', '{{ product.in_wishlist }}')"></div>
+                            </div>
+                            <div class="btn-quickview hidden-xs" title="{{ button_quickview }}"
+                                 onclick="ocquickview.open('{{ product.href }}')">
+                            </div>
+                          </div>
+
+                          {% if product.special %}
+                            {% if product.date_end %}
+                              <div class="bl-countdown">
+                                <div class="text-discont-countdown">{{ text_discont_countdown }}</div>
+                                <div id="countdown{{ product.product_id }}" class="box-timer"></div>
+                                <script type="text/javascript">
+                                  // Передаем дату окончания и ID элемента
+                                  initializeCountdown("{{ product.date_end|date('Y-m-d H:i:s') }}", "countdown{{ product.product_id }}");
+                                </script>
+                              </div>
+                            {% endif %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bl-opt-prod">
+                    <div class="caption">
+                      <div class="ratings">
+                        <div class="rating-box">
+                          {% if product.rating > 0 %}
+                            {% for i in 1..5 %}
+                              {% if i <= product.rating %}
+                                <div class="active"></div>
+                              {% else %}
+                                <div class="deactive"></div>
+                              {% endif %}
+                            {% endfor %}
+                          {% endif %}
+                        </div>
+                        <h4 class="product-name"><a href="{{ product.href }}">{{ product.name }}</a></h4>
+                      </div>
+                      <div class="bl-price" data-product-id="{{ product.product_id }}">
+                        {% if product.price %}
+                          <div class="btn-card">
+                            <div class="price-box-{{ product.product_id }} bl-price-catalog">
+                              {% if not product.special %}
+                                <div class="box-regular">
+                                  <div class="regular-price"><span class="price">{{ product.price }}</span></div>
+                                </div>
+                              {% else %}
+                                <div class="box-special">
+                                  <div class="old-price"><span class="price">{{ product.price }}</span></div>
+                                  <div class="special-price"><span class="price">{{ product.special }}</span></div>
+                                </div>
+                              {% endif %}
+                              <div class="stock-status">{% if product.on_stock %}<span
+                                  class="in-stock">В наявності</span>{% else %}<span
+                                  class="out-stock">Під замовлення</span>{% endif %}</span>
+                              </div>
+                            </div>
+                            <div class="visible-xs">
+                              <a title="Купити" href="{{ product.href }}">
+                                <div class="bl-add-in-cart">
+                                  <div class="minus-add"></div>
+                                  <div class="plus-add-text">Додати до кошика</div>
+                                  <div class="plus-add {% if not product.on_stock %}not-available{% endif %}"></div>
+                                </div>
+                              </a>
+                            </div>
+
+                            {% if config_is_catalog < 1 %}
+                              <div class="product-cart-block hidden-xs">
+                                <div id="prod-bl-qty-{{ product.product_id }}" class="group-quantity">
+                                  <input id="key-{{ product.product_id }}" type="hidden" name="product_id"
+                                         value="{{ product.product_id }}"/>
+
+                                  {% if product.quantity == 0 %}
+                                    <div class="bl-add-in-cart cart-btns-{{ product.uniq_id }}" data-key="{{ product.product_id }}" data-cart="0" {% if product.is_buy %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                      {% if not product.on_stock %}
+                                        <div class="notify" data-product="{{ product.product_id }}" data-opt="{{ product.uniq_id }}" onclick="notify.open(this)">Повідомити про наявність</div>
+                                      {% else %}
+                                        <div class="minus-add"></div>
+                                        <div class="plus-add-text">Додати до кошика</div>
+                                        <div class="plus-add {% if not product.on_stock %}not-available{% endif %}"></div>
+                                      {% endif %}
+                                    </div>
+                                  {% else %}
+                                    <div class="bl-add-in-cart cart-btns-{{ product.uniq_id }}"
+                                         data-key="{{ product.product_id }}" data-cart="{{ product.cart_id }}">
+                                      <div class="minus {% if product.quantity == 0 %}not-available{% endif %}"
+                                           data-key="{{ product.product_id }}"
+                                           data-cart="{{ product.cart_id }}"
+                                           {% if product.quantity > 0 %}onclick="custom_cart.handleClickMinus(this)"{% endif %}>
+                                        -
+                                      </div>
+                                      <input id="qty-{{ product.product_id }}-{{ product.cart_id }}"
+                                             data-key="{{ product.product_id }}"
+                                             data-cart="{{ product.cart_id }}"
+                                             type="number"
+                                             name="quantity" value="{{ product.quantity }}" size="3"
+                                             {% if not product.on_stock %}disabled="disabled"{% endif %}
+                                             class="quantity-input{% if not product.on_stock %} not-available{% endif %}"/>
+
+                                      <div class="plus {% if not product.is_buy %}not-available{% endif %}"
+                                           data-key="{{ product.product_id }}"
+                                           data-cart="{{ product.cart_id }}"
+                                           {% if product.is_buy %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                      </div>
+                                    </div>
+                                  {% endif %}
+                                </div>
+                              </div>
+                            {% endif %}
+
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                    {% if product.options %}
+                      <div data-options-id="{{ product.product_id }}" class="options-box hidden-xs">
+                        <div class="bl-temp-bg"></div>
+                        <div class="bl-opts-item">
+                          <div class="title-stock-warehouses">
+                            {{ text_option }}
+                            <div class="tooltip-container">
+                              <span class="tooltip-trigger"><img width="20px" height="20px" src="/image/info.svg"
+                                                                 alt="info"/></span>
+                              <div class="tooltip">
+                                <p class="bl-bold">Наявність на складі</p>
+                                <div class="option-qty">
+                                  <div class="stock-i-row"><span class="stock-more"></span> - достатньо</div>
+                                  <div class="stock-i-row"><span class="stock-end"></span> - закінчується</div>
+                                  <div class="stock-i-row"><span class="stock-small"></span> - мало</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="option-block required" data-id="{{ product.product_id }}">
+                            {% for option in product.options %}
+                              <div id="input-option{{ option.option_value_id }}" class="b2c-customer-block option-item{% if option.qty <= 0 %} not-available{% endif %}">
+                                <div class="radio">
+                                  <label class="custom-radio">
+                                    <input
+                                      type="radio"
+                                      name="option[{{ product.product_id }}]"
+                                      {% if option.selected %} checked="checked"{% endif %}
+                                      data-product-option="{{ option.product_option_id }}"
+                                      data-product="{{ product.product_id }}"
+                                      data-cart="{{ product.cart_id }}"
+                                      value="{{ option.product_option_id }}-{{ option.product_option_value_id }}"/>
+                                    <span class="radio-control{% if option.selected %} check{% endif %}">
+
+                                      {% if option.percent > 0 %}<span class="opt-discont">%</span>{% endif %}
+
+                                      {{ option.name }}
+
+                                      <div class="option-qty">
+                                          {% if option.qty >= 20 %}
+                                            <span class="stock-more"></span>
+                                          {% elseif option.qty < 20 and option.qty >= 10 %}
+                                            <span class="stock-end"></span>
+                                          {% elseif option.qty < 10 and option.qty > 0 %}
+                                            <span class="stock-small"></span>
+                                          {% endif %}
+                                      </div>
+
+                                    </span>
+                                  </label>
+                                  <div class="option-qty">
+                                    {% if option.qty >= 20 %}
+                                      <span class="stock-more"></span>
+                                    {% elseif option.qty < 20 and option.qty >= 10 %}
+                                      <span class="stock-end"></span>
+                                    {% elseif option.qty < 10 and option.qty > 0 %}
+                                      <span class="stock-small"></span>
+                                    {% endif %}
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="b2b-customer-block option-item" style="display: none">
+                                <div class="b2b-bl-name">
+                                  <div class="b2b-bl-percent">
+                                    {% if option.percent > 0 %}
+                                      <div class="bg-special">
+                                        <span>-{{ option.percent }}%</span>
+                                      </div>
+                                    {% endif %}
+                                  </div>
+                                  <div class="radio">
+                                    <label class="custom-radio">
+                                      <input
+                                        type="radio"
+                                        name="b2b_option[{{ product.product_id }}]"
+                                        {% if option.selected %} checked="checked"{% endif %}
+                                        data-product-option="{{ option.product_option_id }}"
+                                        data-product="{{ product.product_id }}"
+                                        data-cart="{{ product.cart_id }}"
+                                        value="{{ option.product_option_id }}-{{ option.product_option_value_id }}"/>
+                                    </label>
+                                    {{ option.name }}
+
+                                    <div class="option-qty">
+                                      {% if option.qty >= 20 %}
+                                        <span class="stock-more"></span>
+                                      {% elseif option.qty < 20 and option.qty >= 10 %}
+                                        <span class="stock-end"></span>
+                                      {% elseif option.qty < 10 and option.qty > 0 %}
+                                        <span class="stock-small"></span>
+                                      {% endif %}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="b2b-bl-price{% if not option.on_stock %} not-available{% endif %}">
+                                  {% if not option.special %}
+                                    <div class="box-regular">
+                                      <div class="regular-price"><span class="price">{{ option.price }}</span></div>
+                                    </div>
+                                  {% else %}
+                                    <div class="box-special">
+                                      <div class="old-price"><span class="price">{{ option.price }}</span></div>
+                                      <div class="special-price"><span class="price">{{ option.special }}</span></div>
+                                    </div>
+                                  {% endif %}
+                                </div>
+                                <div class="b2b-bl-left">
+                                  {% if option.opt_total_qty_in_cart == 0 %}
+                                    <div class="bl-add-in-cart cart-btns-{{ option.uniq_id }}" data-key="{{ product.product_id }}" data-cart="0" {% if option.on_stock %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                      {% if not option.on_stock %}
+                                        <div class="notify" data-product="{{ product.product_id }}" data-opt="{{ option.uniq_id }}" onclick="notify.open(this)">Повідомити про наявність</div>
+                                      {% else %}
+                                        <div class="minus-add"></div>
+                                        <div class="plus-add-text">Додати до кошика</div>
+                                        <div class="plus-add{% if not option.on_stock %} not-available{% endif %}"></div>
+                                      {% endif %}
+                                    </div>
+                                  {% else %}
+                                    <div class="bl-add-in-cart cart-btns-{{ option.uniq_id }}" data-key="{{ product.product_id }}" data-cart="{{ option.cart_id }}">
+                                      <div class="minus {% if option.opt_total_qty_in_cart == 0 %}not-available{% endif %}"
+                                           data-key="{{ product.product_id }}"
+                                           data-cart="{{ option.cart_id }}"
+                                           {% if option.opt_total_qty_in_cart > 0 %}onclick="custom_cart.handleClickMinus(this)"{% endif %}>-
+                                      </div>
+                                      <input id="qty-{{ product.product_id }}-{{ option.cart_id }}"
+                                             data-key="{{ product.product_id }}"
+                                             data-cart="{{ option.cart_id }}"
+                                             type="number"
+                                             name="quantity" value="{{ option.opt_total_qty_in_cart }}" size="3"
+                                             {% if not option.on_stock %}disabled="disabled"{% endif %}
+                                             class="quantity-input{% if not option.on_stock %} not-available{% endif %}"/>
+
+                                      <div class="plus {% if not option.on_stock %}not-available{% endif %}"
+                                           data-key="{{ product.product_id }}"
+                                           data-cart="{{ option.cart_id }}"
+                                           {% if option.on_stock %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                      </div>
+                                    </div>
+                                  {% endif %}
+                                </div>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            {% if pagination %}
+              <div class="toolbar toolbar-bottom">
+                {% if page < total_pages %}
+                  <div id="showmore" class="box-showmore">
+                    <button onclick="showmore()" class="showmore-btn button" type="button">
+                      <svg class="chm-icon-showmore">
+                        <use xlink:href="/image/showmore.svg#icon-showmore"></use>
+                      </svg>
+                      <span class="chm-btn-text">{{ text_show_more }}</span>
+                    </button>
+                  </div>
+                {% endif %}
+                <div class="pages">{{ pagination }}</div>
+              </div>
+            {% endif %}
+          {% else %}
+            <p>{{ text_empty }}</p>
+          {% endif %}
+        </div>
+        {% if description %}
+          <div class="description">{{ description }}</div>
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+  <script><!--
+
+    let selectedCategories = [];
+
+    function clickCategory(cat_id) {
+      if (cat_id === null) {
+        selectedCategories = [];
+      } else {
+        cat_id = cat_id.toString();
+        const index = selectedCategories.indexOf(cat_id);
+        if (index > -1) {
+          selectedCategories.splice(index, 1);
+        } else {
+          selectedCategories.push(cat_id);
+        }
+      }
+
+      // Оновлюємо візуальний стан чекбоксів
+      document.querySelectorAll('.category-filter-item').forEach(el => el.classList.remove('is_check'));
+      selectedCategories.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('is_check');
+      });
+
+      updateActiveFilters();
+
+      // AJAX запит
+      const formData = new FormData();
+      if (selectedCategories.length > 0) {
+        formData.append('category_id', selectedCategories.join(','));
+      }
+      formData.append('manufacturer_id', '{{ manufacturer_id }}');
+      formData.append('curRoute', 'manufacturer');
+      formData.append('page', '1');
+
+      $.ajax({
+        url: 'index.php?route=extension/module/d_ajax_filter/ajax',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function () {
+          $('#ajax-filter-container').addClass('custom_lock');
+        },
+        success: function (json) {
+          $('#ajax-filter-container').removeClass('custom_lock');
+          if (json.success) {
+            const $data = $('<div>').html(json.products);
+            const $newProducts = $data.find('.category-product-list > div');
+            const $container = $('.category-product-list');
+
+            $container.empty().append($newProducts);
+            initSlidersForNewProducts($newProducts);
+            updateViewDisplay();
+            updatePagination($data);
+          }
+
+          $('#showmore .chm-btn').removeClass('active-load');
+
+          if (!$('.pagination li.active').next('li').length) {
+            $('#showmore').hide();
+          }
+        },
+        error: function () {
+          $('#ajax-filter-container').removeClass('custom_lock');
+          $('#showmore .chm-btn').removeClass('active-load');
+          alert('Помилка завантаження наступної сторінки');
+        }
+      });
+    }
+
+    function updateActiveFilters() {
+      const container = document.getElementById('active-filters-container');
+      if (!container) return;
+
+      if (selectedCategories.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let chipsHtml = '';
+      selectedCategories.forEach(id => {
+        const el = document.getElementById(id);
+        const nameElement = el ? el.querySelector('.b-cursor') : null;
+        const name = nameElement ? nameElement.innerText : '...';
+        chipsHtml += `<div class="filter-chip" onclick="clickCategory('${id}')">${name} <span class="chip-close">×</span></div>`;
+      });
+
+      container.innerHTML = `
+        <div class="active-filters-wrapper">
+          <div class="active-filters">
+            <div class="filter-group">
+              <div class="filter-chips">${chipsHtml}</div>
+            </div>
+            <button class="reset-filters-btn" onclick="clickCategory(null)">Скинути фільтри</button>
+          </div>
+        </div>
+      `;
+    }
+    --></script>
+</div>
+{{ footer }}
+
+{{ schema_manufacturer }}

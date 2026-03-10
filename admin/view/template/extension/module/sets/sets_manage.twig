@@ -1,0 +1,210 @@
+{{ header }}{{ column_left }} 
+<div id="content">
+
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button type="submit" form="form-sets_manage" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %} 
+                <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+                {% endfor %} 
+            </ul>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        {% if (error_warning) %} 
+        <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }} 
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+        {% endif %} 
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+            </div>
+            <div class="panel-body">
+                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-sets-manage" class="form-horizontal">
+                    <div class=''>
+                        <div class='col-sm-6'>
+                            <button class='btn btn-success' id="add">{{ btn_add_set }}</button>
+                        </div>
+                        <div class='col-sm-6'>
+                            <button class='btn btn-danger' id="clear">{{ btn_del_set }}</button>
+                        </div>
+                    </div>
+                    <div class='clearfix'></div>
+                    <div class='result'></div>
+
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="cat">{{ entry_category }}</label>
+                        <div class="col-sm-10">
+                            <select name="cat" id="cat" class="form-control">
+                                {% for cat in cats %} 
+                                <option value="{{ cat['category_id'] }}" selected="selected">{{ cat['name'] }}</option>
+                                {% endfor %} 
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-status">{{ entry_products }}</label>
+                        <div class="col-sm-10">
+                            <input name="product_name" class="product_name form-control">
+                        </div>
+                    </div>
+
+                    <table class="table products table-bordered">
+                        <thead>
+                            <tr>
+                                <td>{{ entry_name }}</td>
+                                <td>{{ entry_qunatity }}</td>
+                                <td>{{ entry_option }}</td>
+                                <td>{{ entry_delete }}</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>{{ entry_discount }}</td>
+                                <td colspan='4'>
+                                     <input name="discount" type='text' class="form-control">
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+<style>
+    .btn
+    {
+        margin: 0 auto;
+        display:table;
+    }
+    .result
+    {
+        margin:15px 0;
+    }
+</style>
+<script>
+    $('.products').on('click', '.del_product', function () {
+        $(this).parents('tr').remove();
+        return false;
+    });
+
+    $('#form-sets-manage').on('click', '#add', function () {
+        var data = $('#form-sets-manage input,#form-sets-manage select,#form-sets-manage checkbox').serialize();
+
+        $.ajax({
+            url: 'index.php?route=extension/module/sets_manage/add&user_token={{ user_token }}',
+            method: 'POST',
+            data: data,
+            success: function (json) {
+
+                if (json['error']) {
+                    $("#form-sets-manage .result").html('<div class=\'alert alert-danger\'>' + json['error'] + '</div>')
+                }
+
+                if (json['success']) {
+                    $("#form-sets-manage .result").html('<div class=\'alert alert-success\'>' + json['success'] + '</div>')
+                }
+            }
+        });
+
+        return false;
+    });
+
+    $('#form-sets-manage').on('click', '#clear', function () {
+        var cat_id = $('#form-sets-manage #cat').val();
+
+        $.ajax({
+            url: 'index.php?route=extension/module/sets_manage/clear&user_token={{ user_token }}',
+            method: 'POST',
+            data: {cat_id:cat_id},
+            success: function (json) {
+
+                if (json['error']) {
+                    $("#form-sets-manage .result").html('<div class=\'alert alert-danger\'>' + json['error'] + '</div>')
+                }
+
+                if (json['success']) {
+                    $("#form-sets-manage .result").html('<div class=\'alert alert-success\'>' + json['success'] + '</div>')
+                }
+            }
+        });
+
+        return false;
+    });
+
+
+
+    function autocomplete_select(item) {
+        var new_row = "{{ row }}";
+        var i = $('.products tbody tr:last').index() + 1 + 1;
+
+        new_row = new_row.replace(/{pi}/g, i);
+
+        new_row = $(new_row);
+
+
+        $(new_row).find('.product_name input[type="text"]').val(item['label']);
+        $(new_row).find('.product_name input[type="hidden"]').val(item['value']);
+        $(new_row).find('.old_price input').val(item['price']);
+        $(new_row).find('.new_price input').val(item['price']);
+
+
+        $('.products tbody').append(new_row);
+        
+        if (item['option'].length)
+            $.ajax({
+                method: 'POST',
+                url: 'index.php?route=extension/module/sets/optionsForms&user_token={{ user_token }}',
+                data: {options: item['option']},
+                success: function (data) {
+                    data = data.replace(/set\[{si}\]\[products\]\[{pi}\]/g, 'products[' + i + ']');
+
+                    $(new_row).find('.option .modal-body').html(data);
+
+                    
+                }
+            });
+
+
+    }
+
+    function autocomplete_source(request, response) {
+
+
+        $.ajax({
+            url: 'index.php?route=extension/module/sets/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+            dataType: 'json',
+            success: function (json) {
+                response($.map(json, function (item) {
+                    
+                    return {
+                        label: item['name'],
+                        value: item['product_id'],
+                        price: item['price'],
+                        option: item['option']
+                    }
+                }));
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $('.product_name').autocomplete({'source': autocomplete_source,'select': autocomplete_select});
+    });
+
+</script>
+{{ footer }}

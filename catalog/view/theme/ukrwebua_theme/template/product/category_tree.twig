@@ -1,0 +1,84 @@
+{% if (category_tree is not empty) %}
+  <!-- Category Tree Rendered -->
+  {% for type, categories in category_tree %}
+  <div class="bl-cat-tree-group">
+    <div class="mod-categories-title text-18 bl-bold">{% if type == 0 %}Категорії{% else %}Улюбленець{% endif %}</div>
+    <div class="bl-cat-tree-discont">
+      <div class="col-order-inner">
+        <div class="mod-categories">
+          <ul class="list-unstyled mod-cat-list-items">
+            {% for category in categories %}
+              <li class="mc-item is-open">
+                <span class="dflex justify-content-between">
+                  <div id="{{ category.category_info.category_id }}" class="category-filter-item">
+                    <div class="checkbox-wrapper" onclick="clickCategory('{{ category.category_info.category_id }}')">
+                      <span class="custom-checkbox"></span>
+                      <span class="b-cursor bl-bold text-16">{{ category.category_info.name }}</span>
+                    </div>
+                  </div>
+                  {% if (category.children is not empty) %}
+                    <div class="mc-show-child dflex">
+                      <div class="icon-mc-down"></div>
+                    </div>
+                  {% endif %}
+                </span>
+                {% if (category.children is not empty) %}
+                  <ul class="list-unstyled mc-children children-2-lv">
+                    {% for child in category.children %}
+                      <li class="mc-child-item child-2-lv is-open">
+                        <span class="dflex justify-content-between">
+                            <div id="{{ child.category_info.category_id }}" class="category-filter-item">
+                              <div class="checkbox-wrapper" onclick="clickCategory('{{ child.category_info.category_id }}')">
+                                <span class="custom-checkbox"></span>
+                                <span class="b-cursor">{{ child.category_info.name }}</span>
+                              </div>
+                            </div>
+                          {% if (child.children is not empty) %}
+                            <div class="mc-show-child dflex">
+                              <div class="icon-mc-down"></div>
+                            </div>
+                          {% endif %}
+                        </span>
+                        {% if (child.children is not empty) %}
+                          <ul class="list-unstyled mc-children children-3-lv">
+                            {% for child_3lv in child.children %}
+                              <li class="mc-child-item child-3-lv is-open">
+                                  <div id="{{ child_3lv.category_info.category_id }}" class="category-filter-item">
+                                    <div class="checkbox-wrapper" onclick="clickCategory('{{ child_3lv.category_info.category_id }}')">
+                                      <span class="custom-checkbox"></span>
+                                      <span class="b-cursor">{{ child_3lv.category_info.name }}</span>
+                                    </div>
+                                  </div>
+                              </li>
+                            {% endfor %}
+                          </ul>
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <script>
+    $(document).on('click', '.mc-show-child', function (e) {
+      e.preventDefault();
+
+      if ($(this).closest('li').is('.is-open')) {
+        $(this).parent().next().slideUp('fast', function () {
+          $(this).closest('li').removeClass('is-open');
+        });
+      } else {
+        $(this).parent().next().slideDown('fast', function () {
+          $(this).closest('li').addClass('is-open');
+        });
+      }
+    });
+  </script>
+{% endif %}

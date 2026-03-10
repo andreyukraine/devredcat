@@ -1,0 +1,1127 @@
+{{ header }}
+{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <h1><i class="fa fa-cubes"></i>&nbsp;{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+      <div class="alert alert-danger autoSlideUp"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    {% if success %}
+      <div class="alert alert-success autoSlideUp"><i class="fa fa-check-circle"></i> {{ success }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+      <script>$('.autoSlideUp').delay(3000).fadeOut(600, function () {
+          $(this).show().css({'visibility': 'hidden'});
+        }).slideUp(600);</script>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-list"></i>&nbsp;<span style="vertical-align:middle;font-weight:bold;">Настройки модуля</span>
+        </h3>
+        <div class="storeSwitcherWidget">
+          <div class="form-group">
+            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+              &nbsp;&nbsp;{{ store.name }} {% if store.store_id == 0 %} <strong>{{ text_default }}</strong>{% endif %}
+              &nbsp;<span class="caret"></span><span class="sr-only">Toggle Dropdown</span></button>
+            <ul class="dropdown-menu" role="menu">
+              {% for st in stores %}
+                <li><a
+                    href="index.php?route={{ modulePath }}&store_id={{ st.store_id }}&user_token={{ user_token }}">{{ st.name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form">
+          <input type="hidden" name="store_id" value="{{ store.store_id }}"/>
+          <input type="hidden" name="{{ moduleName }}_status" value="1"/>
+          <div class="tabbable">
+            <div class="tab-navigation form-inline">
+              <ul class="nav nav-tabs mainMenuTabs" id="mainTabs" role="tablist">
+                <li class="active"><a href="#controlpanel" data-toggle="tab"><i class="fa fa-power-off"></i>&nbsp;Модуль</a>
+                </li>
+                <li id="bundlesTab"><a href="#bundles" data-toggle="tab"><i class="fa fa-cubes"></i>&nbsp;Комплекты</a>
+                </li>
+                <li id="settingsTab" class="dropdown">
+                  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-columns"></i>&nbsp;Настройки<span
+                      class="caret"></span></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#widget" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i>&nbsp;Виджет
+                        комплектов</a></li>
+                    <li><a href="#view" role="tab" data-toggle="tab"><i class="fa fa-tag"></i>&nbsp;Вид комплекта</a>
+                    </li>
+                    <li><a href="#listing" role="tab" data-toggle="tab"><i class="fa fa-indent"></i>&nbsp;Список
+                        комплектов</a></li>
+                  </ul>
+                </li>
+              </ul>
+              <div class="tab-buttons">
+                <button type="submit" class="btn btn-success save-changes"><i class="fa fa-check"></i>&nbsp;Сохранить
+                </button>
+                <a href="{{ cancel }}" class="btn btn-warning"><i class="fa fa-times"></i>&nbsp;{{ button_cancel }}</a>
+              </div>
+            </div>
+            <div class="tab-content">
+              <div id="controlpanel" class="tab-pane active">
+                <table class="table">
+                  <tr>
+                    <td class="col-xs-3">
+                      <h5><span class="required">*</span> <strong>Статус:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <select id="Checker" name="{{ moduleName }}[Enabled]" class="form-control">
+                          <option value="yes"
+                                  {% if moduleData.Enabled is not empty and moduleData.Enabled == 'yes' %}selected="selected"{% endif %}>{{ text_enabled }}</option>
+                          <option value="no"
+                                  {% if moduleData.Enabled is empty or moduleData.Enabled == 'no' %}selected="selected"{% endif %}>{{ text_disabled }}</option>
+                        </select>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-xs-3">
+                      <h5><strong>Если один комплект добавлен несколько раз в корзину:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <select name="{{ moduleName }}[MultipleBundles]" class="form-control">
+                          <option value="no"
+                                  {% if moduleData.MultipleBundles is empty or moduleData.MultipleBundles == 'no' %}selected="selected"{% endif %}>
+                            Добавить скидку один раз
+                          </option>
+                          <option value="yes"
+                                  {% if moduleData.MultipleBundles is not empty and moduleData.MultipleBundles == 'yes' %}selected="selected"{% endif %}>
+                            Добавить скидку каждый раз
+                          </option>
+                        </select>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-xs-3">
+                      <h5><span class="required">*</span> <strong>Скидка на комплект включает стоимость НДС</strong>
+                      </h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <select name="{{ moduleName }}[DiscountTaxation]" class="form-control">
+                          <option value="no"
+                                  {% if moduleData.DiscountTaxation is empty or moduleData.DiscountTaxation == 'no' %}selected="selected"{% endif %}>
+                            Да
+                          </option>
+                          <option value="yes"
+                                  {% if moduleData.DiscountTaxation is not empty and moduleData.DiscountTaxation == 'yes' %}selected="selected"{% endif %}>
+                            Нет
+                          </option>
+                        </select>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div id="bundles" class="tab-pane">
+                <table class="table">
+                  <tbody>
+                  <tr>
+                    <td class="col-xs-4">
+                      <h5><strong>Показывать случайные комплекты:</strong></h5>
+                      <span class="help"><i class="fa fa-info-circle"></i>&nbsp;Если включено, модуль будет отображать комплекты случайно на <strong>макетах</strong>, где модуль выведен. Применяется только на страницах без комплектов.</span>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <select name="{{ moduleName }}[ShowRandomBundles]" class="form-control">
+                          <option value="yes"
+                                  {% if moduleData.ShowRandomBundles is defined and moduleData.ShowRandomBundles == 'yes' %}selected="selected"{% endif %}>
+                            Включено
+                          </option>
+                          <option value="no"
+                                  {% if moduleData.ShowRandomBundles is not defined or moduleData.ShowRandomBundles == 'no' %}selected="selected"{% endif %}>
+                            Отключено
+                          </option>
+                        </select>
+                      </div>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+
+                <div class="table-responsive">
+                  <table id="module" class="table table-bordered table-hover" width="100%">
+                    <thead>
+                    <tr class="table-header">
+                      <td class="left" width="50%" style="vertical-align:top;">
+                        <strong>Товары в комплекте:</strong><br/>
+                        <span style="font-weight:normal;">
+            <i class="icon-info-sign"></i>
+            <strong>Заметка:</strong> Если товары имеют значок <i class="fa fa-tags"
+                                                                  style="color:#ab9a87;font-size:14px;"></i> - значит у них есть опции.
+          </span>
+                      </td>
+                      <td class="left" width="20%" style="vertical-align:top;">
+                        <strong>Настройки комплекта:</strong><br/>
+                        <span style="font-weight:normal;"><i class="icon-info-sign"></i></span>
+                      </td>
+                      <td class="left" width="30%" style="vertical-align:top;">
+                        <strong>Вывод комплекта:</strong><br/>
+                        <span style="font-weight:normal;">
+            <i class="icon-info-sign"></i> Выберите товары и категории, где модуль будет выведен <br/>
+            <strong>Заметка:</strong> Если имеется более одного комплекта, связанного с товаром / категорией, они будут отображаться случайным образом.
+          </span>
+                      </td>
+                      <td width="1%" style="vertical-align:top;"></td>
+                    </tr>
+                    </thead>
+
+                    {% set module_row = 0 %}
+                    {% if CustomBundles is defined %}
+                      {% for module in CustomBundles %}
+                        {% set bundle_id = module.id is defined ? module.id : random(10000, 99999) %}
+                        <tbody id="module-row{{ bundle_id }}">
+                        <tr>
+                          <td class="left" style="vertical-align:top;">
+                            <input type="hidden" class="bundle_id" name="productbundles_custom[{{ bundle_id }}][id]"
+                                   value="{{ bundle_id }}"/>
+                            <span style="vertical-align:middle;">Добавить товар:</span>
+                            <input type="text" name="productsInput" class="form-control" value=""/>
+
+                            <div id="product-bundle_{{ bundle_id }}" class="scrollbox first">
+                              {% if module.products is defined %}
+                                {% set class1 = 'odd' %}
+                                {% for pr in module.products %}
+                                  {% set class1 = (class1 == 'even') ? 'odd' : 'even' %}
+                                  {% set product = model_catalog_product.getProduct(pr) %}
+                                  {% set product_options = model_catalog_product.getProductOptions(pr) %}
+                                  {% set product_specials = model_catalog_product.getProductSpecials(pr) %}
+                                  {% set special = false %}
+
+                                  {% for product_special in product_specials %}
+                                    {% if (product_special.date_start == '0000-00-00' or product_special.date_start < 'now'|date('Y-m-d')) and (product_special.date_end == '0000-00-00' or product_special.date_end > 'now'|date('Y-m-d')) %}
+                                      {% set special = product_special.price %}
+                                    {% endif %}
+                                  {% endfor %}
+
+                                  {% set final_price = special ? special : product.price %}
+
+                                  <div id="product-bundle_{{ bundle_id }}_{{ pr }}" class="{{ class1 }}">
+                                    {% if product_options is not empty %}<i class="fa fa-tags"
+                                                                            style="color:#ab9a87;font-size:13px;"></i> {% endif %}
+                                    {{ product.name }} - {{ currencyLibrary.format(final_price, config_currency) }}
+                                    <i class="fa fa-minus-circle removeIcon" product_price="{{ final_price }}"></i>
+                                    <input type="hidden" name="productbundles_custom[{{ bundle_id }}][products][]"
+                                           value="{{ pr }}"/>
+                                  </div>
+                                {% endfor %}
+                              {% endif %}
+                            </div>
+                          </td>
+
+                          <td class="left" style="vertical-align:top;">
+                            <div class="tab-content">
+                              Заголовок
+                              {% for language in languages %}
+                                <div id="{{ bundle_id }}-{{ language.language_id }}"
+                                     class="tab-pane {% if loop.first %}active{% endif %}">
+                                  <div class="input-group">
+                                    <span class="input-group-addon"><img src="{{ language.flag_url }}"/></span>
+                                    <input type="text" class="form-control"
+                                           name="productbundles_custom[{{ bundle_id }}][name][{{ language.language_id }}]"
+                                           value="{{ module.name[language.language_id] is defined ? module.name[language.language_id] : '' }}"/>
+                                  </div>
+                                </div>
+                              {% endfor %}
+                            </div>
+
+                            <br/>
+                            <div id="product-bundle-prices_{{ bundle_id }}">
+                              <h5>Общая стоимость: {% if currencyAlignment == "L" %}{{ currency }}{% endif %}
+                                <span
+                                  id="product-bundle-totalprice_{{ bundle_id }}">{{ module.totalprice is defined ? module.totalprice : '0' }}</span>
+                                <input type="hidden" name="productbundles_custom[{{ bundle_id }}][totalprice]"
+                                       value="{{ module.totalprice is defined ? module.totalprice : '0' }}"/>
+                                {% if currencyAlignment == "R" %}{{ currency }}{% endif %}
+                              </h5>
+
+                              <h5>Стоимость комплекта: {% if currencyAlignment == "L" %}{{ currency }}{% endif %}
+                                <span
+                                  id="product-bundle-price_{{ bundle_id }}">{{ module.price is defined ? module.price : '0' }}</span>
+                                <input type="hidden" name="productbundles_custom[{{ bundle_id }}][price]"
+                                       value="{{ module.price is defined ? module.price : '0' }}"/>
+                                {% if currencyAlignment == "R" %}{{ currency }}{% endif %}
+                              </h5>
+
+                              <br/>
+                              <h5>Скидка:</h5>
+                              <div class="col-xs-12" style="float:none;margin:0px;padding:0px;">
+                                {% if currencyAlignment == "L" %}
+                                  <div class="input-group">
+                                    <span class="input-group-addon">{{ currency }}</span>
+                                    <input class="input-mini voucherPrice form-control"
+                                           name="productbundles_custom[{{ bundle_id }}][voucherprice]"
+                                           id="product-bundle-voucherprice{{ bundle_id }}" type="text"
+                                           value="{{ module.voucherprice is defined ? module.voucherprice : '0' }}">
+                                  </div>
+                                {% else %}
+                                  <div class="input-group">
+                                    <input class="input-mini voucherPrice form-control"
+                                           name="productbundles_custom[{{ bundle_id }}][voucherprice]"
+                                           id="product-bundle-voucherprice{{ bundle_id }}" type="text"
+                                           value="{{ module.voucherprice is defined ? module.voucherprice : '0' }}">
+                                    <span class="input-group-addon">{{ currency }}</span>
+                                  </div>
+                                {% endif %}
+                              </div>
+                            </div>
+                          </td>
+
+                          <td class="left">
+                            <div style="padding-bottom:5px;">
+                              <span style="vertical-align:middle;">&nbsp;Товар:</span>
+                              <input type="text" name="productsShow_Input" class="form-control" value=""/>
+                              <div id="product-bundle-productsShow_{{ bundle_id }}" class="scrollbox second">
+                                {% if module.productsShow is defined %}
+                                  {% set class1 = 'odd' %}
+                                  {% for pr in module.productsShow %}
+                                    {% set class1 = (class1 == 'even') ? 'odd' : 'even' %}
+                                    {% set product = model_catalog_product.getProduct(pr) %}
+                                    {% set product_options = model_catalog_product.getProductOptions(pr) %}
+                                    {% set product_specials = model_catalog_product.getProductSpecials(pr) %}
+                                    {% set special = false %}
+
+                                    {% for product_special in product_specials %}
+                                      {% if (product_special.date_start == '0000-00-00' or product_special.date_start < 'now'|date('Y-m-d')) and (product_special.date_end == '0000-00-00' or product_special.date_end > 'now'|date('Y-m-d')) %}
+                                        {% set special = product_special.price %}
+                                      {% endif %}
+                                    {% endfor %}
+
+                                    {% set final_price = special ? special : product.price %}
+
+                                    <div id="product-bundle-productsShow_{{ bundle_id }}_{{ pr }}" class="{{ class1 }}">
+                                      {{ product.name }}
+                                      <i class="fa fa-minus-circle removeIcon" product_price="{{ final_price }}"></i>
+                                      <input type="hidden" name="productbundles_custom[{{ bundle_id }}][productsShow][]"
+                                             value="{{ pr }}"/>
+                                    </div>
+                                  {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+
+                            <div>
+                              <span style="vertical-align:middle;">Категория:</span>
+                              <input type="text" name="categoriesShow_Input" class="form-control" value=""/>
+                              <div id="product-bundle-categoriesShow_{{ bundle_id }}" class="scrollbox third">
+                                {% if module.categoriesShow is defined %}
+                                  {% set class = 'odd' %}
+                                  {% for product_category in module.categoriesShow %}
+                                    {% set class = (class == 'even') ? 'odd' : 'even' %}
+                                    {% set category_info = model_catalog_category.getCategory(product_category) %}
+                                    {% set CategoryName = category_info.path ? category_info.path ~ ' &gt; ' ~ category_info.name : category_info.name %}
+
+                                    <div id="product-bundle-categoriesShow_{{ bundle_id }}_{{ product_category }}"
+                                         class="{{ class }}">
+                                      {{ CategoryName }}
+                                      <i class="fa fa-minus-circle removeIcon"></i>
+                                      <input type="hidden"
+                                             name="productbundles_custom[{{ bundle_id }}][categoriesShow][]"
+                                             value="{{ product_category }}"/>
+                                    </div>
+                                  {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+                          </td>
+
+                          <td style="vertical-align:bottom;text-align:center">
+                            <a onclick="$('#module-row{{ bundle_id }}').remove();" data-toggle="tooltip"
+                               data-original-title="Удалить комплект" class="btn btn-small btn-danger"
+                               style="text-decoration:none;">
+                              <i class="fa fa-trash"></i>
+                            </a>
+                          </td>
+                        </tr>
+                        </tbody>
+                        {% set module_row = module_row + 1 %}
+                      {% endfor %}
+                    {% endif %}
+
+                    <tfoot>
+                    <tr>
+                      <td colspan="3"></td>
+                      <td style="text-align:center">
+                        <a onclick="addModule();" data-toggle="tooltip" data-original-title="Добавить новый комплект"
+                           class="btn btn-small btn-primary">
+                          <i class="fa fa-plus"></i>
+                        </a>
+                      </td>
+                    </tr>
+                    </tfoot>
+                  </table>
+                </div>
+
+                <script type="text/javascript">
+                  function addModule() {
+                    var module_row = Math.floor(Math.random() * 99999) + 10000;
+                    var html = `<tbody style="display:none;" id="module-row${module_row}">
+                      <tr>
+                        <td class="left" style="vertical-align:top;">
+                          <input type="hidden" class="bundle_id" name="productbundles_custom[${module_row}][id]" value="${module_row}" />
+                          <span style="vertical-align:middle;">Добавить товар:</span>
+                          <input type="text" name="productsInput" class="form-control" style="display: inline-block;margin-bottom:5px;" value="" />
+                          <div id="product-bundle_${module_row}" class="scrollbox first"></div>
+                        </td>
+                        <td class="left" style="vertical-align:top;">
+                          <div class="tab-content">
+                            Заголовок
+                            {% for language in languages %}
+                              <div id="${module_row}-{{ language.language_id }}" class="tab-pane {% if loop.first %}active{% endif %}">
+                                <div class="input-group">
+                                  <span class="input-group-addon"><img src="{{ language.flag_url }}"/></span>
+                                  <input type="text" class="form-control" name="productbundles_custom[${module_row}][name][{{ language.language_id }}]" value="" />
+                                </div>
+                              </div>
+                            {% endfor %}
+                          </div>
+                          <br />
+                          <h5>Общая стоимость: {% if currencyAlignment == "L" %}{{ currency }}{% endif %}
+                            <span id="product-bundle-totalprice_${module_row}">0.0</span>
+                            <input type="hidden" name="productbundles_custom[${module_row}][totalprice]" value="0.0" />
+                            {% if currencyAlignment == "R" %}{{ currency }}{% endif %}
+                          </h5>
+                          <h5>Стоимость комплекта: {% if currencyAlignment == "L" %}{{ currency }}{% endif %}
+                            <span id="product-bundle-price_${module_row}">0.0</span>
+                            <input type="hidden" name="productbundles_custom[${module_row}][price]" value="0" />
+                            {% if currencyAlignment == "R" %}{{ currency }}{% endif %}
+                          </h5>
+                          <br />
+                          <h5>Скидка:</h5>
+                          {% if currencyAlignment == "L" %}
+                            <div class="input-group">
+                              <span class="input-group-addon">{{ currency }}</span>
+                              <input class="input-mini voucherPrice form-control" name="productbundles_custom[${module_row}][voucherprice]"
+                                     id="product-bundle-voucherprice${module_row}" type="text" value="0">
+                            </div>
+                          {% else %}
+                            <div class="input-group">
+                              <input class="input-mini voucherPrice form-control" name="productbundles_custom[${module_row}][voucherprice]"
+                                     id="product-bundle-voucherprice${module_row}" type="text" value="0">
+                              <span class="input-group-addon">{{ currency }}</span>
+                            </div>
+                          {% endif %}
+                        </td>
+                        <td class="left" style="vertical-align:top;">
+                          <div style="padding-bottom:5px;">
+                            <span style="vertical-align:middle;">Товар:</span>
+                            <input type="text" name="productsShow_Input" class="form-control" style="display: inline-block;margin-bottom:5px;" value="" />
+                            <div id="product-bundle-productsShow_${module_row}" class="scrollbox second"></div>
+                          </div>
+                          <div style="padding-right:12px;padding-bottom:5px;">
+                            <span style="vertical-align:middle;">Категория:</span>
+                            <input type="text" name="categoriesShow_Input" class="form-control" style="display: inline-block;margin-bottom:5px;" value="" />
+                            <div id="product-bundle-categoriesShow_${module_row}" class="scrollbox third"></div>
+                          </div>
+                        </td>
+                        <td style="vertical-align:bottom;text-align:center;">
+                          <a onclick="$('#module-row${module_row}').remove();" data-toggle="tooltip" data-original-title="Удалить комплект" class="btn btn-small btn-danger">
+                            <i class="fa fa-trash"></i>
+                          </a>
+                        </td>
+                      </tr>
+                    </tbody>`;
+
+                    $('#module tfoot').before(html);
+                    $('#module-row' + module_row).fadeIn();
+                    initializeAutocomplete();
+                  }
+
+                  // Add Products
+                  var initializeAutocomplete = function () {
+                    // Calculate Bundle Price
+                    $('.voucherPrice').on('keyup', function () {
+                      var bundle_id = $(this).parents('tr').find('.bundle_id').val();
+                      if ($('#product-bundle-voucherprice' + bundle_id).val) {
+                        var VoucherPrice = parseFloat($('#product-bundle-totalprice_' + bundle_id).html()) - parseFloat($('#product-bundle-voucherprice' + bundle_id).val()).toFixed(2);
+                        $('#product-bundle-price_' + bundle_id).html(parseFloat(VoucherPrice).toFixed(2));
+                        $('input[name=\'productbundles_custom[' + bundle_id + '][price]\']').val(VoucherPrice);
+                      }
+                    });
+
+                    // var currentProductsInputObject;
+                    // $('input[name=\'productsInput\']').keydown(function () {
+                    //   currentProductsInputObject = $(this);
+                    // });
+                    // $('input[name=\'productsInput\']').click(function () {
+                    //   currentProductsInputObject = $(this);
+                    // });
+
+                    var currentProductsShowObject;
+                    $('input[name=\'productsShow_Input\']').keydown(function () {
+                      currentProductsShowObject = $(this);
+                    });
+                    $('input[name=\'productsShow_Input\']').click(function () {
+                      currentProductsShowObject = $(this);
+                    });
+
+                    var currentcategoriesShowObject;
+                    $('input[name=\'categoriesShow_Input\']').keydown(function () {
+                      currentcategoriesShowObject = $(this);
+                    });
+                    $('input[name=\'categoriesShow_Input\']').click(function () {
+                      currentcategoriesShowObject = $(this);
+                    });
+
+                    {# $('input[name=\'productsInput\']').autocomplete({ #}
+                    {#  source: function (request, response) { #}
+                    {#    $.ajax({ #}
+                    {#      url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&store_id={{ store.store_id }}&filter_name=' + encodeURIComponent(request), #}
+                    {#      dataType: 'json', #}
+                    {#      success: function (json) { #}
+                    {#        response($.map(json, function (item) { #}
+                    {#          return { #}
+                    {#            label: item.name, #}
+                    {#            value: item.product_id, #}
+                    {#            price: item.price, #}
+                    {#            special: item.special, #}
+                    {#            option: item.option #}
+                    {#          } #}
+                    {#        })); #}
+                    {#      } #}
+                    {#    }); #}
+                    {#  }, #}
+                    {#  select: function (item) { #}
+                    {#    var bundle_id = currentProductsInputObject.parents('tr').find('.bundle_id').val(); #}
+
+                    {#    var textOption = ""; #}
+                    {#    if (item.option != "") { #}
+                    {#      textOption = '<i class="fa fa-tags"></i> '; #}
+                    {#    } #}
+                    {#    var real_price = item.special == 0 ? item.price : item.special; #}
+
+                    {#    currentProductsInputObject.parent().find('.scrollbox').append( #}
+                    {#      '<div id="product-bundle_' + bundle_id + '_' + item.value + '">' + #}
+                    {#      textOption + item.label + ' - {% if currencyAlignment == "L" %}{{ currency }}{% endif %}' + #}
+                    {#      parseFloat(real_price).toFixed(2) + '{% if currencyAlignment == "R" %}{{ currency }}{% endif %}' + #}
+                    {#      '<i class="fa fa-minus-circle removeIcon" product_price="' + real_price + '"></i>' + #}
+                    {#      '<input type="hidden" name="productbundles_custom[' + bundle_id + '][products][]" value="' + item.value + '" />' + #}
+                    {#      '</div>' #}
+                    {#    ); #}
+
+                    {#    var TotalPrice = (parseFloat($('#product-bundle-totalprice_' + bundle_id).html()) + parseFloat(real_price)).toFixed(2); #}
+                    {#    $('#product-bundle-totalprice_' + bundle_id).html(TotalPrice); #}
+                    {#    $('input[name=\'productbundles_custom[' + bundle_id + '][totalprice]\']').val(TotalPrice); #}
+
+                    {#    currentProductsInputObject.parent().find('#product-bundle_' + bundle_id + ' div:odd').attr('class', 'odd'); #}
+                    {#    currentProductsInputObject.parent().find('#product-bundle_' + bundle_id + ' div:even').attr('class', 'even'); #}
+                    {#  } #}
+                    {# }); #}
+
+
+
+
+                    // -------------------------- вибір товарів -------------------------------
+
+
+                    $(document).ready(function () {
+                      // Глобальна змінна для відстеження поточного поля вводу
+                      var currentInputField = null;
+
+                      // Ініціалізація автозаповнення для полів вводу товарів
+                      $('input[name="productsInput"]').autocomplete({
+                        source: function (request, response) {
+                          $.ajax({
+                            url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+                            dataType: 'json',
+                            success: function (json) {
+                              response($.map(json, function (item) {
+                                return {
+                                  label: item['name'],
+                                  value: item['product_id'],
+                                  price: item.price,
+                                  special: item.special || 0,
+                                  option: item.option || false,
+                                  options: item.options || []
+                                }
+                              }));
+                            }
+                          });
+                        },
+                        select: function (item) {
+                          currentInputField = $(this);
+                          var bundle_id = $(this).closest('tr').find('.bundle_id').val();
+                          if (item.option && item.option.length > 0) {
+                            showOptionsModal(item, bundle_id);
+                          } else {
+                            // Якщо опцій немає - додаємо товар відразу
+                            var real_price = item.special > 0 ? item.special : item.price;
+                            addProductToBundle(item, bundle_id, real_price);
+                          }
+                        }
+                      });
+
+                      // Функція показу модального вікна з опціями
+                      function showOptionsModal(item, bundle_id) {
+
+                        // Удаляем предыдущее модальное окно, если оно есть
+                        $('#optionsModal').remove();
+
+                        // Створюємо HTML для модального вікна
+                        var modalHTML = `
+                        <div class="modal fade" id="optionsModal" tabindex="-1" role="dialog">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Оберіть опції для: ${item.label}</h4>
+                                    </div>
+                                    <div class="modal-body" id="optionsContainer">
+                                        ${generateOptionsHTML(item.option)}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" id="confirmOptions">Підтвердити</button>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Скасувати</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+
+                        // Додаємо модальне вікно на сторінку
+                        $('body').append(modalHTML);
+
+                        // Показуємо модальне вікно
+                        $('#optionsModal').modal('show');
+
+                        // Обробник підтвердження вибору
+                        $('#confirmOptions').off('click').on('click', function () {
+                          var selectedOptions = getSelectedOptions();
+
+                          $('input[name="productsInput"]')
+                            .val("")
+                            .autocomplete("close");
+
+                          console.log(selectedOptions);
+
+                          // Додаємо інформацію про опції до товару
+                          item.selectedOptions = selectedOptions;
+
+                          // Додаємо товар до комплекту
+                          //addProductToBundle(item, bundle_id, finalPrice);
+
+                          // Закриваємо модальне вікно
+                          $('#optionsModal').modal('hide').on('hidden.bs.modal', function() {
+                            $(this).remove();
+                          });
+                        });
+                      }
+
+                      // Генерація HTML для опцій
+                      function generateOptionsHTML(options) {
+                        var html = '';
+                        if (!options || options.length === 0) return '<p>Опції не знайдено</p>';
+                        options.forEach(function (option) {
+                            html += `<div class="form-group">
+                            <label>${option.name}</label>
+                            <select class="form-control option-select" data-option-id="${option.product_option_id}">`;
+                                if (option.product_option_value && option.product_option_value.length > 0) {
+                                  option.product_option_value.forEach(function (value) {
+                                    html += `<option value="${value.product_option_value_id}" data-price-prefix="${value.price_prefix}" data-price="${value.price}">${value.name}(${value.price_prefix}${value.price})</option>`;
+                                  });
+                                } else {
+                                  html += '<option value="">Немає варіантів</option>';
+                                }
+                            html += `</select></div>`;
+                        });
+                        return html;
+                      }
+
+                      // Отримання вибраних опцій
+                      function getSelectedOptions() {
+                        var selected = [];
+                        $('.option-select').each(function () {
+                          var optionId = $(this).data('option-id');
+                          var valueId = $(this).val();
+                          var option = $(this).find('option:selected');
+                          if (valueId) {
+                            selected.push({
+                              option_id: optionId,
+                              value_id: valueId,
+                              price_prefix: option.data('price-prefix'),
+                              price: parseFloat(option.data('price')) || 0
+                            });
+                          }
+                        });
+                        return selected;
+                      }
+
+                      // Функція додавання товару до комплекту
+                      function addProductToBundle(item, bundle_id, price) {
+                        var optionsIcon = item.option ? '<i class="fa fa-tags"></i> ' : '';
+                        var optionsHTML = '';
+
+                        // Додаємо приховані поля для опцій, якщо вони є
+                        if (item.selectedOptions && item.selectedOptions.length > 0) {
+                          item.selectedOptions.forEach(function (opt, index) {
+                            optionsHTML += `
+                            <input type="hidden" name="productbundles_custom[${bundle_id}][options][${item.value}][${index}][option_id]" value="${opt.option_id}">
+                            <input type="hidden" name="productbundles_custom[${bundle_id}][options][${item.value}][${index}][value_id]" value="${opt.value_id}">`;
+                          });
+                        }
+
+                        var productHtml = `
+                        <div id="product-bundle_${bundle_id}_${item.value}">
+                            ${optionsIcon}${item.label} -
+                            {% if currencyAlignment == "L" %}{{ currency }}{% endif %}
+                            ${price}
+                            {% if currencyAlignment == "R" %}{{ currency }}{% endif %}
+                            <i class="fa fa-minus-circle removeIcon" product_price="${price}"></i>
+                            <input type="hidden" name="productbundles_custom[${bundle_id}][products][]" value="${item.value}" />
+                            ${optionsHTML}
+                        </div>`;
+
+                        currentInputField.closest('td').find('.scrollbox').append(productHtml);
+                        updateTotalPrice(bundle_id, price);
+                      }
+
+                      // Оновлення загальної ціни комплекту
+                      function updateTotalPrice(bundle_id, price) {
+                        var totalElement = $('#product-bundle-totalprice_' + bundle_id);
+                        var currentTotal = parseFloat(totalElement.text()) || 0;
+                        var newTotal = (currentTotal + parseFloat(price)).toFixed(2);
+
+                        totalElement.text(newTotal);
+                        $('input[name="productbundles_custom[' + bundle_id + '][totalprice]"]').val(newTotal);
+                      }
+
+                      // Видалення товару з комплекту
+                      $(document).on('click', '.removeIcon', function () {
+                        var bundle_id = $(this).closest('tr').find('.bundle_id').val();
+                        var price = parseFloat($(this).attr('product_price'));
+                        var currentTotal = parseFloat($('#product-bundle-totalprice_' + bundle_id).text());
+
+                        $(this).parent().remove();
+                        $('#product-bundle-totalprice_' + bundle_id).text((currentTotal - price).toFixed(2));
+                        $('input[name="productbundles_custom[' + bundle_id + '][totalprice]"]').val((currentTotal - price).toFixed(2));
+                      });
+                    });
+
+                    // -------------------------- end -------------------------------
+
+
+                    $('.scrollbox.first').delegate('.fa-minus-circle', 'click', function () {
+                      var bundle_id = $(this).parents('tr').find('.bundle_id').val();
+                      var remove_price = $(this).attr("product_price");
+                      $(this).parent().remove();
+                      var RemovePrice = (parseFloat($('#product-bundle-totalprice_' + bundle_id).html()) - parseFloat(remove_price)).toFixed(2);
+                      $('#product-bundle-totalprice_' + bundle_id).html(RemovePrice);
+                      $('input[name=\'productbundles_custom[' + bundle_id + '][totalprice]\']').val(RemovePrice);
+                    });
+
+                    // Show in Products
+                    $('input[name=\'productsShow_Input\']').autocomplete({
+                      delay: 500,
+                      source: function (request, response) {
+                        $.ajax({
+                          url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&store_id={{ store.store_id }}&filter_name=' + encodeURIComponent(request),
+                          dataType: 'json',
+                          success: function (json) {
+                            response($.map(json, function (item) {
+                              return {
+                                label: item.name,
+                                value: item.product_id,
+                                price: item.price,
+                                special: item.special
+                              }
+                            }));
+                          }
+                        });
+                      },
+                      select: function (item) {
+                        var bundle_id = currentProductsShowObject.parents('tr').find('.bundle_id').val();
+                        currentProductsShowObject.parent().find('#product-bundle-productsShow_' + bundle_id + '_' + item.value).remove();
+                        currentProductsShowObject.parent().find('.second').append(
+                          '<div id="product-bundle-productsShow_' + bundle_id + '_' + item.value + '">' +
+                          item.label +
+                          '<i class="fa fa-minus-circle removeIcon"></i>' +
+                          '<input type="hidden" name="productbundles_custom[' + bundle_id + '][productsShow][]" value="' + item.value + '" />' +
+                          '</div>'
+                        );
+
+                        currentProductsShowObject.parent().find('#product-bundle-productsShow_' + bundle_id + ' div:odd').attr('class', 'odd');
+                        currentProductsShowObject.parent().find('#product-bundle-productsShow_' + bundle_id + ' div:even').attr('class', 'even');
+                      }
+                    });
+
+                    $('.scrollbox.second').delegate('.fa-minus-circle', 'click', function () {
+                      var bundle_id = $(this).parents('tr').find('.bundle_id').val();
+                      $(this).parent().remove();
+                      $(this).parent().find('#product-bundle-productsShow_' + bundle_id + ' div:odd').attr('class', 'odd');
+                      $(this).parent().find('#product-bundle-productsShow_' + bundle_id + ' div:even').attr('class', 'even');
+                    });
+
+                    // Show in Categories
+                    $('input[name=\'categoriesShow_Input\']').autocomplete({
+                      delay: 500,
+                      source: function (request, response) {
+                        $.ajax({
+                          url: 'index.php?route=catalog/category/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+                          dataType: 'json',
+                          success: function (json) {
+                            response($.map(json, function (item) {
+                              return {
+                                label: item.name,
+                                value: item.category_id
+                              }
+                            }));
+                          }
+                        });
+                      },
+                      select: function (item) {
+                        var bundle_id = currentcategoriesShowObject.parents('tr').find('.bundle_id').val();
+                        currentcategoriesShowObject.parent().find('#product-bundle-categoriesShow_' + bundle_id + '_' + item.value).remove();
+                        currentcategoriesShowObject.parent().find('.third').append(
+                          '<div id="product-bundle-categoriesShow_' + bundle_id + '_' + item.value + '">' +
+                          item.label +
+                          '<i class="fa fa-minus-circle removeIcon"></i>' +
+                          '<input type="hidden" name="productbundles_custom[' + bundle_id + '][categoriesShow][]" value="' + item.value + '" />' +
+                          '</div>'
+                        );
+
+                        currentcategoriesShowObject.parent().find('#product-bundle-categoriesShow_' + bundle_id + ' div:odd').attr('class', 'odd');
+                        currentcategoriesShowObject.parent().find('#product-bundle-categoriesShow_' + bundle_id + ' div:even').attr('class', 'even');
+                      }
+                    });
+
+                    $('.scrollbox.third, .scrollbox.second').delegate('.fa-minus-circle', 'click', function () {
+                      var bundle_id = $(this).parents('tr').find('.bundle_id').val();
+                      $(this).parent().remove();
+                      $(this).parent().find('#product-bundle-categoriesShow_' + bundle_id + ' div:odd').attr('class', 'odd');
+                      $(this).parent().find('#product-bundle-categoriesShow_' + bundle_id + ' div:even').attr('class', 'even');
+                    });
+                  }
+
+                  initializeAutocomplete();
+                </script>
+              </div>
+              <div id="listing" class="tab-pane">
+                <table class="table">
+                  <tr>
+                    <td class="col-xs-3">
+                      <h5><strong>URL страницы списка комплектов:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-12">
+                        <a href="{{ store.url }}index.php?route=module/productbundles/listing" target="_blank">
+                          {{ store.url }}index.php?route=module/productbundles/listing
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="col-xs-3">
+                      <h5><strong>Добавить ссылку в главное меню:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <select id="LinkChecker" name="{{ moduleName }}[MainLinkEnabled]" class="form-control">
+                          <option value="yes" {{ moduleData.MainLinkEnabled == 'yes' ? 'selected="selected"' : '' }}>
+                            Включено
+                          </option>
+                          <option
+                            value="no" {{ moduleData.MainLinkEnabled == 'no' or moduleData.MainLinkEnabled is empty ? 'selected="selected"' : '' }}>
+                            Отключено
+                          </option>
+                        </select>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tbody id="MainLinkOptions">
+                  <tr>
+                    <td class="col-xs-3">
+                      <h5><strong>Текст на ссылке в меню:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        {% for language in languages %}
+                          <div class="input-group">
+                            <span class="input-group-addon">{{ language.name }}:</span>
+                            <input type="text" class="form-control"
+                                   name="{{ moduleName }}[LinkTitle][{{ language.language_id }}]"
+                                   value="{{ moduleData.LinkTitle[language.language_id] ?? 'Bundles' }}"/>
+                          </div>
+                          <br/>
+                        {% endfor %}
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="col-xs-3">
+                      <h5><strong>Порядок сортировки пукнта меню:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <input type="number" class="form-control" name="{{ moduleName }}[LinkSortOrder]"
+                               value="{{ moduleData.LinkSortOrder ?? '7' }}"/>
+                      </div>
+                    </td>
+                  </tr>
+                  </tbody>
+
+                  <tr>
+                    <td class="col-xs-3">
+                      <h5><strong>Комплектов на странице:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <input type="number" name="{{ moduleName }}[ListingLimit]" class="form-control"
+                               value="{{ moduleData.ListingLimit ?? '10' }}"/>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="col-xs-3" style="vertical-align:top;">
+                      <h5><strong>SEO настройки:</strong></h5><br/><br/><br/><br/>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <ul class="nav nav-tabs" id="langtabs" role="tablist">
+                          {% for language in languages %}
+                            <li><a href="#lang-{{ language.language_id }}" role="tab" data-toggle="tab"><img
+                                  src="{{ language.flag_url }}" title="{{ language.name }}"/></a></li>
+                          {% endfor %}
+                        </ul>
+
+                        <div class="tab-content">
+                          {% for language in languages %}
+                            <div class="tab-pane" id="lang-{{ language.language_id }}">
+                              Title:<br/>
+                              <input name="{{ moduleName }}[PageTitle][{{ language.language_id }}]" class="form-control"
+                                     type="text"
+                                     value="{{ moduleData.PageTitle[language.language_id] ?? 'Вместе дешевле' }}"/><br/>
+                              Meta Description:<br/>
+                              <textarea name="{{ moduleName }}[MetaDescription][{{ language.language_id }}]"
+                                        class="form-control"
+                                        rows="4">{{ moduleData.MetaDescription[language.language_id] ?? 'Получите скидку покупая комплекты товаров' }}</textarea><br/>
+                              Meta Keywords:<br/>
+                              <input name="{{ moduleName }}[MetaKeywords][{{ language.language_id }}]"
+                                     class="form-control" type="text"
+                                     value="{{ moduleData.MetaKeywords[language.language_id] ?? 'Скидки, комлекты' }}"/><br/>
+                              SEO URL:<br/>
+                              <input name="{{ moduleName }}[SeoURL][{{ language.language_id }}]" class="form-control"
+                                     type="text" value="{{ moduleData.SeoURL[language.language_id] ?? 'bundles' }}"/>
+                              <span class="help"><i
+                                  class="fa fa-info-circle"></i>&nbsp;<em>{{ constant('HTTP_CATALOG') ~ '<strong>bundles</strong>' }}</em></span>
+                            </div>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="col-xs-3">
+                      <h5><strong>Размеры картинок:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <div class="input-group">
+                          <span class="input-group-addon">Ширина:&nbsp;</span>
+                          <input type="text" name="{{ moduleName }}[ListingPictureWidth]" class="form-control"
+                                 value="{{ moduleData.ListingPictureWidth ?? '120' }}"/>
+                          <span class="input-group-addon">px</span>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                          <span class="input-group-addon">Высота:</span>
+                          <input type="text" name="{{ moduleName }}[ListingPictureHeight]" class="form-control"
+                                 value="{{ moduleData.ListingPictureHeight ?? '120' }}"/>
+                          <span class="input-group-addon">px</span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="col-xs-3" style="vertical-align:top;">
+                      <h5><strong>Пользовательский CSS:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <textarea rows="5" name="{{ moduleName }}[ListingCustomCSS]" placeholder="Custom CSS..."
+                                  class="form-control">{{ moduleData.ListingCustomCSS ?? '' }}</textarea>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+
+              </div>
+              <div id="widget" class="tab-pane">
+                <table class="table">
+                  <tr>
+                    <td class="col-xs-3" style="vertical-align:top;">
+                      <h5><strong>Заголовок:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        {% for language in languages %}
+                          <div class="input-group">
+            <span class="input-group-addon">
+              <img src="{{ language.flag_url }}" style="margin-top:-3px;"
+                   title="{{ language.name }}"/> {{ language.name }}
+            </span>
+                            <input name="{{ moduleName }}[WidgetTitle][{{ language.language_id }}]" class="form-control"
+                                   type="text"
+                                   value="{{ moduleData.WidgetTitle[language.language_id] ?? 'Check out this bundle:' }}"/>
+                          </div>
+                          <br/>
+                        {% endfor %}
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="col-xs-3">
+                      <h5><strong>Виджет с фоном:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <select name="{{ moduleName }}[WrapInWidget]" class="form-control">
+                          <option value="yes" {{ moduleData.WrapInWidget == 'yes' ? 'selected="selected"' : '' }}>
+                            Включено
+                          </option>
+                          <option value="no" {{ moduleData.WrapInWidget == 'no' ? 'selected="selected"' : '' }}>
+                            Отключено
+                          </option>
+                        </select>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="col-xs-3">
+                      <h5><strong>Комплектов в виджете:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <input type="number" name="{{ moduleName }}[WidgetLimit]" class="form-control"
+                               value="{{ moduleData.WidgetLimit ?? '2' }}"/>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="col-xs-3">
+                      <h5><strong>Показ:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <select name="{{ moduleName }}[DisplayType]" class="form-control">
+                          <option
+                            value="default" {{ moduleData.DisplayType == 'default' ? 'selected="selected"' : '' }}>По
+                            умолчанию
+                          </option>
+                          <option value="random" {{ moduleData.DisplayType == 'random' ? 'selected="selected"' : '' }}>
+                            Случайный
+                          </option>
+                        </select>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="col-xs-3" style="vertical-align:top;">
+                      <h5><strong>Размеры картинок:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <div class="input-group">
+                          <span class="input-group-addon">Ширина:&nbsp;</span>
+                          <input type="text" name="{{ moduleName }}[WidgetWidth]" class="form-control"
+                                 value="{{ moduleData.WidgetWidth ?? '80' }}"/>
+                          <span class="input-group-addon">px</span>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                          <span class="input-group-addon">Высота:</span>
+                          <input type="text" name="{{ moduleName }}[WidgetHeight]" class="form-control"
+                                 value="{{ moduleData.WidgetHeight ?? '80' }}"/>
+                          <span class="input-group-addon">px</span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="col-xs-3" style="vertical-align:top;">
+                      <h5><strong>Пользовательский CSS:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <textarea rows="5" name="{{ moduleName }}[CustomCSS]" placeholder="Custom CSS"
+                                  class="form-control">{{ moduleData.CustomCSS ?? '' }}</textarea>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div id="view" class="tab-pane">
+                <table class="table">
+                  <tr>
+                    <td class="col-xs-3" style="vertical-align:top;">
+                      <h5><strong>Размеры картинки:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <div class="input-group">
+                          <span class="input-group-addon">Ширина:&nbsp;</span>
+                          <input type="text" name="{{ moduleName }}[ViewWidth]" class="form-control"
+                                 value="{{ moduleData.ViewWidth ?? '80' }}"/>
+                          <span class="input-group-addon">px</span>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                          <span class="input-group-addon">Высота:</span>
+                          <input type="text" name="{{ moduleName }}[ViewHeight]" class="form-control"
+                                 value="{{ moduleData.ViewHeight ?? '80' }}"/>
+                          <span class="input-group-addon">px</span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-xs-3" style="vertical-align:top;">
+                      <h5><strong>Пользовательский CSS:</strong></h5>
+                    </td>
+                    <td class="col-xs-9">
+                      <div class="col-xs-4">
+                        <textarea rows="5" name="{{ moduleName }}[ViewCustomCSS]" placeholder="Custom CSS"
+                                  class="form-control">{{ moduleData.ViewCustomCSS ?? '' }}</textarea>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

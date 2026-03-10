@@ -1,0 +1,305 @@
+{% if products %}
+  <div class="tt_product_module_{{ config_module.class }}" id="product_module{{ config_module.module_id }}">
+    <div class="module-title">
+      {% if config_module.sub_title_lang[code].sub_title %}
+        <p class="sub-title">{{ config_module.sub_title_lang[code].sub_title }}</p>
+      {% endif %}
+
+      {% if config_module.title_lang[code].title %}
+        <h2>{{ config_module.title_lang[code].title }}</h2>
+      {% else %}
+        <div class="bl-title-module">
+          <h2 class="bl-bold">{{ heading_title }}</h2>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="ocproducts slick-container">
+      <div class="tt-product-slick slick-slider">
+        {% for product in products %}
+          <div id="product-{{ product.product_id }}" class="product-slider-item grid-style">
+
+            <div class="product-thumb transition">
+              <div class="product-slider" style="background-color: {{ bg_color }}">
+                <div class="item">
+                  <div class="label-product label-sale-{{ product.product_id }}">
+                    {% if product.special %}
+                      <div class="bg-special"><span>{{ '-' ~ product.rate_special ~ '%' ~ text_label_sale }}</span></div>
+                    {% endif %}
+                    <div class="box-label">
+                      <div class="statuses-product statuses-{{ product.product_id }}">
+                        {% for status in product.statuses %}
+                          <div class="status-product label_{{ status.code }}" style="background-color: {{ status.color }}">
+                            <span>{{ status.name }}</span>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+
+                  <a title="{{ product.name }}" href="{{ product.href }}" class="product-image">
+                    <div class="image">
+                      {% if product.images|length > 0 %}
+                        <div class="slider-for-{{ product.product_id }} slider">
+                          {% for image in product.images %}
+                            <div class="item product-image-options-{{ image.product_option_value_id }} {% if image.select %}select{% endif %}"
+                                 data-pos="{{ loop.index0 }}">
+                              <img class="img-responsive" width="{{ image.width }}" height="{{ image.height }}"
+                                   src="{{ image.thumb }}" title="{{ product.name }}" alt="{{ product.name }}" />
+                            </div>
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    </div>
+                  </a>
+
+                  <div class="action-links">
+                    <div class="inner">
+                      <button class="wishlist btn-wishlist-{{ product.product_id }} {% if product.in_wishlist %}is-check{% endif %}"
+                              aria-label="{% if product.in_wishlist %}{{ text_remove_from_wishlist }}{% else %}{{ text_add_to_wishlist }}{% endif %}"
+                              {% if product.in_wishlist %}onclick="wishlist.remove('{{ product.product_id }}', false);"
+                              {% else %}onclick="wishlist.add('{{ product.product_id }}');"{% endif %}>
+                      </button>
+                      <button class="btn-quickview hidden-xs"
+                              aria-label="{{ button_quickview }}"
+                              onclick="ocquickview.open('{{ product.href }}')">
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="caption">
+                  <div class="ratings">
+                    <div class="rating-box">
+                      {% if product.rating > 0 %}
+                        {% for i in 1..5 %}
+                          {% if i <= product.rating %}
+                            <div class="active"></div>
+                          {% else %}
+                            <div class="deactive"></div>
+                          {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                    <h3 class="product-name"><a title="{{ product.name }}" href="{{ product.href }}">{{ product.name }}</a></h3>
+                  </div>
+
+                  <div data-product-id="{{ product.product_id }}">
+                    {% if product.price %}
+                      <div class="btn-card">
+                        <div class="price-box-{{ product.product_id }} bl-price-catalog">
+                          {% if not product.special %}
+                            <div class="box-regular">
+                              <div class="regular-price"><span class="price">{{ product.price }}</span></div>
+                            </div>
+                          {% else %}
+                            <div class="box-special">
+                              <div class="old-price"><span class="price">{{ product.price }}</span></div>
+                              <div class="special-price"><span class="price">{{ product.special }}</span></div>
+                            </div>
+                          {% endif %}
+
+                          <div class="stock-status">
+                            {% if product.on_stock %}
+                              <span class="in-stock">В наявності</span>
+                            {% else %}
+                              <span class="out-stock">Під замовлення</span>
+                            {% endif %}
+                          </div>
+                        </div>
+
+                        <div class="visible-xs">
+                          <a title="{{ product.name }}" href="{{ product.href }}">
+                            <div class="plus btn"></div>
+                          </a>
+                        </div>
+
+                        {% if config_is_catalog < 1 %}
+                          <div class="product-cart-block hidden-xs">
+                            <div id="prod-bl-qty-{{ product.product_id }}" class="group-quantity">
+                              <input id="key-{{ product.product_id }}" type="hidden" name="product_id" value="{{ product.product_id }}" />
+
+                              {% if product.quantity == 0 %}
+                                <div class="bl-add-in-cart cart-btns-{{ product.uniq_id }}" data-key="{{ product.product_id }}" data-cart="0" {% if product.is_buy %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                  {% if not product.is_buy %}
+                                    <div class="notify" data-product="{{ product.product_id }}" data-opt="{{ product.uniq_id }}" onclick="notify.open(this)">Повідомити про наявність</div>
+                                  {% else %}
+                                    <div class="minus-add"></div>
+                                    <div class="plus-add-text">Додати до кошика</div>
+                                    <div class="plus-add {% if not product.is_buy %}not-available{% endif %}"></div>
+                                  {% endif %}
+                                </div>
+                              {% else %}
+                                <div class="bl-add-in-cart cart-btns-{{ product.uniq_id }}" data-key="{{ product.product_id }}" data-cart="{{ product.cart_id }}">
+                                  <div class="minus {% if product.quantity == 0 %}not-available{% endif %}"
+                                       data-key="{{ product.product_id }}"
+                                       data-cart="{{ product.cart_id }}"
+                                       {% if product.quantity > 0 %}onclick="custom_cart.handleClickMinus(this)"{% endif %}>-
+                                  </div>
+                                  <input id="qty-{{ product.product_id }}-{{ product.cart_id }}" data-key="{{ product.product_id }}"
+                                         data-cart="{{ product.cart_id }}" type="number" name="quantity" value="{{ product.quantity }}"
+                                         {% if not product.on_stock %}disabled="disabled"{% endif %}
+                                         class="quantity-input{% if not product.on_stock %} not-available{% endif %}" />
+
+                                  <div class="plus {% if not product.is_buy %}not-available{% endif %}"
+                                          data-key="{{ product.product_id }}" data-cart="{{ product.cart_id }}"
+                                          {% if product.is_buy %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                  </div>
+                                </div>
+                              {% endif %}
+                            </div>
+                          </div>
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              {% if product.options %}
+                <div data-options-id="{{ product.product_id }}" class="options-box hidden-xs" style="background-color: {{ bg_color }}">
+                  <div class="bl-temp-bg" style="background-color: {{ bg_color }}"></div>
+                  <div class="bl-opts-item">
+                    <div class="title-stock-warehouses">
+                      {{ text_option }}
+                      <div class="tooltip-container">
+                        <span class="tooltip-trigger" aria-label="{{ text_availability_info }}">
+                          <img width="20px" height="20px" src="/image/info.svg" alt="info"/>
+                        </span>
+                        <div class="tooltip">
+                          <p class="bl-bold">Наявність на складі</p>
+                          <div class="option-qty">
+                            <div class="stock-i-row"><span class="stock-more"></span> - достатньо</div>
+                            <div class="stock-i-row"><span class="stock-end"></span> - закінчується</div>
+                            <div class="stock-i-row"><span class="stock-small"></span> - мало</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="option-block required" data-id="{{ product.product_id }}">
+                      {% for option in product.options %}
+                        <div id="input-option{{ option.option_value_id }}" class="option-item{% if option.qty <= 0 %} not-available{% endif %}">
+                          <div class="radio">
+                            <label class="custom-radio">
+                              <input type="radio" name="option[{{ product.product_id }}]"
+                                {% if option.selected %} checked="checked"{% endif %}
+                                     data-product-option="{{ option.product_option_id }}"
+                                     data-product="{{ product.product_id }}" data-cart="{{ product.cart_id }}"
+                                     value="{{ option.product_option_id }}-{{ option.product_option_value_id }}"
+                                />
+                              <span class="radio-control{% if option.selected %} check{% endif %}">{{ option.name }}</span>
+                            </label>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <button class="slick-prev slick-arrow" type="button" aria-label="Попередній слайд">
+        <span class="visually-hidden">Попередній</span>
+      </button>
+      <button class="slick-next slick-arrow" type="button" aria-label="Наступний слайд">
+        <span class="visually-hidden">Наступний</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function () {
+
+      var $sliderContainer = $('#product_module{{ config_module.module_id }} .tt-product-slick');
+      var $navContainer = $('#product_module{{ config_module.module_id }} .ocproducts');
+
+      function getSlidesToShow() {
+        var w = $(window).width();
+        if (w < 768) return 2;
+        if (w < 992) return 3;
+        if (w < 1200) return 4;
+        return 5;
+      }
+
+      // Приховуємо слайдер до ініціалізації
+      $sliderContainer.css('opacity', '0');
+
+      function fixSlickAccessibility($slider) {
+        $slider.find('.slick-slide').each(function () {
+          var $slide = $(this);
+          var hidden = $slide.attr('aria-hidden') === 'true';
+
+          $slide
+            .find('a, button, input, select, textarea, [tabindex]')
+            .each(function () {
+              if (hidden) {
+                $(this)
+                  .attr('tabindex', '-1')
+                  .attr('aria-hidden', 'true');
+              } else {
+                $(this)
+                  .removeAttr('tabindex')
+                  .removeAttr('aria-hidden');
+              }
+            });
+        });
+      }
+
+      // === MAIN PRODUCT SLIDER ===
+      $sliderContainer
+        .on('init afterChange', function () {
+          $sliderContainer.css('opacity', 1);
+
+          // ❗ КРИТИЧНО: знімаємо aria-hidden з товарних слайдів
+          $sliderContainer.find('.product-slider-item').removeAttr('aria-hidden');
+
+          fixSlickAccessibility($sliderContainer);
+        })
+        .slick({
+          slidesToShow: getSlidesToShow(),
+          slidesToScroll: getSlidesToShow(),
+          arrows: true,
+          infinite: false,
+          adaptiveHeight: true,
+          accessibility: true,
+          prevArrow: $navContainer.find('.slick-prev'),
+          nextArrow: $navContainer.find('.slick-next')
+        });
+
+      $(window).on('resize', function () {
+        var slides = getSlidesToShow();
+        $sliderContainer.slick('slickSetOption', {
+          slidesToShow: slides,
+          slidesToScroll: slides
+        }, true);
+      });
+
+      // === IMAGE SLIDERS ===
+      {% for product in products %}
+      (function () {
+        var productId = '{{ product.product_id }}';
+        var $imgSlider = $('#product-{{ product.product_id }} .slider-for-{{ product.product_id }}');
+
+        if (!$imgSlider.length) return;
+
+        $imgSlider
+          .on('init afterChange', function () {
+            fixSlickAccessibility($imgSlider);
+          })
+          .slick({
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            fade: true,
+            arrows: false,
+            accessibility: false
+          });
+      })();
+      {% endfor %}
+
+    });
+  </script>
+
+{% endif %}

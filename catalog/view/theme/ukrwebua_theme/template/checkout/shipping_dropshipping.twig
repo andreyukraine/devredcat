@@ -1,0 +1,181 @@
+<div id="dropshipping-upload-container-{{ order_id }}" style="margin-top: 10px; border: 1px dashed #ccc; padding: 15px; border-radius: 7px; background-color: #f9f9f9;">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        <input type="hidden" name="shipping_method[{{ order_id }}][dropshipping_tth]" value="" />
+        <div id="dropshipping-file-list-{{ order_id }}" style="display: flex; flex-direction: column; gap: 15px;">
+            {% if dropshipping_tth_files %}
+                {% for file in dropshipping_tth_files %}
+                    {% if file.filename %}
+                        <div class="dropshipping-file-item" id="file-{{ file.code }}">
+                            <span style="font-size: 13px; flex-grow: 1;">{{ file.filename }}</span>
+                          <div class="form-group">
+                            <label class="control-label">Номер ТТН</label>
+                            <input class="form-control dropshipping-ttn-name" type="text" name="shipping_method[{{ order_id }}][dropshipping_tth_numbers][{{ file.code }}]" value="{{ file.tth_number }}" placeholder="Номер ТТН" onchange="updateTTHNumber('{{ file.code }}', this.value, '{{ order_id }}');" />
+                          </div>
+                            <i class="fa fa-check-circle" style="color: #27ae60;"></i>
+                            <a href="javascript:void(0);" onclick="removeDropshippingFile('{{ file.code }}', '{{ order_id }}');" title="Видалити"><img width="15px" alt="del" height="15px" src="/image/close.svg"></a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <button type="button" id="button-upload-tth-{{ order_id }}" class="btn btn-default">
+                {{ button_upload }}
+            </button>
+        </div>
+    </div>
+    
+    <div id="dropshipping-upload-success-{{ order_id }}" style="color: #27ae60; margin-top: 10px; font-weight: bold; display: none;">
+        {{ text_upload_success }}
+    </div>
+</div>
+
+<script type="text/javascript"><!--
+if (typeof updateTTHNumber !== 'function') {
+    window.updateTTHNumber = function(code, value, order_id) {
+        $.ajax({
+            url: 'index.php?route=checkout/shipping_method/update_tth_number',
+            type: 'post',
+            data: {
+                code: code,
+                tth_number: value,
+                order_id: order_id
+            },
+            dataType: 'json',
+            success: function(json) {
+                if (json['success']) {
+                    if (typeof custom_block !== 'undefined' && typeof custom_block.checkoutShipping === 'function') {
+                        custom_block.checkoutShipping(order_id);
+                    }
+                }
+            }
+        });
+    };
+}
+
+if (typeof removeDropshippingFile !== 'function') {
+    window.removeDropshippingFile = function(code, order_id) {
+        if (confirm('Ви впевнені, що хочете видалити цей файл?')) {
+            $.ajax({
+                url: 'index.php?route=checkout/shipping_method/remove_tth',
+                type: 'post',
+                data: {
+                    code: code,
+                    order_id: order_id
+                },
+                dataType: 'json',
+                success: function(json) {
+                    if (json['success']) {
+                        $('#file-' + code).fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                    }
+                }
+            });
+        }
+    };
+}
+
+$('#button-upload-tth-{{ order_id }}').on('click', function() {
+    var node = this;
+
+    $('#form-upload').remove();
+
+    $('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" accept="application/pdf" /></form>');
+
+    $('#form-upload input[name=\'file\']').trigger('click');
+
+    if (typeof timer != 'undefined') {
+        clearInterval(timer);
+    }
+
+    timer = setInterval(function() {
+        if ($('#form-upload input[name=\'file\']').val() != '') {
+            clearInterval(timer);
+
+            var file = $('#form-upload input[name=\'file\']')[0].files[0];
+            var error = '';
+
+            // Check file extension
+            var ext = file.name.split('.').pop().toLowerCase();
+            if (ext !== 'pdf') {
+                error = 'Будь ласка, завантажуйте лише PDF-файли.';
+            }
+
+                        // Check file size (3MB = 3145728 bytes)
+            if (!error && file.size > 3145728) {
+                error = 'Розмір файлу не повинен перевищувати 3Мб.';
+            }
+
+            if (error) {
+                var $errorBlock = $(node).closest('.radio-shipping-method').find('.shipping-method-error');
+                if ($errorBlock.length) {
+                    $errorBlock.html(error).show();
+                } else {
+                    $('.text-danger').remove();
+                    $(node).parent().after('<div class="text-danger">' + error + '</div>');
+                }
+                return;
+            }
+
+            $.ajax({
+                url: 'index.php?route=tool/upload',
+                type: 'post',
+                dataType: 'json',
+                data: new FormData($('#form-upload')[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function() {
+                    $(node).attr('disabled', true).text('ЗАВАНТАЖЕННЯ...');
+                },
+                success: function(json) {
+                    $(node).attr('disabled', false).text('{{ button_upload }}');
+                    $('.text-danger').remove();
+
+                    if (json['error']) {
+                        var $errorBlock = $(node).closest('.radio-shipping-method').find('.shipping-method-error');
+                        if ($errorBlock.length) {
+                            $errorBlock.html(json['error']).show();
+                        } else {
+                            $(node).parent().after('<div class="text-danger">' + json['error'] + '</div>');
+                        }
+                    }
+
+                    if (json['success']) {
+                        var filename = json['filename'];
+                        var code = json['code'];
+                        
+                        var html = '<div class="dropshipping-file-item" id="file-' + code + '">';
+                        html += '  <i class="fa fa-file-pdf-o" style="color: #e74c3c;"></i>';
+                        html += '  <span style="font-size: 13px; flex-grow: 1;">' + filename + '</span>';
+                        html += '  <div class="form-group"><label class="control-label">Номер ТТН</label><input type="text" class="form-control dropshipping-ttn-name" name="shipping_method[{{ order_id }}][dropshipping_tth_numbers][' + code + ']" value="" placeholder="Номер ТТН" onchange="updateTTHNumber(\'' + code + '\', this.value, \'{{ order_id }}\');" /></div>';
+                        html += '  <i class="fa fa-check-circle" style="color: #27ae60;"></i>';
+                        html += '  <a href="javascript:void(0);" onclick="removeDropshippingFile(\'' + code + '\', \'{{ order_id }}\');" title="Видалити"><img width="15px" alt="del" height="15px" src="/image/close.svg"></a>';
+                        html += '</div>';
+                        
+                        $('#dropshipping-file-list-{{ order_id }}').append(html);
+                        $('#dropshipping-upload-success-{{ order_id }}').show().delay(3000).fadeOut();
+
+                        $.ajax({
+                            url: 'index.php?route=checkout/shipping_method/save_tth',
+                            type: 'post',
+                            data: {
+                                code: code,
+                                filename: filename,
+                                order_id: '{{ order_id }}'
+                            },
+                            dataType: 'json'
+                        });
+                    }
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    $(node).attr('disabled', false).text('{{ button_upload }}');
+                    alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                }
+            });
+        }
+    }, 500);
+});
+//--></script>

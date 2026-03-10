@@ -1,0 +1,65 @@
+{{ header }}
+<div class="fluid-width">
+  <div id="account-login" class="container">
+    <div class="top-cat">
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% if success %}
+      <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}<button type="button" class="close" data-dismiss="alert">&times;</button></div>
+    {% endif %}
+    <div class="bl-content bl-login-bg">
+        <div class="d-flex row">
+          <div class="col-lg-7 col-md-7 hidden-xs hidden-sm"
+               style="background-image: url('{{ image }}'); background-repeat: no-repeat; background-size: cover;">
+            <div class="account-bg"></div>
+          </div>
+          <div class="col-lg-5 col-md-5 col-xs-12">
+
+            <a title="{{ text_register }}" href="{{ register }}" class="registration-link bl-bold text-18 hidden-xs">
+              {{ text_register }}
+              <span class="open-submenu"></span>
+            </a>
+
+            <div class="p-50">
+              <h1 class="bl-bold">{{ heading_title }}</h1>
+              <br>
+              {% if error_warning %}
+                <div class="for-error error-warning"><i
+                    class="fa fa-exclamation-circle"></i> {{ error_warning }}
+                </div>
+              {% endif %}
+              <br>
+              <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-login">
+                <div class="form-group">
+                  <label class="control-label" for="login-email">{{ entry_email }}</label>
+                  <input type="text" name="email" value="{{ email }}" placeholder="{{ entry_email }}" id="login-email"
+                         class="form-control"/>
+                  {% if error_email %}
+                    <div class="for-error error-email text-danger">{{ error_email }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                  <label class="control-label" for="input-password">{{ entry_password }}</label>
+                  <input type="password" name="password" value="{{ password }}" placeholder="{{ entry_password }}"
+                         id="input-password" class="form-control"/>
+                  {% if error_password %}
+                    <div class="for-error error-password text-danger">{{ error_password }}</div>{% endif %}
+                </div>
+
+                <a title="{{ text_forgotten }}" href="{{ forgotten }}" class="forgotten">{{ text_forgotten }}</a>
+
+                <input type="submit" value="{{ button_login }}" class="button"/>
+                {% if redirect %}
+                  <input type="hidden" name="redirect" value="{{ redirect }}"/>
+                {% endif %}
+              </form>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

@@ -1,0 +1,50 @@
+{{ header }}
+<div class="fluid-width">
+  <div id="product-category" class="container layer-category">
+    <div class="top-cat row fluid-width">
+      <div class="breadcrumbs container">
+        <h1 class="category-name bl-bold">{{ heading_title }}</h1>
+        <ul class="breadcrumb">
+          {% for breadcrumb in breadcrumbs %}
+            <li><a title="{{ breadcrumb.text }}" href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="bl-content row">
+      <div id="content" class="category-main-bl">
+        {% if categories %}
+          {% for category in categories|batch((categories|length / 4)|round(1, 'ceil')) %}
+            {% for child in category %}
+
+                <div class="col-lg-2 col-6 col-md-4 bl-f">
+                  <a href="{{ child.href }}" title="{{ child.name }}">
+                  <div class="c-img">
+                    <div class="category-image" style="background-image: url('{{ child.thumb }}')"></div>
+                  </div>
+                  <div class="cat-main text-center">{{ child.name }}</div>
+                  </a>
+                </div>
+
+            {% endfor %}
+          {% endfor %}
+        {% else %}
+          <p>{{ text_empty }}</p>
+          <div class="buttons">
+            <div class="pull-right"><a href="{{ continue }}" class="btn btn-primary">{{ button_continue }}</a></div>
+          </div>
+        {% endif %}
+      </div>
+      {% if description %}
+        <div class="description">{{ description }}</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{{ footer }}
+<script>
+  $(document).ready(function () {
+    $('body').addClass('product-category');
+  });
+</script>

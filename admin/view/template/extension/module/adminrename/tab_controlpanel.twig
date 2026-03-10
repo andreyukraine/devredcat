@@ -1,0 +1,56 @@
+<style>
+div.row.rename-panel {
+    padding: 20px;
+}
+
+div.row.rename-panel h2 {
+    margin-bottom: 30px;
+}
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">{{ text_rename_your_dir }}</h3>
+              </div>
+              <div class="panel-body">
+                <div class="row rename-panel">
+                    <div class="col-xs-12">
+                    	<div class="row">
+                        	<div class="col-xs-12">
+                            	{{ text_current_admin_folder }} <h2>{{ adminDir }}</h2>
+                            </div>
+                        </div>
+                        <div class="row">
+                        	<div class="col-xs-12">{{ text_desired_admin_folder_name }} </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <input type="text" class="form-control" name="newAdminDir" />
+                            </div>
+                            <div class="col-xs-6">
+                            	<button type="submit" class="btn btn-success save-changes">{{ text_rename }}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">{{ text_what_happens_on_backend }}</h3>
+              </div>
+              <div class="panel-body">
+                <ol>
+                    {{ desc_what_happens_on_backend }}
+                </ol>
+                {{ text_note_what_happens_on_backend }}
+              </div>
+            </div>
+        </div>
+    </div>
+</div>

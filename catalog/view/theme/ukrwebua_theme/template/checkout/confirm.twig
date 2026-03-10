@@ -1,0 +1,87 @@
+{{ header }}
+<div class="fluid-width">
+  <div class="top-cat fluid-width">
+    <div class="breadcrumbs container">
+      <h1 class="category-name">{{ heading_title_confirm }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+
+  <div class="confirm-orders bl-content fluid-width">
+    <div class="container">
+      <div class="col-lg-6 bl-stick" style="background-image: url({{ image }}); background-size: cover;
+        background-position: center;
+        height: 100vh; background-repeat: no-repeat">
+      </div>
+      <div class="col-lg-6">
+        <div class="p-50">
+          <h1 class="t-confirm bl-bold">Дякуємо, ваші замовлення прийняті!</h1>
+          <br>
+          <div class="desc-confirm">
+            <p>Наш співробітник зв'яжеться з вами по телефону чи у месенджері згідно з графіком роботи
+              інтернет-магазину.</p>
+          </div>
+          <div class="i-confirm">
+            <p>Ви можете слідкувати за виконанням замовлення в особистому кабінеті.</p>
+          </div>
+          <br>
+          <br>
+
+          {% for order in orders %}
+            <div class="order-item">
+              {% if orders|length > 1 %}
+                <div class="bl-line">
+                  <div class="bl-bold text-24"><a href="{{ order.url }}">Замовлення №{{ order.number }}</a></div>
+                  <div class="otder-item-total total-store"><span>на суму</span>: {{ order.total }}</div>
+                </div>
+              {% else %}
+                <div class="bl-line">
+                  <div class="bl-bold text-24"><a href="{{ order.url }}">Замовлення</a></div>
+                  <div class="otder-item-total total-store"><span>на суму</span>: {{ order.total }}</div>
+                </div>
+              {% endif %}
+              <div class="bl-line">
+                <div class="otder-item-invoice"><b>№:</b> {{ order.invoice }}</div>
+              </div>
+              <div class="bl-line-col">
+                <div class="otder-item-delivery"><b>Метод доставки:</b></div>
+                <div class="otder-item-delivery-info">
+                  {% for shipp in order.shipping %}
+                    <span class="bl-bold">{{ shipp.title }}</span>
+                    {% if shipp.address is not empty %}
+                      <span>{{ shipp.address }}</span>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="bl-line-col">
+                <div class="otder-item-payment"><b>Метод оплати:</b></div>
+                <div class="otder-item-payment-info">
+                  {% for pay in order.payment %}
+                    <div class="bl-bold">{{ pay.title }}</div>
+                    <div class="pay-des">
+                      {% if pay.action_pay %}
+                        {{ pay.action_pay }}
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+
+          {{ ecommerce_purchase }}
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{{ footer }}

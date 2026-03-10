@@ -1,0 +1,213 @@
+<div class="banner7">
+  <div class="oc-banner7-container">
+    <div class="flexslider oc-nivoslider">
+      <div id="slick-home-{{ slider_id }}" class="slick-slider">
+
+        {% set config = slide_setting[0] %}
+        {% set i=1 %}
+        {% for s in ocslideshows %}
+{#          {% set i=i+1 %}#}
+
+{#          {% if s['type_slide'] and s['video'] is not empty %}#}
+{#            <div class="video-slide">#}
+{#              <video style="width: 100%; height: 100%;" autoplay="autoplay" loop="loop" muted="true" playsinline="true">#}
+{#                <source src="{{ s['video'] }}#t=0.1" type="video/mp4">#}
+{#              </video>#}
+{#            </div>#}
+{#          {% else %}#}
+{#            {% if s['link'] %}#}
+{#              <a href="{{ s['link'] }}">#}
+{#            {% endif %}#}
+{#            <div class="img-slide" style="height:{{ config['height'] }}px !important; background-image: url('{{ s['image'] }}');"></div>#}
+{#            {% if s['link'] %}#}
+{#              </a>#}
+{#            {% endif %}#}
+{#          {% endif %}#}
+
+          {% if s.type_slide and s.video is not empty %}
+            <div class="video-slide">
+              <video
+                style="width:100%; height:100%;"
+                autoplay
+                loop
+                muted
+                playsinline
+                preload="metadata"
+              >
+                <source src="{{ s.video }}#t=0.1" type="video/mp4">
+              </video>
+            </div>
+
+          {% else %}
+            {% if s.link %}<a href="{{ s.link }}">{% endif %}
+
+            <div class="img-slide" style="height:{{ config.height }}px">
+
+              <img
+                src="{{ s.image }}"
+                alt=""
+                width="100%"
+                height="{{ config.height }}"
+                {% if i == 1 %}
+                  fetchpriority="high"
+                  loading="eager"
+                {% else %}
+                  fetchpriority="auto"
+                  loading="lazy"
+                {% endif %}
+                decoding="async"
+              >
+
+            </div>
+
+            {% if s.link %}</a>{% endif %}
+          {% endif %}
+
+
+        {% endfor %}
+      </div>
+
+      {% set i=1 %}
+      {% for s in ocslideshows %}
+
+        {% set class = "" %}
+        {% if s['type'] == 1 %}
+          {% set class = 'slider-1' %}
+        {% endif %}
+
+        {% if s['type'] == 2 %}
+          {% set class = 'slider-2' %}
+        {% endif %}
+
+        {% if s['type'] == 3 %}
+          {% set class = 'slider-3' %}
+        {% endif %}
+
+        {% set i=i+1 %}
+        <div id="banner{{ slider_id }}-caption{{ i }}"
+             class="banner{{ slider_id }}-caption nivo-html-caption nivo-caption move-slides-effect"
+             data-class="slide-movetype{{ s['type'] }}">
+          <div class="timeloading"></div>
+          <div class="fluid-width banner7-content {{ class }}">
+            <div class="container">
+              <div class="container-inner">
+                <div class="text-content">
+                    {% if s['description'] %}<div class="col-lg-6">{% endif %}
+                      {% if s['title'] and s['title'] != "" %}
+                        <p class="banner7-title bl-bold"
+                           style="color: {{ s['title_color'] }}; font-size: {{ s["title_size"] }}px">{{ s['title'] }}</p>
+                      {% endif %}
+                      {% if s['sub_title'] and s['sub_title'] != "" %}
+                        <div>
+                          <p class="sub-title"
+                             style="color: {{ s['sub_title_color'] }}; font-size: {{ s["sub_size"] }}px !important;">{{ s['sub_title'] }}</p>
+                        </div>
+                      {% endif %}
+                    {% if s['description'] %}</div>{% endif %}
+
+                    <div class="banner7-des col-lg-6" style="color: {{ s['title_color'] }}">
+                      {{ s['description'] }}
+                    </div>
+                    {% if s['link'] %}
+                      <div class="banner7-readmore">
+                        <a class="link-more" href="{{ s['link'] }}">{{ text_readmore }}</a>
+                      </div>
+                    {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      <style>
+        .slick-slider {
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .slick-slider.slick-initialized {
+          opacity: 1;
+        }
+      </style>
+      <script>
+        $(document).ready(function () {
+          // Инициализация Slick Slider
+          var homeNavSlider = $('#slick-home-{{ slider_id }}.slick-slider');
+
+          homeNavSlider.css('opacity', 0);
+
+          // Инициализация: скрыть все описания и показать описание для первого активного слайда
+          $('.banner{{ slider_id }}-caption').hide();
+
+          homeNavSlider.on('init', function (slick) {
+            homeNavSlider.css('opacity', 1);
+            $('.banner{{ slider_id }}-caption').eq(slick.currentSlide).show();
+          });
+
+          homeNavSlider.not('.slick-initialized').slick({
+            autoplay: {% if config['auto'] and config['auto'] == 1 %} true {% else %} false {% endif %},
+            autoplaySpeed: {% if config['delay'] %} {{ config['delay'] }} {% else %} 7000 {% endif %},
+            speed: 1000, // Скорость анимации перехода
+            fade: {% if config['effect'] == 'fade' %} true {% else %} false {% endif %}, // Использовать эффект "fade"
+            arrows: {% if config['nextback'] and config['nextback'] == 1 %} true {% else %} false {% endif %},
+            dots: {% if config['contrl'] and config['contrl'] == 1 %} true {% else %} false {% endif %},
+            pauseOnHover: {% if config['hover'] and config['hover'] == 1 %} true {% else %} false {% endif %},
+            prevArrow: '<button type="button" class="slick-prev" title="prev" name="prev"><i class="ion-chevron-left"></i></button>',
+            nextArrow: '<button type="button" class="slick-next" title="next" name="next"><i class="ion-chevron-right"></i></button>',
+            slidesToShow: 1, // Отображать один слайд за раз
+            slidesToScroll: 1, // Переключать по одному слайду
+            infinite: true, // Зацикленный слайдер
+            responsive: [
+              {
+                breakpoint: 1024, // Настройки для экранов до 1024px
+                settings: {
+                  slidesToShow: 1,
+                  slidesToScroll: 1,
+                  arrows: true, // Показать стрелки на планшетах
+                  dots: true // Показать точки навигации
+                }
+              },
+              {
+                breakpoint: 768, // Настройки для экранов до 768px (планшеты и мобильные)
+                settings: {
+                  slidesToShow: 1,
+                  slidesToScroll: 1,
+                  arrows: false, // Скрыть стрелки на мобильных устройствах
+                  dots: true // Включить точки навигации
+                }
+              },
+              {
+                breakpoint: 480, // Настройки для экранов до 480px (мобильные)
+                settings: {
+                  slidesToShow: 1,
+                  slidesToScroll: 1,
+                  arrows: false, // Скрыть стрелки
+                  dots: true, // Включить точки навигации
+                  autoplaySpeed: 5000 // Более быстрая скорость автопрокрутки на мобильных
+                }
+              }
+            ],
+            onInit: function () {
+              homeNavSlider.css('opacity', 1);
+            }
+          });
+
+          // Обработчик для показа и скрытия описаний
+          homeNavSlider.on('beforeChange', function (event, slick, currentSlide, nextSlide) {
+            // Скрываем все описания перед сменой слайда
+            $('.banner{{ slider_id }}-caption').hide();
+          });
+
+          homeNavSlider.on('afterChange', function (event, slick, currentSlide) {
+            // Показываем описание, соответствующее текущему слайду
+            $('.banner{{ slider_id }}-caption').eq(currentSlide).show();
+          });
+
+          // Принудительно инициировать событие 'init' для показа первого описания
+          homeNavSlider.slick('slickGoTo', 0);
+        });
+      </script>
+
+    </div>
+  </div>
+</div>

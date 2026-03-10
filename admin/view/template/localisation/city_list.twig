@@ -1,0 +1,143 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <a href="{{ import_all_streets }}" data-toggle="tooltip" title="{{ button_import_all_streets }}" class="btn btn-info"><i class="fa fa-road"></i></a>
+        <a href="{{ import_all_warehouses }}" data-toggle="tooltip" title="{{ button_import_all_warehouses }}" class="btn btn-warning"><i class="fa fa-building"></i></a>
+        <a href="{{ import }}" data-toggle="tooltip" title="{{ button_import }}" class="btn btn-warning"><i class="fa fa-refresh"></i></a>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div id="import-status-container"></div>
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if success %}
+    <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_list }}</h3>
+      </div>
+      <div class="panel-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <td class="text-left">{% if sort == 'nc.name' %}
+                  <a href="{{ sort_name }}" class="{{ order|lower }}">{{ column_name }}</a>
+                  {% else %}
+                  <a href="{{ sort_name }}">{{ column_name }}</a>
+                  {% endif %}</td>
+                <td class="text-left">{% if sort == 'z.name' %}
+                  <a href="{{ sort_zone }}" class="{{ order|lower }}">{{ column_zone }}</a>
+                  {% else %}
+                  <a href="{{ sort_zone }}">{{ column_zone }}</a>
+                  {% endif %}</td>
+                <td class="text-left">{% if sort == 'nc.settlement_type' %}
+                  <a href="{{ sort_type }}" class="{{ order|lower }}">{{ column_type }}</a>
+                  {% else %}
+                  <a href="{{ sort_type }}">{{ column_type }}</a>
+                  {% endif %}</td>
+                <td class="text-left">{{ column_np_id }}</td>
+                <td class="text-right">{{ column_action }}</td>
+              </tr>
+            </thead>
+            <tbody>
+              {% if cities %}
+              {% for city in cities %}
+              <tr>
+                <td class="text-left">{{ city.name }}</td>
+                <td class="text-left">{{ city.zone }}</td>
+                <td class="text-left">{{ city.type }}</td>
+                <td class="text-left">{{ city.np_city_id }}</td>
+                <td class="text-right">
+                  <a href="{{ city.import_streets }}" data-toggle="tooltip" title="{{ button_import_streets }}" class="btn btn-info"><i class="fa fa-road"></i></a>
+                  <a href="{{ city.import_warehouses }}" data-toggle="tooltip" title="{{ button_import_warehouses }}" class="btn btn-warning"><i class="fa fa-building"></i></a>
+                </td>
+              </tr>
+              {% endfor %}
+              {% else %}
+              <tr>
+                <td class="text-center" colspan="4">{{ text_no_results }}</td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 text-left">{{ pagination }}</div>
+          <div class="col-sm-6 text-right">{{ results }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}
+<script type="text/javascript"><!--
+function updateImportStatus() {
+    $.ajax({
+        url: 'index.php?route=localisation/city/get_import_status&user_token={{ user_token }}',
+        dataType: 'json',
+        success: function(json) {
+            var html = '';
+            
+            if (json['streets']) {
+                var s = json['streets'];
+                var percent = s['total'] > 0 ? Math.round((s['current'] / s['total']) * 100) : 0;
+                if (s['status'] == 'processing' && percent < 1) percent = 1;
+                
+                html += '<div class="alert alert-info">';
+                html += '<i class="fa fa-info-circle"></i> <b>Імпорт вулиць:</b> ' + percent + '% (' + s['current'] + ' з ' + s['total'] + ' міст)';
+                if (s['current_city']) html += '<br><small>Зараз обробляється: ' + s['current_city'] + '</small>';
+                html += '<div class="progress" style="margin-top: 10px; margin-bottom: 0; height: 10px;">';
+                html += '  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="' + percent + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percent + '%"></div>';
+                html += '</div>';
+                html += '</div>';
+            }
+            
+            if (json['posts']) {
+                var p = json['posts'];
+                var percent = p['total'] > 0 ? Math.round((p['current'] / p['total']) * 100) : 0;
+                if (p['status'] == 'processing' && percent < 1) percent = 1;
+
+                html += '<div class="alert alert-info">';
+                html += '<i class="fa fa-info-circle"></i> <b>Імпорт відділень:</b> ' + percent + '% (' + p['current'] + ' з ' + p['total'] + ')';
+                html += '<div class="progress" style="margin-top: 10px; margin-bottom: 0; height: 10px;">';
+                html += '  <div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" aria-valuenow="' + percent + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percent + '%"></div>';
+                html += '</div>';
+                html += '</div>';
+            }
+            
+            $('#import-status-container').html(html);
+            
+            // Continue polling if any import is in progress
+            if ((json['streets'] && json['streets']['status'] == 'processing') || (json['posts'] && json['posts']['status'] == 'processing')) {
+                setTimeout(updateImportStatus, 3000);
+            } else if (html != '') {
+                // If finished recently, poll one more time later to let it disappear or stay for a bit
+                setTimeout(updateImportStatus, 10000);
+            } else {
+                // Check every 30 seconds even if nothing is happening
+                setTimeout(updateImportStatus, 30000);
+            }
+        }
+    });
+}
+
+$(document).ready(function() {
+    updateImportStatus();
+});
+//--></script>

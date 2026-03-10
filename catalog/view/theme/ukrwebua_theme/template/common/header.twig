@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html dir="{{ direction }}" lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>{{ title }}</title>
+  <base href="{{ base }}"/>
+  {% if description %}
+    <meta name="description" content="{{ description }}"/>
+  {% endif %}
+  {% if keywords %}
+    <meta name="keywords" content="{{ keywords }}"/>
+  {% endif %}
+
+  {% if robots %}
+    <meta name="robots" content="{{ robots }}"/>
+  {% endif %}
+
+  {% for item in open_graph %}
+    {% if item.content is not empty %}
+      <meta property="{{ item.property }}" content="{{ item.content }}"/>
+    {% endif %}
+  {% endfor %}
+
+
+  <link href="/catalog/view/javascript/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"/>
+  <link href="/catalog/view/theme/ukrwebua_theme/stylesheet/opentheme/ocslideshow/ocslideshow.css" rel="stylesheet"/>
+
+  <!-- Виправте формат шрифтів для preload -->
+  <link rel="preload" href="/catalog/view/theme/ukrwebua_theme/fonts/Ionicons.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="/catalog/view/theme/ukrwebua_theme/fonts/Raleway-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="/catalog/view/theme/ukrwebua_theme/fonts/Raleway-Light.ttf" as="font" type="font/ttf" crossorigin>
+
+  <!-- Залиште решту коду без змін -->
+  <link rel="preload" href="/catalog/view/theme/ukrwebua_theme/stylesheet/stylesheet.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="/catalog/view/theme/ukrwebua_theme/stylesheet/stylesheet.css"></noscript>
+
+  <script src="/catalog/view/javascript/jquery/jquery-2.1.1.min.js"></script>
+
+  <script src="/catalog/view/javascript/opentheme/countdown/jquery.plugin.min.js" defer></script>
+  <script src="/catalog/view/javascript/opentheme/countdown/jquery.countdown.min.js" defer></script>
+
+  <script src="/catalog/view/javascript/slick/slick.min.js"></script>
+  <link href="/catalog/view/javascript/slick/slick.min.css" rel="stylesheet" type="text/css"/>
+
+  <script src="/catalog/view/javascript/opentheme/ocajaxlogin/ocajaxlogin.js" defer></script>
+  <script src="/catalog/view/javascript/opentheme/ocsearchcategory/ocsearchcategory.js" defer></script>
+
+  <script src="/catalog/view/javascript/custom/checkout.js" defer></script>
+  <script src="/catalog/view/javascript/custom/cart.js" defer></script>
+
+  <script src="/catalog/view/javascript/showmore.js" defer></script>
+
+  <script src="/catalog/view/javascript/bootstrap/js/bootstrap.min.js" defer></script>
+  <script src="/catalog/view/javascript/common.js" defer></script>
+
+  {% for style in styles %}
+    <link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}"/>
+  {% endfor %}
+  {% for link in links %}
+    <link href="{{ link.href }}" rel="{{ link.rel }}"/>
+  {% endfor %}
+  {% for analytic in analytics %}
+    {{ analytic }}
+  {% endfor %}
+
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    window.gaQueue = window.gaQueue || [];
+
+    // Используем другое имя, чтобы не конфликтовать с GTM
+    window.myGA4 = {
+      sendEvent: function (eventName, ecommerceData) {
+        if (window.dataLayer) {
+          window.dataLayer.push({
+            event: eventName,
+            ecommerce: ecommerceData
+          });
+        }
+      }
+    };
+
+    // Глобальная функция для отправки событий
+    window.sendGA4Event = function(eventName, ecommerceData) {
+      if (window.myGA4 && typeof window.myGA4.sendEvent === 'function') {
+        window.myGA4.sendEvent(eventName, ecommerceData);
+      } else {
+        window.gaQueue.push({
+          eventName: eventName,
+          ecommerceData: ecommerceData
+        });
+      }
+    };
+
+    // Обрабатываем очередь событий
+    if (window.gaQueue.length > 0) {
+      window.gaQueue.forEach(function(event) {
+        window.sendGA4Event(event.eventName, event.ecommerceData);
+      });
+      window.gaQueue = [];
+    }
+  </script>
+
+</head>
+<body class="{{ class }} home">
+
+  <header>
+    <div id="header-top-block" class="header-inner fluid-width fluid-width2 fix">
+
+      {% if (ocinformationbar_value is not empty and ocinformationbar_value) %}
+      <div id="ocinformationbar" class="fluid-width">
+        <div class="container">
+            <div class="ocinformationbar-block">
+              <div class="ocinformationbar-text">{{ text_oct_information_bar }}</div>
+              <div id="ocinformationbar-btn" class="ocinformationbar-close">
+                <?xml version="1.0" encoding="utf-8"?>
+                <svg width="15px" height="15px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path fill="{{ ocinformationbar_color_text }}" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"/></svg>
+              </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        $('#ocinformationbar-btn').on('click', function () {
+          $('#ocinformationbar').addClass('hidden');
+          const date = new Date('{{ ocinformationbar_day_now }}'.replace(/-/g, "/"));
+          date.setTime(date.getTime() + ('{{ oct_info_max_day }}' * 24 * 60 * 60 * 1000));
+          document.cookie = '{{ ocinformationbar_value }}=1; path=/; expires=' + date.toUTCString();
+
+          // Если меню открыто - обновляем его положение
+          if ($('#menuview-top-content').hasClass('active')) {
+            ocmenuview_top.view();
+          }
+
+          headerFunctions.updateHeaderHeight();
+          headerFunctions.updateHeaderFix();
+        });
+      </script>
+      <style>
+        #ocinformationbar {
+          background: {{ ocinformationbar_background }};
+        }
+        .ocinformationbar-text {
+          color: {{ ocinformationbar_color_text }};
+        }
+        .ocinformationbar-text a {
+          color: {{ ocinformationbar_color_url }};
+        }
+      </style>
+      {% endif %}
+
+
+
+      <div class="menu-header container">
+        <div class="container-inner">
+          <div class="inner">
+            <div class="inner-inner">
+              <div class="col-menu-fix" id="oc-menu-{{ module_id }}">
+                <div class="oc-menu-bar"onclick="ocmenuview.open()" title="Каталог" >
+                  <div class="menu-main-left">
+                    <div class="bars"></div>
+                    <div class="menu-main-text-shop visible-lg hidden-md hidden-xs">
+                      <span class="text-menu-shop">Каталог</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="oc-menu-bar hidden-xs">
+                  <div class="menu-main-left">
+                    <div class="bars-disconts">
+                      <a href="/brands" title="Бренди"><img width="40px" height="40px" alt="Бренди" src="/image/brands.svg"></a>
+                    </div>
+                  </div>
+                </div>
+                <div class="oc-menu-bar hidden-xs">
+                  <div class="menu-main-left">
+                    <div class="bars-disconts">
+                      <a href="/discont" title="Акції"><img width="40px" height="40px" alt="Акції" src="/image/sales.svg"></a>
+                      <span id="special-total">{{ discont_total }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="oc-menu-bar">
+                  <div class="menu-main-left">
+                    <div class="bars-warehouses" onclick="ocmenuview_top.toggle('main')" title="Меню">
+                      <img width="40px" height="40px" alt="Меню" src="/image/menu_main.svg">
+                    </div>
+                    <div class="menu-main-text-shop hidden-xs">
+                      <span class="text-menu-shop" onclick="ocmenuview_top.toggle('main')">{{ text_menu_shop }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="logo-container">
+                <div id="logo">
+                  {% if logo %}
+                    <a href="{{ home }}" title="{{ name }}">
+                      <img width="103px" height="50px" src="{{ logo }}" alt="{{ name }}"/></a>
+                  {% else %}
+                    <a href="{{ home }}" title="{{ name }}">{{ name }}</a>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="box-cart">
+
+                <div class="phones-top">
+                  <img class="visible-lg" width="35px" height="40px" alt="Телефони" src="/image/phone.svg" onclick="ocmenuview_top.toggle('phone')">
+                  <div class="up-header-phones-top visible-lg visible-md hidden-xs">
+                    <div class="up-header-phones-items">
+                      <div>
+                        <div class="up-header-phones-item" onclick="ocmenuview_top.toggle('phone')">
+                          {% if is_mobile %}
+                          <a href="tel:{{ telephone }}" target="_blank" title="Телефони">
+                            {{ telephone }}
+                          </a>
+                          {% else %}
+                            {{ telephone }}
+                          {% endif %}
+                        </div>
+                        <div class="up-header-phones-text-af" onclick="custom_callback.open();">{{ text_callback }}</div>
+                      </div>
+                      <div class="narow-bottom" onclick="ocmenuview_top.toggle('phone')"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="menu-top-right hidden-xs">
+                  <div class="box-setting hidden-xs">
+                    <div class="account-btn">
+                      <img src="{{ account_img }}" width="40px" height="40px" title="Авторизація" onclick="ocajaxlogin.appendLoginForm();">
+                    </div>
+                  </div>
+                </div>
+                <div class="header-search-wrap">
+                  <button type="button" class="header-search-icon" aria-label="Пошук" title="Пошук">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M20 20L15.8033 15.8033M18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18C14.6421 18 18 14.6421 18 10.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  <div class="header-search-ocsearchcategory">{{ ocsearchcategory }}</div>
+                </div>
+                {{ wishlist_top }}
+                {{ cart_top }}
+              </div>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div id="menuview-top-content" class="fluid-width"></div>
+

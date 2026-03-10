@@ -1,0 +1,219 @@
+{{ header }} 
+<script src="view/javascript/ocsociallogin/velovalidation.js" type="text/javascript"></script>
+{{ column_left }} 
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button id="ocsociallogin_module_save"  data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+                 <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+            </div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %} 
+                    <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+                {% endfor %} 
+            </ul>
+            {% if (already_exist is defined) %} 
+                <div class="alert alert-danger">
+                    <i class="fa fa-check-circle"></i> {{ already_exist }} 
+                </div>
+            {% endif %} 
+             <div id="error_message"></div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+                </div>
+                <div class="panel-body" style="clear: both">
+                    {{ tab_common }} 
+                    <div class="tab-content">
+                        <form  method="post" id="form-ocsocialloginmodules" class="form-horizontal">
+                            <div class="form-group required">
+                                <label class="col-sm-2 control-label" for="input-width">{{ text_name }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="name" value="{{ name }}" placeholder="{{ text_name }}" id="name" class="form-control" />
+                                </div>
+                            </div> 
+                            <div class="form-group"> 
+                                <label class="col-sm-2 control-label" for="input-status">{{ text_title_status }}</label>
+                                <div class="col-sm-10">
+                                    <select name="title_status" id="title_status" class="form-control">
+                                        {% if (title_status) %} 
+                                            <option value="1" selected="selected">{{ text_enabled }}</option>
+                                            <option value="0">{{ text_disabled }}</option>
+                                        {% else %} 
+                                            <option value="1">{{ text_enabled }}</option>
+                                            <option value="0" selected="selected">{{ text_disabled }}</option>
+                                        {% endif %} 
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" id="select_title" {% if (title_status == 0) %}
+ {{ 'style="display:none"' }}
+ {% endif %} >
+                            {% for language in languages %} 
+                            <div class="form-group required">
+                                <label class="col-sm-2 control-label" for="input-width">{{ text_title }}</label>
+                                    
+                                <div class="col-sm-10">
+                                    <div class="input-group">
+                                        <span class="input-group-btn"> <img src="language/{{ language['code'] }}/{{ language['code'] }}.png" title="{{ language['name'] }}" />&nbsp;</span>
+                                        <input type="text" name="title[{{ language['language_id'] }}]" value="{{ title[language['language_id']] }}" placeholder="{{ text_title }}" id="input-width" class="form-control title" />
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            {% endfor %} 
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-width">{{ text_layout }}</label>
+                                <div class="col-sm-10">
+                                  <select name="layout_id" class="form-control" id="layout_id">
+                                                            {% for layout in layouts %} 
+                                                            {% if (layout['layout_id'] == layout_id) %} 
+                                                            <option value="{{ layout['layout_id'] }}" selected="selected">{{ layout['name'] }}</option>
+                                                            {% else %} 
+                                                            <option value="{{ layout['layout_id'] }}">{{ layout['name'] }}</option>
+                                                            {% endif %} 
+                                                            {% endfor %} 
+                                                        </select> </div>
+                            </div> 
+                            <div class="form-group required">
+                                <label class="col-sm-2 control-label" for="input-width">{{ text_button_layout }}</label> 
+                                <div class="col-sm-10">
+                                    <select name="button_layout" id="button_layout" class="form-control"> 
+                                        <option value="">{{ text_select_it }}</option>
+                                        {% for layout in all_icon_layout %} 
+                                        <option value="{{layout['id'] }}" {% if (button_layout == layout['id']) %}{{ 'selected' }}{% endif %}>{{ layout['name'] }}</option>
+                                         {% endfor %}
+                                    </select>
+                                </div>
+                            </div> 
+                             <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-width">{{ text_position }}</label>
+                                <div class="col-sm-10">
+                                 <select name="position" class="form-control">
+                                                            {% if (position == 'content_top') %} 
+                                                            <option value="content_top" selected="selected">{{ text_content_top }}</option>
+                                                            {% else %} 
+                                                            <option value="content_top">{{ text_content_top }}</option>
+                                                            {% endif %} 
+                                                            {% if (position == 'content_bottom') %} 
+                                                            <option value="content_bottom" selected="selected">{{ text_content_bottom }}</option>
+                                                            {% else %} 
+                                                            <option value="content_bottom">{{ text_content_bottom }}</option>
+                                                            {% endif %} 
+                                                            {% if (position == 'column_left') %} 
+                                                            <option value="column_left" selected="selected">{{ text_column_left }}</option>
+                                                            {% else %} 
+                                                            <option value="column_left">{{ text_column_left }}</option>
+                                                            {% endif %} 
+                                                            {% if (position == 'column_right') %} 
+                                                            <option value="column_right" selected="selected">{{ text_column_right }}</option>
+                                                            {% else %} 
+                                                            <option value="column_right">{{ text_column_right }}</option>
+                                                            {% endif %} 
+                                                        </select> 
+                                </div>
+                            </div> 
+                            <div class="form-group required">
+                                <label class="col-sm-2 control-label" for="input-width">{{ text_sortorder }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="sort_order" value="{{ sortorder }}" placeholder="{{ text_sortorder }}" id="sortorder" class="form-control" />
+                                </div>
+                            </div> 
+                            <div class="form-group"> 
+                                <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                                <div class="col-sm-10">
+                                    <select name="status" id="input-status" class="form-control">
+                                        {% if (status) %} 
+                                            <option value="1" selected="selected">{{ text_enabled }}</option>
+                                            <option value="0">{{ text_disabled }}</option>
+                                        {% else %} 
+                                            <option value="1">{{ text_enabled }}</option>
+                                            <option value="0" selected="selected">{{ text_disabled }}</option>
+                                        {% endif %} 
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>    
+                </div>    
+            </div>
+        </div>
+    </div>
+</div>    
+<script type="text/javascript">
+$(document).ready(function () {
+    
+  var error_message = '{{ form_error_message }}'; 
+  var error_button_layout = '{{ error_button_layout }}';
+  velovalidation.setErrorLanguage({
+    empty_field: '{{ error_empty_field }}',
+    number_field: '{{ error_number_field }}',
+  });
+  
+  $("#title_status").change(function() {
+        if($(this).val() == 0) {
+            $("#select_title").hide();
+        } else {
+            $("#select_title").show();
+        }
+    });
+  
+    $("#ocsociallogin_module_save").click(function() {
+        var error = false;
+        $(".has-error").removeClass("has-error");
+        $(".text-danger").remove();
+        
+        var name_mandatory = velovalidation.checkMandatory($('#name')); 
+        var sortorder_mandatory = velovalidation.checkMandatory($('#sortorder'));
+        var sortorder_numeric = velovalidation.isNumeric($('#sortorder'));
+        var buttonlayout_mandatory = velovalidation.checkMandatory($('#button_layout'));
+        if (name_mandatory != true) {
+            error = true;
+            $("#name").parent().parent().addClass("has-error");
+            $("#name").after('<div class="text-danger">' + name_mandatory + '</span>');
+        }
+
+       if (sortorder_mandatory != true) {
+             error = true;
+             $("#sortorder").parent().parent().addClass("has-error");
+             $("#sortorder").after('<div class="text-danger">' + sortorder_mandatory + '</span>');
+        }
+        if(sortorder_mandatory == true) {
+            if (sortorder_numeric != true) {
+                 error = true;
+                 $("#sortorder").parent().parent().addClass("has-error");
+                 $("#sortorder").after('<div class="text-danger">' + sortorder_numeric + '</span>');
+            }
+        }
+        
+        if($(title_status).val() == 1) {
+            $(".title").each(function() {
+                var title_mandatory = velovalidation.checkMandatory($(this));
+                if (title_mandatory != true) {
+                        error = true;
+                        $(this).parent().parent().addClass('has-error');
+                        $(this).after('<div class="text-danger">' + title_mandatory + '</span>');
+                } 
+            });
+         }
+      if(buttonlayout_mandatory != true ){
+             $('#button_layout').parent().parent().addClass('has-error');
+             $('#button_layout').after('<div class="text-danger">' + buttonlayout_mandatory + '</span>');
+           $('#error_message').html('<div class="alert alert-danger"><i class="fa fa-check-circle">'+ error_button_layout+'</i></div>');
+          return false;
+      }
+       else if (error) {
+            $('#error_message').html('<div class="alert alert-danger"><i class="fa fa-check-circle">'+ error_message +'</i></div>');
+          return false;
+        } else {
+           $("#form-ocsocialloginmodules").submit();
+        }    
+    });
+    
+ });
+</script>
+{{ footer }} 
+

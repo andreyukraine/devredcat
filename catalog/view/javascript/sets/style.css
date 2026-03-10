@@ -1,0 +1,299 @@
+.set
+{
+    margin-top:20px;
+    overflow:hidden;
+}
+.sets .ao
+{
+    font-size:25px;
+    font-weight: bold;
+    padding:0 10px;
+}
+.sets h3
+{
+    margin:15px 0 5px 0;
+    text-align: center;
+}
+.sets
+{
+    margin:10px auto;
+    width:100%;
+    padding:10px 20px;
+}
+.sets .set .quantity
+{
+    position:absolute;
+    right:0;
+    top:0;
+    padding:10px;
+}
+.sets .carousel-indicators li
+{
+        border: 1px solid black;
+}
+.sets .carousel-control
+{
+    width:5%;
+}
+.old_price,.old_summ
+{
+    text-decoration: line-through;
+}
+.new_price,.new_summ
+{
+}
+.sets .old_summ
+{
+    font-size:16px;
+    margin-bottom: 10px;
+}
+.sets .new_summ
+{
+    font-size:18px;
+    margin-top:15px;
+}
+.sets .set-product
+{
+    padding:10px;
+    position: relative;
+    max-width: 160px;
+}
+.sets .set-product h4
+{
+    font-size:13px;
+}
+.sets .total
+{
+    max-width: 160px;
+    position: relative;
+    padding:45px 10px;
+}
+.sets .total button
+{
+    white-space: normal;
+}
+.sets .total .economy_text
+{
+    font-size:14px;
+}
+.sets .total .economy_val
+{
+    font-weight: bold;
+    font-size:16px;
+}
+.sets .set-product .new_price
+{
+    font-weight: bold;
+    font-size:16px;
+}
+.sets .set .disc
+{
+    position:absolute;
+    left:0;
+    top:0;
+    padding:10px;
+
+}
+.sets .add-set-btn
+{
+    margin-top:15px;
+    background-image: none;
+}
+.img-responsive
+{
+    max-width:100%;
+    margin: 0 auto;
+}
+.sets
+{
+    text-align: center;
+}
+@media screen and (min-width: 768px) {
+    .sets .cell
+    {
+        display:table-cell;
+        vertical-align:middle;
+    }
+    .sets .set .set_table
+    {
+        display: table;
+        margin: 0 auto;
+    }
+}
+@media screen and (max-width: 767px) {
+    .sets .total .economy_text
+    {
+        font-size:12px;
+    }
+    .sets .total .economy_val
+    {
+        font-weight: bold;
+        font-size:14px;
+    }
+    .sets .new_summ {
+        margin-top: 10px;
+    }
+    .sets .add-set-btn {
+        margin-top: 10px;
+    }
+    .sets
+    {
+        margin:10px auto;
+        padding:5px 0px;
+    }
+    .sets .old_summ
+    {
+        font-size:14px;
+        margin-bottom: 5px;
+    }
+    .sets .new_summ
+    {
+        font-size:18px;
+    }
+    .sets .set-product .old_price
+    {
+        font-size:11px;
+        white-space: nowrap;
+    }
+    .sets .set .quantity,.sets .set .disc
+    {
+        padding:5px;
+    }
+    .sets .set-product .new_price
+    {
+        font-size:14px;
+    }
+    .sets .set-product h4 
+    {
+        font-size:12px;
+        height:26px;
+        overflow:hidden;
+    }
+    .sets .set-product,.sets .total
+    {
+        display: inline-block;
+        margin:0 auto;
+        overflow: hidden;
+        width:50%;
+        max-width: 150px;
+    }
+    .sets .set-product{
+        padding:10px 5px;
+    }
+    .sets .total
+    {
+        height:160px;
+        padding:25px 5px;
+    }
+
+    .sets .set-product img
+    {
+        max-width: 70px;
+    }
+    .sets .ao
+    {
+        display: none;
+    }
+    .sets .ao
+    {
+        font-size:20px;
+        margin:20px 0;
+    }
+}
+
+.slick-slide
+{
+    height:auto;
+}
+.slick-prev:before, .slick-next:before { 
+    color:#1d9de7;
+
+}
+.slick-prev, .slick-next
+{
+    z-index: 10;
+}
+
+@media screen and (max-width: 768px) {
+    .slick-prev
+    {
+        left: 10px;
+    }
+    .slick-next
+    {
+        right: 10px;
+    }
+}
+
+@media screen and (min-width: 767px) {
+
+    .slick-prev:before, .slick-next:before{
+        font-size:40px;
+    }
+    .slick-prev, .slick-next
+    {
+        width:40px;
+        height:40px;
+    }
+    .slick-prev
+    {
+        left: -40px;
+    }
+    .slick-next
+    {
+        right: -40px;
+    }
+}
+
+/* COLORS */
+.sets .ao
+{
+    color:#1d9de7;
+}
+.sets h3
+{
+    color:#e04747;
+}
+
+.sets .set .quantity
+{
+    background-color: #e04747;
+    color:white;
+}
+
+.old_price,.old_summ
+{
+    color:#e04747;
+}
+.new_price,.new_summ
+{
+    color:#1d9de7;
+}
+
+.sets .set-product
+{
+    border:1px solid #ddd;
+}
+.sets .total
+{
+    border:2px solid #1d9de7;
+}
+
+.sets .set .disc
+{
+    background-color: #1d9de7;
+    color:white;
+}
+.sets .add-set-btn
+{
+
+}
+
+.sets .total .economy_text
+{
+    color:#e04747;
+}
+.sets .total .economy_val
+{
+    color:#e04747;
+}

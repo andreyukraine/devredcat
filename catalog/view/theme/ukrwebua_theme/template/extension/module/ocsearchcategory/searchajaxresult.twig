@@ -1,0 +1,66 @@
+{% if products|length == 0 %}
+    <p class="ajax-result-msg">{{ text_empty }}</p>
+{% else %}
+    <ul class="ajax-result-list">
+      <div class="ajax-result-list-products">
+        {% set i = 0 %}
+        {% for product in products %}
+          {% set i = i + 1 %}
+          <li class="ajax-result-item col-lg-12">
+            <div class="product-info row">
+              <div class="product-image col-xs-3 col-md-2 col-lg-2">
+
+                <div class="label-product label-sale-{{ product.product_id }}">
+                  {% if product.special %}
+                    <div class="bg-special"><span>{{ '-' ~ product.rate_special ~ '%' ~ text_label_sale }}</span></div>
+                  {% endif %}
+                </div>
+
+                <a href="{{ product.href }}">
+                  <div class="product-image">
+                    <img class="img-responsive" width="{{ product.width }}" height="{{ product.height }}" src="{{ product.thumb }}" title="{{ product.name }}" alt="{{ product.name }}" />
+                  </div>
+                </a>
+              </div>
+
+              <div class="detail col-xs-9 col-md-10 col-lg-10">
+                <h2 class="product-name">
+                  <a href="{{ product.href }}">{{ product.name }}</a>
+                </h2>
+                {% if product.price %}
+                  <div class="btn-card-search">
+                    <div class="price-box-{{ product.product_id }} bl-price-catalog">
+                      {% if not product.special %}
+                        <div class="box-regular">
+                          <div class="regular-price"><span class="price">{{ product.price }}</span></div>
+                        </div>
+                      {% else %}
+                        <div class="box-special">
+                          <div class="old-price"><span class="price">{{ product.price }}</span></div>
+                          <div class="special-price"><span class="price">{{ product.special }}</span></div>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endif %}
+
+                <div class="stock-status">{% if product.on_stock %}<span
+                    class="in-stock">В наявності</span>{% else %}<span
+                    class="out-stock">Під замовлення</span>{% endif %}</span>
+                </div>
+
+              </div>
+            </div>
+          </li>
+          {% if i % 2 == 0 %}
+            <div style="clear:both"></div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </ul>
+  <div class="ajax-result-more">
+    <div id="search-result-more" onclick="showSearchMore()" class="button">
+      <span>Всі результати</span>
+    </div>
+  </div>
+{% endif %}

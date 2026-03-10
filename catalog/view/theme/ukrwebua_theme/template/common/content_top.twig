@@ -1,0 +1,11 @@
+{% if modules %}
+<div class="fluid-width">
+  <div class="container">
+    <div class="bl-hidden">
+    {% for code, module in modules %}
+      <div class="bl-module">{{ module }}</div>
+    {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}

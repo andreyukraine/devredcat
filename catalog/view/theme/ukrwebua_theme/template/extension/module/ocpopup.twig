@@ -1,0 +1,68 @@
+<div id="bl-popup" class="">
+  <div class="popup-content">
+      <img class="popup-close" width="25px" height="25px" src="/image/close.svg" onclick='custom_popup.close()' alt="close">
+      <div id="popup-container">
+        <div id="popup-main-block">
+          <p>{{ text|raw }}</p>
+        </div>
+      </div>
+  </div>
+</div>
+<style>
+
+  .popup-close{
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    background-color: #fff;
+    border-radius: 50%;
+  }
+
+  .popup-content p {
+    margin: 0px !important;
+  }
+
+  .popup-container.open {
+    position: fixed;
+    right: 0;
+    bottom: 20px;
+    margin: 0;
+    width: auto;
+    max-width: 380px;
+    z-index: 20;
+  }
+
+  /* Додаткові стилі для кращого вигляду */
+  #bl-popup {
+    background-color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+
+  .popup-container {
+    display: flex !important;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-right: 20px;
+    padding-bottom: 20px;
+  }
+
+  .popup-container {
+    margin: 0;
+    animation: slideInUp 0.5s;
+    transform: translateY(0) !important;
+  }
+
+  @keyframes slideInUp {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+</style>

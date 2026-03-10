@@ -1,0 +1,50 @@
+{{ header }}
+<div class="fluid-width">
+  <div id="blog" data-blog-id="0"  class="container">
+    <div class="top-cat row fluid-width">
+      <div class="breadcrumbs container">
+        <h1 class="category-name">{{ heading_title }}</h1>
+        <ul class="breadcrumb">
+          {% for breadcrumb in breadcrumbs %}
+            <li><a title="{{ breadcrumb.text }}" href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="fluid-width">
+  <div id="information-information" class="container">
+    <div class="row bl-content">
+      <div class="col-lg-3">
+      {{ menu }}
+      {{ column_left }}
+      </div>
+      <div id="content" class="col-sm-9 showcase-list">{{ content_top }}
+        {% if articles %}
+          <div class="article-page">
+            {% for article in articles %}
+              <div class="article-row">
+                <a title="{{ article.name }}" href="{{ article.href }}">
+                  <div class="article-item">
+                    <div class="article-image" style="background-image: url('{{ article.image }}')">
+                    </div>
+                    <div class="bl-article-title">
+                      <div class="article-date">{{ article.date_added }}</div>
+                      <div class="name text-18">{{ article.name }}</div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="toolbar toolbar-bottom">
+            <div class="pages">{{ pagination }}</div>
+          </div>
+        {% else %}
+          <p>{{ text_empty }}</p>
+        {% endif %}
+        {{ content_bottom }}</div>
+      {{ column_right }}</div>
+  </div>
+  {{ footer }}

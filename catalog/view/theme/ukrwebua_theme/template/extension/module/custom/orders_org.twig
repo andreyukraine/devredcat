@@ -1,0 +1,131 @@
+<div id="custom-orders_org">
+  {% set number = 1 %}
+  {% if orders|length > 1 %}
+    <div class="more-one-orders">
+      <img src="/image/info_red.svg">
+      Зверніть увагу, товари, що на різних складах, буде доставлено окремими замовленнями
+    </div>
+  {% endif %}
+
+  <div class="cart-fix-list-products">
+    {% for organization_id, order in orders %}
+      <div id="order-{{ organization_id }}" class="line-order">
+        <div>
+          <div class="title-orders">
+            <div class="title-bl bl-bold">Замовлення №{{ number }}</div>
+            <div class="total-store"><span>на суму:</span> {{ order.total_order }}</div>
+          </div>
+          <hr>
+        </div>
+
+        {% for product in order.products %}
+          <div id="product-{{ product.warehouse_id }}-{{ product.product_id }}">
+            <div id="cart-line-{{ product.cart_id }}" class="cart-line-lg">
+
+              <div class="text-center cart-fix-image">
+                {% if product.percent %}
+                  <div class="label-product label_sale">
+                    <div class="bg-special"><span>-{{ product.percent }}%</span></div>
+                  </div>
+                {% endif %}
+
+                {% if (product.image) %}
+                  <a href="{{ product.href }}">
+                    <img class="cart-image img-responsive" width="150" height="150" src="{{ product.image }}"
+                         alt="{{ product.name }}"
+                         title="{{ product.name }}"/>
+                  </a>
+                {% endif %}
+              </div>
+
+              <div class="text-left info-item">
+
+                <div class="hj-cart">
+                  <a href="{{ product.href }}"><span class="bl-bold">{{ product.name }}</span></a>
+                  <div class="text-right cart-close">
+                    <img width="20" height="20" src="/image/trash-icon.svg"
+                         onclick="custom_cart.remove('{{ product.product_id }}', '{{ product.cart_id }}');"
+                         title="{{ button_remove }}"
+                         alt="close">
+                  </div>
+                </div>
+
+                {% if (product.option) %}
+                  <div class="opts">
+                    {% for option in product.option %}
+                      <small><b>{{ option.name }}</b> : {{ option.value }}</small>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+
+                <div id="product-{{ organization_id }}-{{ product.product_id }}" class="cart-fix-line">
+                  <div class="cart-price">
+                    {% if not product.special %}
+                      <div class="price-box box-regular">
+                        <div class="regular-price">
+                          <span class="price">{{ product.price_view }}</span>
+                        </div>
+                      </div>
+                    {% else %}
+                      <div class="price-box box-special">
+                        <div class="old-price"><span class="price">{{ product.price_view }}</span></div>
+                        <div class="special-price"><span class="price">{{ product.special_view }}</span></div>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="cart-quantity btn-card">
+                    <div class="btn-card">
+                      <div class="cart-right-btns in-cart">
+                        <div class="minus btn {% if product.quantity == 1 %}not-available{% endif %}"
+                             data-key="{{ product.product_id }}"
+                             data-cart="{{ product.cart_id }}"
+                             data-store="{{ product.warehouse_id }}"
+                             {% if product.quantity > 0 %}onclick="custom_cart.handleClickInCart(this, 'minus')"{% endif %}>
+                          -
+                        </div>
+
+                        <input type="hidden" class="old-value"
+                               id="old-value-{{ warehouse_id }}-{{ product.product_id }}"
+                               name="old_value" value="">
+                        <input id="qty-{{ product.warehouse_id }}-{{ product.product_id }}-{{ product.cart_id }}"
+                               data-key="{{ product.product_id }}"
+                               data-cart="{{ product.cart_id }}"
+                               data-order="{{ product.warehouse_id }}" type="number"
+                               name="quantity" value="{{ product.quantity }}" class="quantity-input-order"/>
+
+                        <div class="plus btn {% if not product.is_buy %}not-available{% endif %}"
+                             data-key="{{ product.product_id }}"
+                             data-cart="{{ product.cart_id }}"
+                             data-store="{{ product.warehouse_id }}"
+                             {% if product.is_buy %}onclick="custom_cart.handleClickInCart(this, 'plus')"{% endif %}>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cart-price-total text-right">
+                    {% if not product.special %}
+                      <div class="price-box box-regular">
+                                  <span class="regular-price">
+                                    <span class="price">{{ product.price_total_item_view }}</span>
+                                  </span>
+                      </div>
+                    {% else %}
+                      <div class="price-box box-special">
+                        <div class="old-price"><span class="price">{{ product.price_total_item_view }}</span></div>
+                        <div class="special-price"><span class="price">{{ product.special_total_item_view }}</span>
+                        </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        {% endfor %}
+
+      </div>
+      {% set number = number + 1 %}
+    {% endfor %}
+  </div>
+</div>

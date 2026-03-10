@@ -1,0 +1,7 @@
+<div class="bl-menu-top">
+  {% for key, item in menu_top %}
+    <div class="{% if key == 0 %}menu-top-item-first{% else %}menu-top-item{% endif %}">
+      <a href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
+    </div>
+  {% endfor %}
+</div>

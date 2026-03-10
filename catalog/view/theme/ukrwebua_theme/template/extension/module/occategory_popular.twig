@@ -1,0 +1,112 @@
+{% if categories %}
+  <div class="category-popular-container" id="category-popular-module{{ module_id }}">
+    <div class="bloglatest-slider module-title">
+      <h2 class="bl-bold">{{ heading_title }}</h2>
+    </div>
+
+    {% set count, rows = 1, config_slide.f_rows %}
+    {% if not rows %}
+      {% set rows = 1 %}
+    {% endif %}
+    <div class="category-popular-content">
+      <div class="slick-container">
+        <div class="slick-category-popular">
+          {% for category in categories %}
+            {% if count % rows == 0 %}
+              <div class="row_items">
+            {% endif %}
+            {% set count = count + 1 %}
+            <div class="item">
+              <div class="item-inner">
+                <a title="{{ category.name }}" href="{{ category.href }}">
+                  <div class="cat-popular-content">
+                    <div class="bl-popular-img" style="background-image: url('{{ category.image }}')"></div>
+                    <div class="bl-article-title">
+                      <div class="name text-32 bl-bold">{{ category.name }}</div>
+                      <div class="category-popular-more text-18 d-flex">Дивитися всі
+                        <img src="/image/back.svg" width="35px" height="25px" alt="{{ category.name }}">
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+            {% if (count % rows == 0) or (count == categories|length) %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .slick-category-popular .slick-track {
+      gap: 15px;
+    }
+
+    .slick-category-popular {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .slick-category-popular.slick-initialized {
+      opacity: 1;
+    }
+  </style>
+  <script>
+    $(document).ready(function () {
+      var occategory_popularNavSlider = $("#category-popular-module{{ module_id }} .slick-category-popular");
+
+      // Функція для ініціалізації слайдера
+      function initSlider() {
+        var itemsToShow = getSlidesToShow();
+
+        // Проверка на существование слайдов
+        occategory_popularNavSlider.not('.slick-initialized').slick({
+          slidesToShow: itemsToShow,
+          slidesToScroll: itemsToShow,
+          initialSlide: 0,
+          dots: false,
+          focusOnSelect: false,
+          vertical: false,
+          arrows: true,
+          slide: "div",
+          infinite: false,
+        });
+      }
+
+      // Функція для визначення кількості слайдів
+      function getSlidesToShow() {
+        var windowWidth = $(window).width();
+        if (windowWidth < 375) {
+          return 1;
+        } else if (windowWidth < 480) {
+          return 1;
+        } else if (windowWidth < 768) {
+          return 1;
+        } else if (windowWidth < 992) {
+          return 2;
+        } else if (windowWidth < 1200) {
+          return 2;
+        } else {
+          return 2; // значення за замовчуванням
+        }
+      }
+
+      // Ініціалізація слайдера
+      initSlider();
+
+      //Респонсив поведінка
+      $(window).on('resize', function () {
+        var currentSlidesToShow = occategory_popularNavSlider.slick('slickGetOption', 'slidesToShow');
+        var newSlidesToShow = getSlidesToShow();
+
+        if (currentSlidesToShow !== newSlidesToShow) {
+          occategory_popularNavSlider.slick('unslick');
+          initSlider();
+        }
+      });
+    });
+  </script>
+{% endif %}

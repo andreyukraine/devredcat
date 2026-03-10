@@ -1,0 +1,13 @@
+{% if not logged %}
+  <div onclick="ocajaxlogin.appendLoginForm();" title="Список бажань" class="btn-wishlist hidden-xs" style="cursor: pointer">
+    <div id="wishlist" class="btn-group btn-block">
+      <span id="wishlist-total">{{ text_items }}</span>
+    </div>
+  </div>
+{% else %}
+  <a href="{{ redirect }}" title="Список бажань" class="btn-wishlist hidden-xs">
+    <div id="wishlist" class="btn-group btn-block">
+      <span id="wishlist-total">{{ text_items }}</span>
+    </div>
+  </a>
+{% endif %}

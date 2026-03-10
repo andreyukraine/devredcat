@@ -1,0 +1,79 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if success %}
+    <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_list }}</h3>
+      </div>
+      <div class="panel-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <td class="text-left">{% if sort == 'p.name' %}
+                  <a href="{{ sort_name }}" class="{{ order|lower }}">{{ column_name }}</a>
+                  {% else %}
+                  <a href="{{ sort_name }}">{{ column_name }}</a>
+                  {% endif %}</td>
+                <td class="text-right">{{ column_number }}</td>
+                <td class="text-left">{% if sort == 'c.name' %}
+                  <a href="{{ sort_city }}" class="{{ order|lower }}">{{ column_city }}</a>
+                  {% else %}
+                  <a href="{{ sort_city }}">{{ column_city }}</a>
+                  {% endif %}</td>
+                <td class="text-left">{% if sort == 'p.type' %}
+                  <a href="{{ sort_type }}" class="{{ order|lower }}">{{ column_type }}</a>
+                  {% else %}
+                  <a href="{{ sort_type }}">{{ column_type }}</a>
+                  {% endif %}</td>
+                <td class="text-left">{{ column_address }}</td>
+              </tr>
+            </thead>
+            <tbody>
+              {% if posts %}
+              {% for post in posts %}
+              <tr>
+                <td class="text-left">{{ post.name }}</td>
+                <td class="text-right">{{ post.number }}</td>
+                <td class="text-left">{{ post.city }}</td>
+                <td class="text-left">{{ post.type }}</td>
+                <td class="text-left">{{ post.address }}</td>
+              </tr>
+              {% endfor %}
+              {% else %}
+              <tr>
+                <td class="text-center" colspan="5">{{ text_no_results }}</td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 text-left">{{ pagination }}</div>
+          <div class="col-sm-6 text-right">{{ results }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

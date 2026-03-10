@@ -1,0 +1,1034 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+      <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <br>
+        <br>
+          <div id="cronJobResult"></div>
+        <br>
+        <br>
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#tab-product" data-toggle="tab">Товари</a></li>
+          <li><a href="#tab-client" data-toggle="tab">Клієнти</a></li>
+          <li><a href="#tab-seo" data-toggle="tab">Seo</a></li>
+          <li><a href="#tab-img" data-toggle="tab">Зображення</a></li>
+          <li><a href="#tab-email" data-toggle="tab">Перевірка пошти</a></li>
+        </ul>
+        <div class="tab-content">
+
+          {# imgs #}
+          <div class="tab-pane" id="tab-img">
+            <div class="row">
+              <div class="col-lg-6">
+                  <div class="row opt-blok">
+                    <div class="col-lg-12"><h4>Зображення</h4>
+                      <hr>
+                    </div>
+                    <div class="col-lg-12">
+                      <button id="importImgProd" class="btn btn-primary">Import img prod</button>
+                      <button id="importImgCat" class="btn btn-primary">Import img cat</button>
+                      <button id="importImgBrand" class="btn btn-primary">Import img brand</button>
+                      <br>
+                      <br>
+                      <hr>
+                      <p>Результати з потрібними зображеннями зберігаються /image/catalog/find-images</p>
+                      <br>
+                      <h4>Видалення crop у зображення</h4>
+                      <hr>
+
+                      <br>
+                      <p>Вкажіть категорію товарів</p>
+                      <div class="form-group">
+                          <select name="main_category_id" class="form-control">
+                            <option value="0" selected="selected">{{ text_none }}</option>
+                            {% for category in product_categories %}
+                              {% if category.category_id == main_category_id %}
+                                <option value="{{ category.category_id }}" selected="selected">{{ category.name }}</option>
+                              {% else %}
+                                <option value="{{ category.category_id }}">{{ category.name }}</option>
+                              {% endif %}
+                            {% endfor %}
+                          </select>
+                      </div>
+                      <br>
+                      <p>або вкажіть назву зображення без .jpg</p>
+                      <input type="text" name="barcode-img" value="" class="form-group" style="width: 100%">
+                      <br><br>
+                      <button id="cropImgProd" class="btn btn-primary">Crop img prod</button>
+                    </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+
+          {# Email #}
+          <div class="tab-pane" id="tab-email">
+            <div class="row">
+              <div class="col-lg-6">
+                <form action="{{ email }}" method="post" enctype="multipart/form-data" id="form-module"
+                      class="form-horizontal">
+                  <input type="hidden" name="tab-active" value="tab-email">
+                  <div class="form-group">
+                    <label class="col-sm-1 control-label" for="mail_from">Пошта на яку відправити</label>
+                    <div class="col-sm-5">
+                      <input type="text" name="mail_from" value="" id="mail_from" class="form-control" required>
+                    </div>
+                  </div>
+                  <br>
+                  <div class="col-sm-12 text-left">
+                    <input type="submit" name="save" value="Виконати" class="btn btn-primary"/>
+                  </div>
+                  <br>
+                </form>
+                </div>
+            </div>
+          </div>
+
+          {# Клієнти #}
+          <div class="tab-pane" id="tab-client">
+            <div class="row">
+              <div class="col-lg-2">
+                <div class="row opt-blok">
+                  <div class="col-lg-12"><h4>Адреса клієнтів</h4>
+                    <hr>
+                  </div>
+                  <div class="col-lg-12">
+                    <button id="updateAddressesClient" class="btn btn-primary">Import</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <br>
+                    <button id="clearAddressesClient" class="btn btn-danger">Clear</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <hr>
+                    <p>1. Спочатку отримуємо адреси з ERP де у клієнтів проставлений код (id покупателя сайта) з ними
+                      криїзджає код кліента в ERP</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-2">
+                <div class="row opt-blok">
+                  <div class="col-lg-12"><h4>Знижки і цінові групи клієнтів</h4>
+                    <hr>
+                  </div>
+                  <div class="col-lg-12">
+                    <button id="updatePriceGroupsClient" class="btn btn-primary">Import</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <br>
+                    <button id="clearCustomerAddressPriceGroups" class="btn btn-danger">Clear</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <hr>
+                    <p>2. Після того як отримали адреси з ERP проходимось по адресам і по (id покупателя ERP) отримуємо
+                      його знижк</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-2">
+                <div class="row opt-blok">
+                  <div class="col-lg-12"><h4>Групи кліентів</h4>
+                    <hr>
+                  </div>
+                  <div class="col-lg-12">
+                    <button id="updateGroupe" class="btn btn-primary">Import</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <hr>
+                    <p>Імпорт видів дисконтних карт</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-2">
+                <div class="row opt-blok">
+                  <div class="col-lg-12"><h4>Інформаційні карти</h4>
+                    <hr>
+                  </div>
+                  <div class="col-lg-12">
+                    <button id="importCards" class="btn btn-primary">Import</button>
+                    <button id="importCardsCron" class="btn btn-primary">Import Cron</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <br>
+                    <button id="clearCards" class="btn btn-danger">Clear</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <hr>
+                    <p>Імпорт дисконтних карток з накопиченням і знижкою</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {# Товари #}
+          <div class="tab-pane active" id="tab-product">
+            <div class="row">
+              <div class="col-lg-2">
+                <div class="row opt-blok">
+                  <div class="col-lg-12"><h4>Категорії</h4>
+                    <hr>
+                  </div>
+                  <div class="col-lg-12">
+                    <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-blog"
+                          class="form-horizontal">
+                      <input name="type" type="hidden" value="category">
+                      <button type="submit" class="btn btn-primary">Import</button>
+                    </form>
+                  </div>
+                  <div class="col-lg-12">
+                    <br>
+                    <button id="clearCategoties" class="btn btn-danger">Clear</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <hr>
+                    <p>Імпорт категорій і альтеррнативних категорій</p>
+                  </div>
+
+                  {#              <div class="col-lg-12"> #}
+                  {#                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-blog" #}
+                  {#                      class="form-horizontal"> #}
+                  {#                  <input name="type" type="hidden" value="pdo_srvsql"> #}
+                  {#                  <button type="submit" class="btn btn-primary">Import pdo</button> #}
+                  {#                </form> #}
+                  {#              </div> #}
+                </div>
+              </div>
+              <div class="col-lg-2">
+                <div class="row opt-blok">
+                  <div class="col-lg-12"><h4>Склади</h4>
+                    <hr>
+                  </div>
+                  <div class="col-lg-12">
+                    <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-blog"
+                          class="form-horizontal">
+                      <input name="type" type="hidden" value="warehouses">
+                      <button type="submit" class="btn btn-primary">Import</button>
+                    </form>
+                  </div>
+                  <div class="col-lg-12">
+                    <br>
+                    <button id="clearWarehouses" class="btn btn-danger">Clear</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <hr>
+                    <p>Імпорт складів з галочкою можливий самовивіз</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-2">
+                <div class="row opt-blok">
+                  <div class="col-lg-12"><h4>Товари</h4>
+                    <hr>
+                  </div>
+                  <div class="col-lg-12">
+                    <button id="importProducts" class="btn btn-primary">Import</button>
+                    <button id="importProductsCron" class="btn btn-primary">Import Cron</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <br>
+                    <button id="clearProducts" class="btn btn-danger">Clear</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <hr>
+                    <p>Імпорт товарів по складам з позначкою "на сайт"</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-2">
+                <div class="row opt-blok">
+                  <div class="col-lg-12"><h4>Знижки на товари</h4>
+                    <hr>
+                  </div>
+                  <div class="col-lg-12">
+                    <button id="importDisconts" class="btn btn-primary">Import</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <br>
+                    <button id="clearDisconts" class="btn btn-danger">Clear</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <hr>
+                    <p>Імпорт знижок із документів установка знижок номенклатури</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-2">
+                <div class="row opt-blok">
+                  <div class="col-lg-12"><h4>Фільтр</h4>
+                    <hr>
+                  </div>
+                  <div class="col-lg-12">
+                    <button id="updateFilter" class="btn btn-primary">Оновити</button>
+                  </div>
+                  <div class="col-lg-12">
+                    <hr>
+                    <p>Оновлює таблиці після імпорту для правильної фільтрації</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {# Seo #}
+          <div class="tab-pane" id="tab-seo">
+            <form action="" method="post" enctype="multipart/form-data" id="form-import-excel-category">
+
+                  <div class="form-group form-group-sm">
+                    <label class="col-sm-2 control-label">Файл завантаження</label>
+                    <div class="col-sm-4">
+                      <div class="input-group">
+                        <input type="file" name="file" style="display: none"/>
+                        <input type="text" name="import_meta" value="{{ filename }}" placeholder="{{ entry_filename }}" id="input-filename" class="form-control"/>
+                        <span class="input-group-btn">
+                          <button type="button" id="button-upload-file" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-upload"></i> {{ button_upload }}</button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="code">Назва стовпчика UID</label>
+                    <div class="col-sm-4">
+                      <input type="text" name="code" value="code" id="code" class="form-control" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="h1">Назва стовпчика Meta H1</label>
+                    <div class="col-sm-4">
+                      <input type="text" name="h1" value="h1" id="h1" class="form-control" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="title">Назва стовпчика Meta Title</label>
+                    <div class="col-sm-4">
+                      <input type="text" name="title" value="title" id="title" class="form-control" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="desc">Назва стовпчика Meta Desc</label>
+                    <div class="col-sm-4">
+                      <input type="text" name="desc" value="desc" id="desc" class="form-control" required>
+                    </div>
+                  </div>
+
+                  <div id="import-mete-category-excel" class="btn btn-primary">Виконати</div>
+
+                </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{{ footer }}
+
+<script type="text/javascript">
+  $(document).ready(function () {
+
+    $('#button-upload-file').on('click', function() {
+      $('#form-import-excel-category input[name=\'file\']').trigger('click');
+
+      if (typeof timer != 'undefined') {
+        clearInterval(timer);
+      }
+
+      timer = setInterval(function() {
+        if ($('#form-import-excel-category input[name=\'file\']').val() != '') {
+          clearInterval(timer);
+
+          $.ajax({
+            url: 'index.php?route=extension/module/ocimport/ajaxUploadFile&user_token={{ user_token }}',
+            type: 'post',
+            dataType: 'json',
+            data: new FormData($('#form-import-excel-category')[0]),
+            cache: false,
+            contentType: false,
+            processData: false,
+            beforeSend: function() {
+              $('#button-upload-file').button('loading');
+            },
+            complete: function() {
+              $('#button-upload-file').button('reset');
+            },
+            success: function(json) {
+              if (json['error']) {
+                alert(json['error']);
+              } else {
+                $('input[name=\'import_meta\']').val(json['filename']);
+              }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+              alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+          });
+        }
+      }, 100);
+    });
+
+    $('#import-mete-category-excel').on('click', function() {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/importMetaCategoryExcel&user_token={{ user_token }}',
+        type: 'post',
+        data: $('#form-import-excel-category').serialize(),
+        dataType: 'json',
+        beforeSend: function() {
+          $('#import-mete-category-excel').button('loading');
+        },
+        complete: function() {
+          $('#import-mete-category-excel').button('reset');
+        },
+        success: function(json) {
+          $('.alert-dismissible').remove();
+
+          if (json['error']) {
+            $('#review').after('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+          }
+
+          if (json['success']) {
+            $('#review').after('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+          }
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+      });
+    });
+
+    $('#importImgBrand').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/import_brand_img&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['error']) {
+            $('#cronJobResult').html('<div class="alert alert-danger">' + json['error'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+        }
+      });
+    });
+
+    $('#updateGroupe').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/update_groupe&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['error']) {
+            $('#cronJobResult').html('<div class="alert alert-danger">' + json['error'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+        }
+      });
+    });
+
+    $('#updatePriceGroupsClient').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/update_price_groups_client&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['error']) {
+            $('#cronJobResult').html('<div class="alert alert-danger">' + json['error'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+        }
+      });
+    });
+
+    $('#updateAddressesClient').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/update_addresses_client&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['error']) {
+            $('#cronJobResult').html('<div class="alert alert-danger">' + json['error'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+        }
+      });
+    });
+
+    $('#updateFilter').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/update_filter&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['error']) {
+            $('#cronJobResult').html('<div class="alert alert-danger">' + json['error'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+        }
+      });
+    });
+
+    $('#importImgProd').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/import_product_img&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['error']) {
+            $('#cronJobResult').html('<div class="alert alert-danger">' + json['error'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+        }
+      });
+    });
+
+    $('#cropImgProd').on('click', function () {
+
+      // Получаем значение из input
+      var img_name = $('input[name="barcode-img"]').val();
+      var img_category = $('select[name="main_category_id"]').val();
+
+      console.log(img_category);
+
+      $.ajax({
+        url: "index.php?route=extension/module/ocimport/crop_product_img&user_token={{ user_token }}&img_name=" + img_name + "&img_category=" + img_category,
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['error']) {
+            $('#cronJobResult').html('<div class="alert alert-danger">' + json['error'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+        }
+      });
+    });
+
+    $('#importImgCat').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/import_category_img&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['error']) {
+            $('#cronJobResult').html('<div class="alert alert-danger">' + json['error'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+        }
+      });
+    });
+
+
+    $('#importDisconts').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/import_disconts&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['error']) {
+            $('#cronJobResult').html('<div class="alert alert-danger">' + json['error'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+
+        }
+      });
+    });
+
+    $('#importCards').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/import_cards&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Job is running...');
+        },
+        success: function (json) {
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+
+        }
+      });
+    });
+
+    $('#importCardsCron').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/cron_cards&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+
+        }
+      });
+    });
+
+    $('#clearCards').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/clear_cards&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else {
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + thrownError + '</div>');
+        }
+      });
+    });
+
+    $('#clearCategoties').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/clear_categories&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else {
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + thrownError + '</div>');
+        }
+      });
+    });
+
+    $('#clearWarehouses').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/clear_warehouse&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else {
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + thrownError + '</div>');
+        }
+      });
+    });
+
+    $('#clearProducts').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/clear_products&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else {
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + thrownError + '</div>');
+        }
+      });
+    });
+
+    $('#clearAddressesClient').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/clear_addresses_client&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else {
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + thrownError + '</div>');
+        }
+      });
+    });
+
+    $('#clearCustomerAddressPriceGroups').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/clear_customer_address_price_groups&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else {
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + thrownError + '</div>');
+        }
+      });
+    });
+
+    $('#importProducts').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/import_products&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Job is running...');
+        },
+        success: function (json) {
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 1000);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+
+        }
+      });
+    });
+
+    $('#importProductsCron').on('click', function () {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/cron_prods&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+          $('#cronJobResult').html('Cron job is running...');
+        },
+        success: function (json) {
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 100);
+          }
+          // Начинаем отслеживать статус выполнения задачи
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + thrownError + '</div>');
+        }
+      });
+    });
+
+
+    function checkCronStatus() {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocimport/checkCronStatus&user_token={{ user_token }}',
+        type: 'get',
+        dataType: 'json',
+        success: function (json) {
+
+          console.log(json);
+
+          if (json['success']) {
+            $('#cronJobResult').html('<div class="alert alert-success">' + json['success'] + '</div>');
+          } else if (json['load']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['load'] + '</div>');
+          } else if (json['error']) {
+            $('#cronJobResult').html('<div class="alert alert-danger">' + json['error'] + '</div>');
+          } else if (json['status']) {
+            $('#cronJobResult').html('<div class="alert alert-info">' + json['status'] + '</div>');
+
+            if (json['progress']) {
+              $('#cronJobResult').append('<pre>' + json['progress'] + '</pre>');
+            }
+            setTimeout(checkCronStatus, 100);
+          }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          $('#cronJobResult').html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+        }
+      });
+    }
+  });
+</script>

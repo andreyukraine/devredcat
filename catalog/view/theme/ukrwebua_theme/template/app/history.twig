@@ -1,0 +1,762 @@
+{{ header }}
+<div class="fluid-width">
+  <div class="container">
+    <div class="top-cat">
+      <h1 class="product-name bl-bold">Маршрути та замовлення на карті</h1>
+    </div>
+    <div class="bl-content row">
+      <div class="col-lg-3">
+        <form action="{{ action }}" id="form-filter">
+          <h3 class="b-bold">Виберіть період завантаження даних:</h3>
+          <div class="bl-select-date">
+            <div class="input-group date col-lg-6">
+              <input type="date" name="date_start" value="{{ date_start }}" placeholder="Дата початку"
+                     data-date-format="DD-MM-YYYY"
+                     class="form-control">
+            </div>
+            <div class="input-group date col-lg-6">
+              <input type="date" name="date_end" value="{{ date_end }}" placeholder="Дата початку"
+                     data-date-format="DD-MM-YYYY"
+                     class="form-control">
+            </div>
+          </div>
+          <br>
+          <div id="send" class="button">Отримати дані</div>
+          <br>
+          {% if managers %}
+            <h3 class="b-bold">Виберіть менеджер:</h3>
+            <select name="manager" id="manager" class="form-control">
+              <option value="">-</option>
+              {% for manager in managers %}
+                {% if manager == select_manager %}
+                  <option selected="selected" value="{{ manager }}">{{ manager }}</option>
+                {% else %}
+                  <option value="{{ manager }}">{{ manager }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          {% endif %}
+          <br>
+          <br>
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-info" title="Інфо" data-toggle="tab">Інфо</a></li>
+            <li><a href="#tab-detail" title="Журнал" data-toggle="tab">Журнал</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-info">
+              <p class="bl-bold text-18">Кількість точок:</p>
+              <div id="count" class="text-27 b-bold">0</div>
+              <br>
+              <p class="bl-bold text-18">Загальний пробіг:</p>
+              <div id="total" class="text-27 b-bold">0</div>
+              <br>
+              <p class="bl-bold text-18">Загальний час:</p>
+              <div id="duration" class="text-27 b-bold">0</div>
+            </div>
+
+            <div class="tab-pane" id="tab-detail">
+              <div id="list-doc"></div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+      <div class="col-lg-9">
+        <div id="map" class="bl-map" style="width: auto; height: 750px; position: relative; overflow: hidden;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}
+
+<style>
+
+  .m-date {
+    text-align: right;
+  }
+
+  .m-doc {
+    margin-bottom: 20px;
+  }
+
+  .m-client {
+    font-weight: 700;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    float: left;
+    width: 100%;
+    justify-content: left;
+    gap: 15px;
+  }
+
+  .m-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  #list-doc {
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 7px;
+  }
+
+  .marker-info {
+    padding: 10px;
+    min-width: 200px;
+    font-family: Arial, sans-serif;
+  }
+
+  .marker-info strong {
+    color: #1a73e8;
+  }
+
+  .marker-info small {
+    color: #5f6368;
+    font-size: 12px;
+  }
+
+  .tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .gm-style .gm-style-iw-d {
+    position: relative;
+    top: -15px;
+  }
+
+  .c-bottom {
+    display: flex;
+    justify-content: end;
+  }
+
+  .m-latlon {
+    font-size: 10px;
+  }
+
+  .tooltip-text {
+    visibility: hidden;
+    background-color: #333;
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    position: absolute;
+    bottom: 100%; /* над текстом */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    white-space: nowrap;
+  }
+
+  .tooltip-target:hover .tooltip-text {
+    visibility: visible;
+  }
+
+</style>
+
+<!-- Сначала подключаем Google Maps API -->
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOByDDJtXvfnZt-rXbnpeG6KTR3BMusRc&libraries=places&language=uk"></script>
+<script src="https://googlemaps.github.io/js-markerclustererplus/dist/index.min.js"></script>
+
+<script>
+
+  // Глобальные переменные для хранения данных и карты
+  var allMarkersData = {{ logs_json|raw }};
+  var map;
+  var markers = [];
+  var markerCluster;
+  var routePath = null; // Добавляем эту строку
+  var infoWindow = null; // И эту тоже, если используете infoWindow
+  var directionsService;
+  var directionsRenderer;
+
+  var stylesCluster = [
+    {
+      textColor: 'red',
+      url: '/image/location.svg',
+      height: 50,
+      width: 50
+    },
+    {
+      textColor: 'red',
+      url: '/image/location.svg',
+      height: 56,
+      width: 56
+    },
+    {
+      textColor: 'red',
+      url: '/image/location.svg',
+      height: 66,
+      width: 66
+    }
+  ];
+
+  const iconColors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#673AB7'];
+
+  const ROUTE_STYLES = {
+    OPTIMAL: {
+      strokeColor: '#003f40',
+      strokeOpacity: 0.8,
+      strokeWeight: 5,
+      icons: [{
+        icon: {
+          path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+          strokeColor: '#ffffff',
+          fillColor: '#ffffff',
+          scale: 3
+        },
+        offset: '100%',
+        repeat: '100px'
+      }]
+    },
+    SIMPLE: {
+      strokeColor: '#EA4335',
+      strokeOpacity: 0.7,
+      strokeWeight: 4,
+      icons: [{
+        icon: {
+          path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+          strokeColor: '#ffffff',
+          fillColor: '#ffffff',
+          scale: 3
+        },
+        offset: '100%',
+        repeat: '80px'
+      }]
+    }
+  };
+
+  $(document).ready(function () {
+    // Инициализация карты при загрузке
+    initMap();
+
+    // Обработчик изменения менеджера
+    $('#manager').on('change', function () {
+      var selectedManager = $(this).val();
+      updateMapMarkers(selectedManager);
+    });
+
+    // Обработчик кнопки "Отримати дані"
+    $('#send').on('click', function () {
+      fetchData();
+      location.reload(true);
+    });
+  });
+
+  function fetchData() {
+    $.ajax({
+      url: 'index.php?route=app/history/get',
+      type: 'post',
+      data: $('#form-filter').serialize(),
+      dataType: 'json',
+      beforeSend: function () {
+        $('#send').prop('disabled', true).text('Завантаження...');
+      },
+      success: function (json) {
+        if (json.logs) {
+          allMarkersData = json.logs;
+
+          clearMarkers();
+          $('#manager').val("")
+          $('#count').html(0);
+          $('#total').html(0);
+          $('#duration').html(0);
+          // Обновляем маркеры на карте
+          //updateMapMarkers($('#manager').val());
+        }
+      },
+      complete: function () {
+        $('#send').prop('disabled', false).text('Отримати дані');
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+  }
+
+  function updateManagersList() {
+    const selectedManager = $(this).val();
+
+    // Показываем загрузку
+    $('#manager').prop('disabled', true);
+    $('#send').prop('disabled', true).text('Расчет маршрута...');
+
+    // Даем время на рендеринг перед тяжелыми вычислениями
+    setTimeout(() => {
+      updateMapMarkers(selectedManager);
+      $('#manager').prop('disabled', false);
+      $('#send').prop('disabled', false).text('Отримати дані');
+    }, 200);
+  }
+
+  function updateMapMarkers(selectedManager) {
+    // Фильтруем данные
+    const filteredData = selectedManager
+      ? allMarkersData.filter(item => item.user === selectedManager && item.lat && item.lon)
+      : allMarkersData.filter(item => item.lat && item.lon);
+
+    // Сортируем по времени
+    filteredData.sort((a, b) => new Date(a.date.replace(/(\d+).(\d+).(\d+)/, '$3-$2-$1')) -
+      new Date(b.date.replace(/(\d+).(\d+).(\d+)/, '$3-$2-$1')));
+
+    // Строим маршрут
+    calculateOptimalRoute(filteredData);
+
+    // Виводимо список маркерів
+    const listContainer = document.getElementById('list-doc');
+    listContainer.innerHTML = ''; // Очищаємо контейнер
+
+    if (filteredData.length === 0) {
+      listContainer.innerHTML = '<p>Маркери не знайдено</p>';
+      return;
+    }
+
+    // Створюємо список
+    const listElement = document.createElement('ul');
+
+    filteredData.forEach((item, index) => {
+        const listItem = document.createElement('li');
+
+        const marker_color = `${iconColors[index % iconColors.length]}`;
+
+        listItem.className = 'marker-list-item';
+        listItem.style.cursor = 'pointer';
+
+        let docContent = 'Звіт візиту';
+        if (item.doc && item.doc.trim() !== "") {
+          docContent = `<p>${item.doc}</p><br>`;
+        }
+
+        let docComment = '';
+        if (item.comment && item.comment.trim() !== "") {
+          docComment = `<p>${item.comment}<br>`;
+        }
+
+        // Додаємо обробник кліку
+        listItem.addEventListener('click', () => {
+          const targetLat = parseCoord(item.lat);
+          const targetLng = parseCoord(item.lon);
+
+          // Переміщуємо карту до обраної точки
+          map.panTo({lat: targetLat, lng: targetLng});
+          map.setZoom(15);
+
+          // Закриваємо попереднє інфовікно (якщо воно існує)
+          if (window.infoWindow) {
+            window.infoWindow.close();
+          }
+
+          // Шукаємо відповідний маркер
+          let foundMarker = null;
+          const tolerance = 0.00001; // Допустима похибка для порівняння координат
+
+          markers.forEach((marker) => {
+            const markerLat = marker.getPosition().lat();
+            const markerLng = marker.getPosition().lng();
+
+            if (Math.abs(markerLat - targetLat) < tolerance &&
+              Math.abs(markerLng - targetLng) < tolerance) {
+              foundMarker = marker;
+            }
+          });
+
+          // Якщо маркер знайдено, відкриваємо інфовікно
+          if (foundMarker) {
+            const content = `
+          <div class="marker-info">
+            <div class="tooltip-wrapper">
+              <div class="tooltip-target" style="color: ${marker_color}; font-weight: bold;">
+                Точка ${index + 1}
+                <span class="tooltip-text">Деталі про точку</span>
+              </div>
+            </div>
+            ${docContent}
+            ${docComment}
+            <strong>${item.client}</strong>
+            <small>${formatTime(item.date)}</small>
+          </div>`;
+
+            window.infoWindow = new google.maps.InfoWindow({content});
+            window.infoWindow.open(map, foundMarker);
+          } else {
+            console.warn('Маркер не знайдено для координат:', targetLat, targetLng);
+          }
+        });
+
+        // Форматуємо дату
+        const formattedDate = item.date.replace(/(\d+).(\d+).(\d+)/, '$3-$2-$1');
+
+        // Створюємо структуру div-ів
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'm-row';
+
+        const dateDiv = document.createElement('div');
+        dateDiv.className = 'm-date';
+        dateDiv.textContent = formattedDate;
+
+        const clientDiv = document.createElement('div');
+        clientDiv.className = 'm-client';
+        if (item.doc === "" && item.client === "" && item.day_start !== "01.01.0001 0:00:00") {
+          clientDiv.textContent = 'Початок роботи';
+        } else if (item.doc === "" && item.client === "" && item.day_end !== "01.01.0001 0:00:00") {
+          clientDiv.textContent = 'Кінець роботи';
+        } else if (item.client !== "") {
+          clientDiv.textContent = `${item.client}`;
+        } else {
+          clientDiv.textContent = 'Немає даних';
+        }
+
+        const docDiv = document.createElement('div');
+        docDiv.className = 'm-doc';
+        if (item.doc === "" && item.client !== "") {
+          docDiv.textContent = 'Звіт клієнта';
+        } else if (item.doc !== "") {
+          docDiv.textContent = `${item.doc}`;
+        } else {
+          docDiv.textContent = 'Немає даних';
+        }
+
+        const clientBottom = document.createElement('div');
+        clientBottom.className = 'c-bottom';
+
+        const clientNumber = document.createElement('div');
+        clientNumber.className = 'm-number';
+        clientNumber.textContent = index + 1;
+        clientNumber.style.backgroundColor = `${marker_color}`;
+        clientNumber.style.borderRadius = '50%';
+        clientNumber.style.padding = '5px';
+        clientNumber.style.width = '30px';
+        clientNumber.style.height = '30px';
+        clientNumber.style.textAlign = 'center';
+
+        clientDiv.appendChild(clientNumber);
+
+        const clientLatLon = document.createElement('div');
+        clientLatLon.className = 'm-latlon';
+        clientLatLon.textContent = `${item.lat}` + " - " + `${item.lon}`;
+        clientBottom.appendChild(clientLatLon);
+
+        docDiv.appendChild(clientBottom);
+
+        // Додаємо div-и до рядка
+        rowDiv.appendChild(dateDiv);
+        rowDiv.appendChild(clientDiv);
+        rowDiv.appendChild(docDiv);
+
+        // Додаємо рядок до пункту списку
+        listItem.appendChild(rowDiv);
+
+        // Додаємо пункт до списку
+        listElement.appendChild(listItem);
+      }
+    );
+
+    listContainer.appendChild(listElement);
+  }
+
+  function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: 50.4501, lng: 30.5234},
+      zoom: 12,
+      mapTypeId: 'roadmap'
+    });
+
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({
+      map: map,
+      suppressMarkers: true,
+      polylineOptions: {
+        strokeColor: '#4285F4',
+        strokeOpacity: 0.8,
+        strokeWeight: 5,
+        icons: [{
+          icon: {
+            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            strokeColor: '#ffffff',
+            fillColor: '#ffffff',
+            scale: 3
+          },
+          offset: '100%',
+          repeat: '100px'
+        }]
+      }
+    });
+  }
+
+  // Функция для форматирования времени
+  function formatTime(dateString) {
+    if (!dateString) return '';
+
+    // Преобразуем "11.07.2025 8:42:22" в "11.07.2025 08:42"
+    const [datePart, timePart] = dateString.split(' ');
+    const [hours, minutes] = timePart.split(':');
+
+    return `${datePart} ${hours.padStart(2, '0')}:${minutes}`;
+  }
+
+  // Функция расчета расстояния между двумя точками в км (формула Хаверсина)
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Радиус Земли в км
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Расстояние в км
+  }
+
+  function clearMarkers() {
+    // Удаляем маркеры
+    markers.forEach(marker => marker.setMap(null));
+    markers = [];
+
+    // Удаляем полилинию
+    if (routePath) {
+      routePath.setMap(null);
+      routePath = null;
+    }
+
+    // Закрываем инфоокно
+    if (infoWindow) {
+      infoWindow.close();
+      infoWindow = null;
+    }
+
+    // Очищаем DirectionsRenderer
+    directionsRenderer.setMap(null);
+  }
+
+  function calculateOptimalRoute(markersData) {
+    // Проверка координат
+    const validMarkers = markersData.filter(marker =>
+      !isNaN(parseCoord(marker.lat)) &&
+      !isNaN(parseCoord(marker.lon))
+    );
+
+    if (validMarkers.length < 2) {
+      showRouteWarning('Недостаточно точек для построения маршрута');
+      return;
+    }
+
+    const waypoints = validMarkers.slice(1, -1).map(marker => ({
+      location: new google.maps.LatLng(
+        parseCoord(marker.lat),
+        parseCoord(marker.lon)
+      ),
+      stopover: true
+    }));
+
+    const request = {
+      origin: new google.maps.LatLng(
+        parseCoord(validMarkers[0].lat),
+        parseCoord(validMarkers[0].lon)
+      ),
+      destination: new google.maps.LatLng(
+        parseCoord(validMarkers[validMarkers.length - 1].lat),
+        parseCoord(validMarkers[validMarkers.length - 1].lon)
+      ),
+      waypoints: waypoints,
+      travelMode: google.maps.TravelMode.DRIVING,
+      optimizeWaypoints: true,
+      region: 'UA', // Украина
+      unitSystem: google.maps.UnitSystem.METRIC
+    };
+
+    directionsService.route(request, (response, status) => {
+      if (status === 'OK') {
+
+        // Настраиваем стиль для DirectionsRenderer
+        directionsRenderer.setOptions({
+          polylineOptions: ROUTE_STYLES.OPTIMAL
+        });
+        // Отображаем маршрут по дорогам
+        directionsRenderer.setDirections(response);
+
+        // Добавляем кастомные маркеры
+        addCustomMarkers(markersData);
+
+        // Обновляем статистику
+        updateRouteStats(response);
+      } else {
+        console.warn('Ошибка маршрута:', status);
+        drawSimpleRoute(markersData);
+      }
+    });
+  }
+
+  function parseCoord(value) {
+    if (typeof value === 'string') {
+      value = value.replace(',', '.');
+    }
+    return parseFloat(value);
+  }
+
+  function addCustomMarkers(markersData) {
+    // Удаляем только маркеры, но не линии
+    markers.forEach(marker => marker.setMap(null));
+    markers = [];
+
+    $("#count").html(markersData.length);
+
+    markers = markersData.map((item, index) => {
+
+      const marker = new google.maps.Marker({
+        position: {lat: parseCoord(item.lat), lng: parseCoord(item.lon)},
+        map: map,
+        title: `Точка ${index + 1}`,
+        icon: {
+          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="40" viewBox="0 0 30 40">
+                        <path fill="${iconColors[index % iconColors.length]}" d="M15 0C6.7 0 0 6.7 0 15c0 10 15 25 15 25s15-15 15-25c0-8.3-6.7-15-15-15z"/>
+                        <text x="15" y="22" font-family="Arial" font-size="12" font-weight="bold" fill="white" text-anchor="middle">${index + 1}</text>
+                    </svg>
+                `)}`,
+          scaledSize: new google.maps.Size(30, 40),
+          anchor: new google.maps.Point(15, 40)
+        }
+      });
+
+      let docContent = 'Звіт візиту';
+      if (item.doc && item.doc.trim() !== "") {
+        docContent = `<p>${item.doc}</p><br>`;
+      }
+
+      let docComment = '';
+      if (item.comment && item.comment.trim() !== "") {
+        docComment = `<p>${item.comment}<br>`;
+      }
+
+      // Добавляем информационное окно
+      marker.addListener('mouseover', () => {
+        const content = `
+        <div class="marker-info">
+          <div class="tooltip-wrapper">
+            <div class="tooltip-target" style="color: ${iconColors[index % iconColors.length]}; font-weight: bold;">
+              Точка ${index + 1}
+              <span class="tooltip-text">Деталі про точку</span>
+            </div>
+          </div>
+          ${docContent}
+          ${docComment}
+          <strong>${item.client}</strong>
+          <small>${formatTime(item.date)}</small>
+        </div>`;
+
+
+        if (infoWindow) infoWindow.close();
+        infoWindow = new google.maps.InfoWindow({content});
+        infoWindow.open(map, marker);
+      });
+
+      return marker;
+    });
+  }
+
+  function drawSimpleRoute(markersData) {
+    // Очищаем предыдущие элементы
+    clearMarkers();
+
+    // Добавляем кастомные маркеры
+    addCustomMarkers(markersData);
+
+    // Рисуем упрощенный маршрут со стрелками
+    routePath = new google.maps.Polyline({
+      path: markersData.map(m => ({
+        lat: parseCoord(m.lat),
+        lng: parseCoord(m.lon)
+      })),
+      geodesic: true,
+      strokeColor: '#EA4335',
+      strokeOpacity: 0.8,
+      strokeWeight: 4,
+      icons: [{
+        icon: {
+          path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+          strokeColor: '#ffffff',
+          fillColor: '#ffffff',
+          scale: 3
+        },
+        offset: '100%',
+        repeat: '100px'
+      }]
+    });
+
+    routePath.setMap(map);
+    calculateSimpleDistance(markersData);
+  }
+
+  function calculateSimpleDistance(markersData) {
+    if (!markersData || markersData.length < 2) {
+      $('#total').html('0 км');
+      return;
+    }
+
+    let totalDistance = 0;
+    for (let i = 0; i < markersData.length - 1; i++) {
+      const start = markersData[i];
+      const end = markersData[i + 1];
+
+      totalDistance += calculateDistance(
+        parseCoord(start.lat),
+        parseCoord(start.lon),
+        parseCoord(end.lat),
+        parseCoord(end.lon)
+      );
+    }
+
+    $('#total').html(totalDistance.toFixed(1) + ' км');
+  }
+
+  function updateRouteStats(response) {
+    if (!response || !response.routes || response.routes.length === 0) {
+      console.error('Некорректный ответ от Directions API');
+      return;
+    }
+
+    const route = response.routes[0];
+    let totalDistance = 0;
+    let totalDuration = 0;
+
+    // Суммируем расстояние и время по всем участкам маршрута
+    route.legs.forEach(leg => {
+      totalDistance += leg.distance.value; // Метры
+      totalDuration += leg.duration.value; // Секунды
+    });
+
+    // Обновляем UI
+    $('#total').html(`${(totalDistance / 1000).toFixed(1)} км`);
+
+    // Если есть элемент для отображения времени
+    if ($('#duration').length) {
+      $('#duration').html(`${Math.round(totalDuration / 60)} мин`);
+    }
+  }
+
+  function validateMarker(marker) {
+    const lat = parseCoord(marker.lat);
+    const lng = parseCoord(marker.lon);
+
+    return !isNaN(lat) && !isNaN(lng) &&
+      lat >= -90 && lat <= 90 &&
+      lng >= -180 && lng <= 180;
+  }
+
+  function prepareMarkers(markersData) {
+    return markersData
+      .filter(validateMarker)
+      .map(marker => ({
+        ...marker,
+        lat: parseCoord(marker.lat),
+        lon: parseCoord(marker.lon)
+      }));
+  }
+
+
+</script>

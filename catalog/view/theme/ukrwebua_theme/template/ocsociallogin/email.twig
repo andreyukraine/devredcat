@@ -1,0 +1,105 @@
+{{ header }} 
+<div class="container">
+    <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %} 
+            <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+        {% endfor %} 
+    </ul>
+
+    <div class="row">{{ column_left }} 
+        {% if (column_left and column_right) %} 
+            {% set class = 'col-sm-6' %} 
+        {% elseif (column_left or column_right) %} 
+            {% set class = 'col-sm-9' %} 
+        {% else %} 
+            {% set class = 'col-sm-12' %} 
+        {% endif %} 
+        <div id="content" class="{{ class }}">{{ content_top }} 
+            <div class="kbsocial_login_modal modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{ text_enter_email_id }}</h5>
+                        </div>
+                        <div class="modal-body">
+                            <div id="email_repeat"> </div>
+                            <div class="form-group" style="clear: both">
+
+                                <label class="col-sm-3 control-label">
+                                    <span>
+                                        {{ text_enter_email_id }} 
+                                    </span>
+                                </label> 
+                                <div class="col-sm-9">
+                                    <input type="text" name="ocsociallogin_email_id" value="" placeholder="{{ text_enter_email_id }}" id="ocsociallogin_email_id" class="form-control">
+                                </div>
+                           </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="login_modal_continue">{{ button_continue }}</button>
+                            <button type="button" class="btn btn-secondary" id="login_modal_close">{{ button_close }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           {{ content_bottom }} 
+        </div>
+        {{ column_right }} 
+    </div>
+</div>
+<script src="catalog/view/javascript/ocsociallogin/velovalidation.js" type="text/javascript"></script>
+<script type="text/javascript">
+$('.kbsocial_login_modal').modal({
+  keyboard: false
+})    
+
+$(document).ready(function() {
+    
+    velovalidation.setErrorLanguage({
+        empty_field: '{{ empty_field_error }}',
+        validate_email: '{{ email_error }}',
+    });
+    
+    $("#login_modal_close").click(function() {
+        $('.kbsocial_login_modal').modal('hide');
+    });
+
+    $("#login_modal_continue").click(function() {
+        var error = false;
+        $(".has-error").removeClass("has-error");
+        $(".text-danger").remove();
+        var email_check = velovalidation.checkEmail($('#ocsociallogin_email_id'));
+        var email_mandatory = velovalidation.checkMandatory($('#ocsociallogin_email_id'));
+            
+        if (email_mandatory != true) {
+            error = true;
+            $('#ocsociallogin_email_id').parent().parent().addClass('has-error');
+            $('#ocsociallogin_email_id').after('<div class="text-danger">' + email_mandatory + '</span>');
+        } else if  (email_check != true) {
+            error = true;
+            $('#ocsociallogin_email_id').parent().parent().addClass('has-error');
+            $('#ocsociallogin_email_id').after('<div class="text-danger">' + email_check + '</span>');
+        }
+            
+        if (error) {
+            return false;
+        } else {
+            var email = document.getElementById('ocsociallogin_email_id').value;
+            $.ajax({
+                url: '{{ email_check_url }}',
+                type: 'POST',
+                dataType: 'json',
+                data: 'email=' + email,
+                success:function(json) {
+                   if(json){
+                        $('#email_repeat').html('<div class="alert alert-danger"><i class="fa fa-check-circle">This Email exists.</i></div>');
+                    } else {
+                       window.location = 'index.php?route=ocsociallogin/capture_email/enteremail&email='+email;
+                    }
+                }
+            });
+        }
+    });
+});
+</script>
+{{ footer }} 

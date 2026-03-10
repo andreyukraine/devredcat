@@ -1,0 +1,111 @@
+<input type="hidden" id="customer-type" name="customer-type" value="">
+<div class="ajax-body-login">
+  <div class="bl-fix-account">
+    <div id="ajax-loader">
+      <img src="{{ loader_img }}" alt=""/>
+    </div>
+    <div class="account-login">
+      <div class="cart-fix-top">
+        <div class="cart-fix-close">
+            <img onclick="ocajaxlogin.closeForm();" width="25px" height="25px" src="/image/close.svg" alt="Close"/>
+        </div>
+        <div class="cart-fix-title"><span class="text-21 bl-bold">{{ heading_title }}</span></div>
+
+          {% if not logged %}
+            <div class="login-top hidden-xs" onclick="ocajaxlogin.appendTypeClientForm()" style="cursor: pointer">
+              <div class="bl-bold text-18">{{ text_register }}</div>
+              <div class="open-submenu"></div>
+            </div>
+          {% endif %}
+
+        {% if logged %}
+          <div class="login-top hidden-xs" onclick="ocajaxlogin.logoutAction()" style="cursor: pointer">
+                <span class="btn-logout">
+                  <img alt="{{ text_logout }}" src="/image/logout.svg">{{ text_logout }}
+                </span>
+          </div>
+        {% endif %}
+
+      </div>
+      <div class="ajax-content">
+        {{ ajax_login_content }}
+      </div>
+    </div>
+    <div class="account-register">
+      <div class="cart-fix-top">
+        <div class="cart-fix-close">
+            <img onclick="ocajaxlogin.closeForm();" width="25px" height="25px" src="/image/close.svg" alt="Close"/>
+        </div>
+        <div class="cart-fix-title"><span class="text-21 bl-bold">{{ heading_title_reg }}</span></div>
+
+        <div class="login-top hidden-xs" onclick="ocajaxlogin.appendLoginForm()" style="cursor: pointer">
+          <div class="bl-bold text-18">{{ text_login }}</div>
+          <div class="open-submenu"></div>
+        </div>
+
+      </div>
+      <div class="ajax-content">
+        {{ ajax_register_content }}
+      </div>
+    </div>
+    <div class="account-type-client">
+      <div class="cart-fix-top">
+        <div class="cart-fix-close">
+            <img onclick="ocajaxlogin.closeForm();" width="25px" height="25px" src="/image/close.svg" alt="Close"/>
+        </div>
+        <div class="cart-fix-title"><span class="text-21 bl-bold">{{ heading_title_type_client }}</span></div>
+      </div>
+      <div class="ajax-content">
+        {{ ajax_typeclient_content }}
+      </div>
+    </div>
+    <div class="account-fogotten">
+      <div class="cart-fix-top">
+        <div class="cart-fix-close">
+            <img onclick="ocajaxlogin.closeForm();" width="25px" height="25px" src="/image/close.svg" alt="Close"/>
+        </div>
+        <div class="cart-fix-title"><span class="text-21 bl-bold">{{ heading_title_fogotten }}</span></div>
+
+      </div>
+      <div class="ajax-content">
+        {{ ajax_fogotten_content }}
+      </div>
+    </div>
+    <div class="account-success">
+      <div class="cart-fix-top">
+        <div class="cart-fix-close">
+            <img onclick="ocajaxlogin.closeForm();" width="25px" height="25px" src="/image/close.svg" alt="Close"/>
+        </div>
+        <div class="cart-fix-title"><span class="text-21 bl-bold">{{ heading_title_reg }}</span></div>
+
+      </div>
+      <div class="ajax-content">
+        {{ ajax_success_content }}
+      </div>
+    </div>
+    <div class="account-approved">
+      <div class="cart-fix-top">
+        <div class="cart-fix-close">
+            <img onclick="ocajaxlogin.closeForm();" width="25px" height="25px" src="/image/close.svg" alt="Close"/>
+        </div>
+        <div class="cart-fix-title"><span class="text-21 bl-bold">{{ heading_title_approved }}</span></div>
+
+      </div>
+      <div class="ajax-content">
+        {{ ajax_approved_content }}
+      </div>
+    </div>
+    <div class="logout-success">
+      <div class="ajax-content">
+        {{ ajax_logoutsuccess_content }}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="opc-hidden">
+  {% if enable_status %}
+    <input type="hidden" id="input-opc-status" value="1"/>
+  {% else %}
+    <input type="hidden" id="input-opc-status" value="0"/>
+  {% endif %}
+</div>

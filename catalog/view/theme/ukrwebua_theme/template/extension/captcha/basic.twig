@@ -1,0 +1,50 @@
+<fieldset>
+  <div class="bl-bold text-18">{{ heading_title }}</div>
+  <div id="bl-captcha" class="form-group required">
+    {% if route|slice(0, 9) == 'checkout/' %}
+      <label class="control-label" for="input-payment-captcha">{{ text_captcha }}</label>
+      <input type="text" name="captcha" id="input-payment-captcha" class="form-control" autocomplete="off"/>
+      <img src="index.php?route=extension/captcha/basic/captcha" alt=""/>
+      <svg id="captcha-update">
+        <use xlink:href="/image/showmore.svg#icon-showmore"></use>
+      </svg>
+    {% else %}
+      <label class="control-label" for="input-captcha">{{ text_captcha }}</label>
+      <div class="d-flex">
+        <input type="text" name="captcha" id="input-captcha" placeholder="{{ text_captcha }}" class="form-control"/>
+        <div class="bl-code-system">
+          <img src="index.php?route=extension/captcha/basic/captcha" alt="captcha-code"/>
+          <svg id="captcha-update">
+            <use xlink:href="/image/showmore.svg#icon-showmore"></use>
+          </svg>
+        </div>
+      </div>
+      {% if error_captcha %}
+        <div class="text-danger">{{ error_captcha }}</div>
+      {% endif %}
+    {% endif %}
+  </div>
+  <div class="for-error error-captcha"></div>
+</fieldset>
+
+<script>
+  $(document).delegate('#captcha-update', 'click', function () {
+    $.ajax({
+      url: 'index.php?route=extension/captcha/basic/update&user_token={{ user_token }}&' + new Date().getTime(),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+        $('#bl-captcha').addClass('custom_lock');
+      },
+      success: function (data) {
+        // Update the captcha image
+        $('img[alt="captcha-code"]').attr('src', 'index.php?route=extension/captcha/basic/captcha&' + new Date().getTime());
+        $('#bl-captcha').removeClass('custom_lock');
+      },
+      error: function(xhr, status, error) {
+        console.error('Error updating captcha:', error);
+        $('#bl-captcha').removeClass('custom_lock');
+      }
+    });
+  });
+</script>

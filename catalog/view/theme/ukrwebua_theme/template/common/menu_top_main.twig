@@ -1,0 +1,114 @@
+
+
+<div class="menu-top-bl fluid-width">
+  <div class="menu-top-content container">
+    <div class="row block-menu-warehouses">
+      <div class="warehouses-list col-lg-7 col-md-6 col-xs-12">
+        <h2 class="bl-bold">Меню сайту</h2>
+        {% if menu_top %}
+          {{ menu_top }}
+        {% endif %}
+      </div>
+      <div class="col-lg-5 col-md-6 col-xs-12">
+
+        <div class="bl-menu-top-right">
+          <div class="currency">{{ currency }}</div>
+          <div class="language">{{ language }}</div>
+
+          <div class="bl-menu-top-login">
+            <div class="menu-top-login-icon"><img width="60" height="60" src="/image/user-reg.svg"/></div>
+            <div class="bl-menu-top-login-actions">
+              {% if not is_login %}
+              <div class="menu-top-login-actions">
+                <span class="menu-top-login-action-login bl-bold" onclick="ocajaxlogin.appendLoginForm();">Увійти</span>
+                <span class="bl-bold" onclick="ocajaxlogin.appendTypeClientForm();">Реєстрація</span>
+              </div>
+              <div class="hidden-xs">Авторизуйтесь, щоб скористатися розширеними можливостями</div>
+              {% else %}
+                <div class="login-form-content">
+                  <div>
+                    <a href="{{ account }}" title="{{ text_account }}"><span class="btn-logout bl-bold">{{ text_account }}</span></a>
+                  </div>
+                  <div>
+                    <a href="{{ logout }}" title="{{ text_logout }}">
+                      <span class="btn-logout">
+                        <img title="{{ text_logout }}" src="/image/logout.svg"><span class="bl-bold">{{ text_logout }}</span>
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="bl-menu-top-phone">
+            <div class="menu-top-phone">
+              <div class="list-phone">
+                <div class="up-header-phones-item"><a title="{{ telephone }}" href="tel:{{ telephone }}" target="_blank">{{ telephone }}</a></div>
+                {% if telephone_1 is not empty %}
+                  <div class="up-header-phones-item"><a title="{{ telephone_1 }}" href="tel:{{ telephone }}" target="_blank">{{ telephone_1 }}</a></div>
+                {% endif %}
+                {% if telephone_1 is not empty %}
+                  <div class="up-header-phones-item"><a title="{{ telephone_2 }}" href="tel:{{ telephone }}" target="_blank">{{ telephone_2 }}</a></div>
+                {% endif %}
+                {% if telephone_1 is not empty %}
+                  <div class="up-header-phones-item"><a title="{{ telephone_3 }}" href="tel:{{ telephone }}" target="_blank">{{ telephone_3 }}</a></div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="menu-top-open">
+              <div class="bl-bold">{{ text_open }}</div>
+              <div>
+                {{ open|raw }}
+              </div>
+            </div>
+          </div>
+
+          <div class="button" onclick="custom_callback.open();"><svg height="25" id="icon" viewBox="0 0 32 32" width="25" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;"><path d="M24,13H22a3.0033,3.0033,0,0,0-3-3V8A5.0057,5.0057,0,0,1,24,13Z" transform="translate(0)" style="fill: rgb(255, 255, 255);"></path><path d="M28,13H26a7.0078,7.0078,0,0,0-7-7V4A9.01,9.01,0,0,1,28,13Z" transform="translate(0)" style="fill: rgb(255, 255, 255);"></path><path d="M26,29h-.17C6.18,27.87,3.39,11.29,3,6.23A3,3,0,0,1,5.7612,3.0088Q5.88,3,6,3h5.27a2,2,0,0,1,1.86,1.26L14.65,8a2,2,0,0,1-.44,2.16l-2.13,2.15a9.36,9.36,0,0,0,7.58,7.6l2.17-2.15A2,2,0,0,1,24,17.35l3.77,1.51A2,2,0,0,1,29,20.72V26A3,3,0,0,1,26,29ZM6,5a1,1,0,0,0-1.0032.9968q0,.0417.0032.0832C5.46,12,8.41,26,25.94,27a1,1,0,0,0,1.0582-.9382Q27,26.0309,27,26V20.72l-3.77-1.51-2.87,2.85L19.88,22C11.18,20.91,10,12.21,10,12.12l-.06-.48,2.84-2.87L11.28,5Z" transform="translate(0)" style="fill: rgb(255, 255, 255);"></path><rect data-name="&lt;Transparent Rectangle&gt;" height="32" id="_Transparent_Rectangle_" width="32" class="cls-1" style="fill: none;"></rect></svg>Замовити зворотній дзвінок</div>
+
+          <div class="menu-payment">
+            <div>Ми приймаємо</div>
+            <div class="list-paument">
+              <div><img height="44" width="44" alt="visa" src="/image/visa.svg"></div>
+              <div><img height="44" width="44" alt="mastercard" src="/image/mastercard.svg"></div>
+            </div>
+          </div>
+
+          <div class="menu-social">
+            <div>{{ text_social }}</div>
+              <div class="list-social">
+                {% if config_soc_telegram %}
+                  <div>
+                    <a href="{{ config_soc_telegram }}" target="_blank">
+                      <img width="30px" height="30px" alt="telegram" src="/catalog/view/theme/ukrwebua_theme/image/telegram.svg"></a>
+                  </div>
+                {% endif %}
+                {% if config_soc_facebook %}
+                  <div>
+                    <a href="{{ config_soc_facebook }}" target="_blank">
+                      <img width="30px" height="30px" alt="facebook" src="/catalog/view/theme/ukrwebua_theme/image/facebook.svg"></a>
+                  </div>
+                {% endif %}
+                {% if config_soc_instagram %}
+                  <div>
+                    <a href="{{ config_soc_instagram }}" target="_blank">
+                      <img width="30px" height="30px" alt="instagram" src="/catalog/view/theme/ukrwebua_theme/image/instagram.svg"></a>
+                  </div>
+                {% endif %}
+                {% if config_soc_youtube %}
+                  <div>
+                    <a href="{{ config_soc_youtube }}" target="_blank">
+                      <img width="30px" height="30px" alt="youtube" src="/catalog/view/theme/ukrwebua_theme/image/youtube.svg"></a>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

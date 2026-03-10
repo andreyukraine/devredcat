@@ -1,0 +1,14 @@
+<div class="bl-stock-warehouses">
+  <div class="title-stock-warehouses">{{ title_stock_warehouses }}</div>
+      <div class="stock_item">
+        {% if total_qty >= 20 %}
+          <span class="stock-more">достатньо</span>
+        {% elseif total_qty < 20 and total_qty >= 10 %}
+          <span class="stock-end">закінчується</span>
+        {% elseif total_qty < 10 and total_qty > 0 %}
+          <span class="stock-small">мало</span>
+        {% else %}
+          <span class="stock-not">немає в наявності</span>
+        {% endif %}
+      </div>
+</div>

@@ -1,0 +1,128 @@
+<div id="blog_home" class="menu-recent">
+  <div>
+    <div class="blog-title module-title">
+      <div class="bl-title-module">
+        <svg id="multicategory" class="animationSvg" width="62" height="57" viewBox="0 0 62 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M47.4893 18.289C44.1938 13.0953 40.5122 8.44288 36.415 3.73996" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" style="stroke-dasharray: 19, 21; stroke-dashoffset: 0;"></path>
+          <path d="M39.5523 43.9224C30.1234 45.2731 20.7709 46.7685 11.402 48.4352" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" style="stroke-dasharray: 29, 31; stroke-dashoffset: 0;"></path>
+          <path d="M39.9331 30.758C29.4113 25.8431 18.8964 21.609 7.99704 17.4771" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" style="stroke-dasharray: 35, 37; stroke-dashoffset: 0;"></path>
+        </svg>
+        <h2>{{ text_headingtitle }}</h2>
+      </div>
+
+      {% if module_description %}
+        <div class="module-description">
+          <p>{{ module_description }}</p>
+        </div>
+      {% endif %}
+
+      <div class="navigation-slick-block">
+        <div class="slick_navigation">
+          <div class="slick_arrow" tabindex="0" role="button" aria-label="Previous slide">
+            <i class="slick-arrow-left" aria-hidden="true"></i>
+          </div>
+          <div class="slick_arrow" tabindex="0" role="button" aria-label="Next slide">
+            <i class="slick-arrow-right" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-style">
+      {% if articles %}
+        <div class="articles-container2 slider">
+          {% for article in articles %}
+            <div class="articles-blog">
+              <div class="articles-image">
+                <a href="{{ article.href }}">
+                  <img src="{{ article.image }}" width="{{ article.width }}" height="{{ article.height }}" alt="{{ article.name }}" class="img-responsive"/></a>
+                <p class="date-time-post">
+                  <span class="year-post">{{ article.date_added_y }}</span>
+                  <span class="month-post">{{ article.date_added_m }}</span>
+                  <span class="date-post">{{ article.date_added_d }}</span>
+                </p>
+              </div>
+
+              <div class="aritcles-content">
+                <div class="content-inner">
+                  <a class="articles-name" href="{{ article.href }}">{{ article.name }}</a>
+                  {% if article.author %}
+                    <p class="author-name">{{ text_post_by }}<span>{{ article.author }}</span></p>
+                  {% endif %}
+                  {% if article.intro_text %}
+                    <div class="articles-intro">{{ article.intro_text }}</div>
+                  {% endif %}
+                  <div class="read-more"><a class="" href="{{ article.href }}">{{ button_read_more }}</a></div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>{{ text_empty }}</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<script>
+  $(document).ready(function () {
+    var windowWidth = $(window).width();
+
+    setTimeout(function () {
+
+      var bloghomeNavSlider = $(".articles-container2");
+
+      bloghomeNavSlider.on('init', function (slick) {
+        bloghomeNavSlider.css('opacity', 1);
+      });
+
+      // Функція для визначення кількості слайдів, що показуються в залежності від ширини вікна
+      function getSlidesToShow() {
+
+        if (windowWidth < 375) {
+          return 2;
+        } else if (windowWidth < 480) {
+          return 2;
+        } else if (windowWidth < 768) {
+          return 3;
+        } else if (windowWidth < 992) {
+          return 2;
+        } else if (windowWidth < 1200) {
+          return 4;
+        } else {
+          return 4; // значення за замовчуванням
+        }
+      }
+
+      var itemsToShow = getSlidesToShow();
+
+      bloghomeNavSlider.not('.slick-initialized').slick({
+        slidesToShow: itemsToShow,
+        slidesToScroll: itemsToShow,
+        speed: 500,
+        arrows: false,
+        slide: "div",
+        fade: false,
+        dots: false
+      });
+
+      // Якщо кількість елементів менша або дорівнює кількості показуваних слайдів, приховуємо навігацію
+      var totalItems2 = bloghomeNavSlider.slick('getSlick').slideCount;
+      if (totalItems2 <= itemsToShow) {
+        $('#blog_home .navigation-slick-block').hide();
+      } else {
+        $('#blog_home .navigation-slick-block').show();
+      }
+
+      // Обробник для кнопки Prev
+      $('#blog_home .slick-arrow-left').on('click', function () {
+        bloghomeNavSlider.slick('slickPrev');
+      });
+
+      // Обробник для кнопки Next
+      $('#blog_home .slick-arrow-right').on('click', function () {
+        bloghomeNavSlider.slick('slickNext');
+      });
+
+    }, 200);
+  });
+</script>

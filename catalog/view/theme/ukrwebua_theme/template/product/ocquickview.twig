@@ -1,0 +1,369 @@
+<div id="quickview-modal" class="container">
+  <div class="modal-header">
+    <div class="product-name-quickview"><h2 class="bl-bold">{{ heading_title }}</h2></div>
+    <button type="button" class="close-modal" onclick="ocquickview.close();" data-dismiss="modal"></button>
+  </div>
+
+  <div id="content">
+    {{ content_top }}
+    <div class="column-main">
+
+      <div class="product-quickview-detailed">
+
+          <div class="row" id="product-{{ product_id }}">
+            <div class="product-image-main-{{ product_id }} col-lg-4">
+
+              <div id="product-{{ product_id }}" class="rm-product-images">
+
+                <div class="detail-img">
+                  <div class="box-label">
+                    <div class="label-product label-sale-{{ product_id }}">
+                      {% if special %}
+                        <div class="bg-special"><span>{{ '-' ~ rate_special ~ '%' ~ text_label_sale }}</span>
+                        </div>{% endif %}
+                    </div>
+                    <div class="statuses-product statuses-{{ product_id }}">
+                      {% for status in statuses %}
+                        <div class="status-product label_{{ status.code }}"
+                             style="background-color: {{ status.color }}"><span>{{ status.name }}</span></div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {% if thumb or images %}
+                    <div class="slider-for-{{ product_id }} slider">
+                      {% if images|length > 0 %}
+                        {% set img_count = 0 %}
+                        {% for image in images %}
+                          <div
+                            class="item product-image-options-{{ image.product_option_value_id }} img-slick-block {% if image.select %}select{% endif %}"
+                            data-pos="{{ img_count }}">
+                            <img width="400px" class="img-responsive" src="{{ image.thumb }}"
+                                 title="{{ heading_title }}"
+                                 alt="{{ heading_title }}"/>
+                          </div>
+                          {% set img_count = img_count + 1 %}
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                {% if thumb or images %}
+                  <div id="more-imgs" class="slider-nav-{{ product_id }} slider">
+                    {% if images|length > 1 %}
+                      {% set img_count = 0 %}
+                      {% for image in images %}
+                        <div class="item-slick product-image-options-{{ image.product_option_value_id }}"
+                             data-pos="{{ img_count }}">
+                          <img height="100px" src="{{ image.thumb }}" title="{{ heading_title }}"
+                               alt="{{ heading_title }}"/>
+                        </div>
+                        {% set img_count = img_count + 1 %}
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+
+            </div>
+
+            <div class="product-info-main col-lg-8 ">
+              <div class="bl-detail-info">
+                <div class="product-container" data-product="{{ product_id }}">
+
+                  <div class="bl-attribs">
+                    <div class="title-stock-warehouses">Характеристики:</div>
+                    <div class="top-right-detail-product-sku text-16">
+                      <span class="bl-bold">Код товару:</span>
+                      <span class="sku-{{ product_id }}">{% if sku is not empty %}{{ sku }}{% else %}-{% endif %}</span>
+                    </div>
+
+                    <div class="top-right-detail-product-ean text-16">
+                      <span class="bl-bold">{{ text_model }}</span>
+                      <span
+                        class="model-{{ product_id }}">{% if model is not empty %}{{ model }}{% else %}-{% endif %}</span>
+                    </div>
+
+                    {% if manufacturer %}
+                      <div class="manufacture text-16">
+                        <span class="bl-bold">{{ text_manufacturer }}</span>
+                        <a title="{{ manufacturer }}" href="{{ manufacturers }}">{{ manufacturer }}</a>
+                      </div>
+                    {% endif %}
+
+                    {% if attribute_groups %}
+                      <div class="attr-block">
+                        {% for attribute_group in attribute_groups %}
+                          <div class="row">
+                            <div class="attr-grp-bl col-lg-10 col-md-12 col-xs-12">
+                              {% for attribute in attribute_group.attribute %}
+                                <div class="attr-line text-16">
+                                  <div class="attr-name bl-bold">{{ attribute.name }}:</div>
+                                  <div class="attr-val">{{ attribute.text }}</div>
+                                </div>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="bl-prices">
+                    <div class="title-stock-warehouses">Ціна:</div>
+                    <div data-product-id="{{ product_id }}">
+                    {% if price %}
+                      <div class="btn-card">
+                        <div class="price-box-{{ product_id }} bl-price-catalog">
+                          {% if not special %}
+                            <div class="box-regular">
+                              <div class="regular-price"><span class="price">{{ price }}</span></div>
+                            </div>
+                          {% else %}
+                            <div class="box-special">
+                              <div class="old-price"><span class="price">{{ price }}</span></div>
+                              <div class="special-price"><span class="price">{{ special }}</span></div>
+                            </div>
+                          {% endif %}
+
+                          <div class="stock-status">
+                            {% if on_stock %}
+                            <span class="in-stock">В наявності</span>{% else %}
+                            <span class="out-stock">Під замовлення</span>{% endif %}</span></div>
+
+                        </div>
+
+                        {% if config_is_catalog < 1 %}
+                          <div class="form-group product-cart-block">
+                            <div id="prod-bl-qty-{{ product_id }}" class="group-quantity">
+                              <input id="key-{{ product_id }}" type="hidden" name="product_id"
+                                     value="{{ product_id }}"/>
+
+                              {% if quantity == 0 %}
+                                <div class="bl-add-in-cart cart-btns-{{ uniq_id }}" data-key="{{ product_id }}" data-cart="0" {% if is_buy %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                  {% if not on_stock %}
+                                    <div class="notify" data-product="{{ product_id }}" data-opt="{{ uniq_id }}" onclick="notify.open(this)">Повідомити про наявність</div>
+                                  {% else %}
+                                    <div class="minus-add"></div>
+                                    <div class="plus-add-text">Додати до кошика</div>
+                                    <div class="plus-add {% if not on_stock %}not-available{% endif %}"></div>
+                                  {% endif %}
+                                </div>
+                              {% else %}
+                                <div class="bl-add-in-cart cart-btns-{{ uniq_id }}" data-key="{{ product_id }}" data-cart="{{ cart_id }}">
+                                  <div class="minus {% if quantity == 0 %}not-available{% endif %}"
+                                       data-key="{{ product_id }}"
+                                       data-cart="{{ cart_id }}"
+                                       {% if quantity > 0 %}onclick="custom_cart.handleClickMinus(this)"{% endif %}>-
+                                  </div>
+                                  <input id="qty-{{ product_id }}-{{ cart_id }}" data-key="{{ product_id }}"
+                                         data-cart="{{ cart_id }}"
+                                         type="number"
+                                         name="quantity" value="{{ quantity }}" size="3"
+                                         {% if not on_stock %}disabled="disabled"{% endif %}
+                                         class="quantity-input{% if not on_stock %} not-available{% endif %}"/>
+
+                                  <div class="plus {% if not is_buy %}not-available{% endif %}"
+                                       data-key="{{ product_id }}"
+                                       data-cart="{{ cart_id }}"
+                                       {% if is_buy %}onclick="custom_cart.handleClickPlus(this)"{% endif %}>
+                                  </div>
+                                </div>
+                              {% endif %}
+                            </div>
+                          </div>
+                        {% endif %}
+
+                      </div>
+                    {% endif %}
+                    {% if options %}
+                      <div data-options-id="{{ product_id }}" class="options-box">
+                        <div class="title-stock-warehouses">
+                          {{ text_option }}
+                          <div class="tooltip-container">
+                            <span class="tooltip-trigger"><img width="20px" height="20px" src="/image/info.svg" alt="info"/></span>
+                            <div class="tooltip">
+                              <p class="bl-bold">Наявність на складі</p>
+                              <div class="option-qty">
+                                <div class="stock-i-row"><span class="stock-more"></span> - достатньо</div>
+                                <div class="stock-i-row"><span class="stock-end"></span> - закінчується</div>
+                                <div class="stock-i-row"><span class="stock-small"></span> - мало</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                          <div class="option-block required" data-id="{{ product_id }}">
+                            {% for option in options %}
+                              <div id="input-option{{ option.option_value_id }}"
+                                   class="option-item{% if option.qty <= 0 %} not-available{% endif %}">
+                                <div class="radio">
+
+                                  <label class="custom-radio">
+                                    <input
+                                      type="radio"
+                                      name="option[{{ product_id }}]"
+                                      {% if option.selected %} checked="checked"{% endif %}
+                                      data-product-option="{{ option.product_option_id }}"
+                                      data-product="{{ product_id }}"
+                                      value="{{ option.product_option_id }}-{{ option.product_option_value_id }}"/>
+                                    <span class="radio-control{% if option.selected %} check{% endif %}">
+
+                                      {% if option.percent > 0 %}<span class="opt-discont">%</span>{% endif %}
+
+                                      {{ option.name }}
+
+                                      <div class="option-qty">
+                                          {% if option.qty >= 20 %}
+                                            <span class="stock-more"></span>
+                                          {% elseif option.qty < 20 and option.qty >= 10 %}
+                                            <span class="stock-end"></span>
+                                          {% elseif option.qty < 10 and option.qty > 0 %}
+                                            <span class="stock-small"></span>
+                                          {% endif %}
+                                      </div>
+
+                                    </span>
+                                  </label>
+
+                                  <div class="option-qty">
+                                    {% if option.qty >= 20 %}
+                                      <span class="stock-more"></span>
+                                    {% elseif option.qty < 20 and option.qty >= 10 %}
+                                      <span class="stock-end"></span>
+                                    {% elseif option.qty < 10 and option.qty > 0 %}
+                                      <span class="stock-small"></span>
+                                    {% endif %}
+                                  </div>
+
+                                </div>
+                              </div>
+                            {% endfor %}
+                          </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bl-detail-more bl-login-bg">
+
+                <div class="top-right-detail-product">
+                  {% if review_status %}
+                    <div class="ratings">
+                      <div class="rating-box">
+                        {% if product.rating > 0 %}
+                          {% for i in 1..5 %}
+                            {% if i <= rating %}
+                              <div class="active"></div>
+                            {% else %}
+                              <div class="deactive"></div>
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  {% endif %}
+
+                  <div class="bl-share-right">
+                    <img width="25px" height="25px" alt="share" src="/image/share.svg" onclick="custom_share.open()">
+
+                    <div
+                    class="wishlist btn-wishlist-{{ product_id }}{% if in_wishlist %} is-check{% endif %}"
+                    onclick="toggleWishlist('{{ product_id }}', '{{ in_wishlist }}')"></div>
+                  </div>
+                </div>
+
+                <div class="stocks-{{ product_id }}">
+                  {% if warehouses is not empty %}
+                    <div class="bl-stock-warehouses">
+                      <div class="title-stock-warehouses">{{ title_stock_warehouses }}</div>
+                      {% for warehouse in warehouses %}
+                        <div class="stock_item">
+                          {#                            <span>{{ warehouse.name }}</span> #}
+                          {% if warehouse.quantity >= 20 %}
+                            <span class="stock-more">достатньо</span>
+                          {% elseif warehouse.quantity < 20 and warehouse.quantity >= 10 %}
+                            <span class="stock-end">закінчується</span>
+                          {% elseif warehouse.quantity < 10 and warehouse.quantity > 0 %}
+                            <span class="stock-small">мало</span>
+                          {% else %}
+                            <span class="stock-not">немає в наявності</span>
+                          {% endif %}
+                          </span>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="p-d-block">
+                  <div class="custom-block-product">
+                    <div class="image">
+                      <img src="/image/payment.svg" alt="Оплата">
+                    </div>
+                    <div class="text">
+                      <div class="custom-block-title">Оплата</div>
+                      <div class="custom-block-desc">
+                        Оплата готівкою при отриманні, платіжною карткою Visa або Mastercard
+                      </div>
+                    </div>
+                  </div>
+                  <div class="custom-block-product">
+                    <div class="image">
+                      <img src="/image/delivery.svg" alt="Доставка">
+                    </div>
+                    <div class="text">
+                      <div class="custom-block-title">Доставка</div>
+                      <div class="custom-block-desc">
+                        <p>Доставка по Україні «Новою Поштою»</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="lightbox-quickview" onclick="ocquickview.close();"></div>
+</div>
+<script type="text/javascript">
+
+  var product_id = '{{ product_id }}';
+  var contextSelector = '#product-' + product_id;
+
+
+  var mainSlider = $(contextSelector + " .slider-for-" + product_id);
+  mainSlider.on('init', function (slick) {
+    mainSlider.css('opacity', 1);
+  });
+  mainSlider.not('.slick-initialized').slick({
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    speed: 500,
+    arrows: false,
+    fade: true,
+    asNavFor: contextSelector + " .slider-nav-" + product_id
+  });
+
+  var mainNavSlider = $(contextSelector + " .slider-nav-" + product_id);
+  mainNavSlider.on('init', function (slick) {
+    mainNavSlider.css('opacity', 1);
+  });
+  mainNavSlider.not('.slick-initialized').slick({
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    speed: 500,
+    asNavFor: contextSelector + " .slider-for-" + product_id,
+    arrows: false,
+    dots: false,
+    centerMode: false,
+    focusOnSelect: true,
+    slide: "div",
+    appendArrows: false
+  });
+
+
+</script>

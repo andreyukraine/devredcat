@@ -1,0 +1,39 @@
+<div id="modal-np-addresses" class="modal fade in" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title text-21 bl-bold">Ваші збережені адреси</h3>
+        <img width="25px" height="25px" src="/image/close.svg" class="close" data-dismiss="modal" aria-label="Close" alt="close">
+      </div>
+      <div class="modal-body">
+        {% if addresses %}
+          <div class="list-group-address-modal">
+            {% for address in addresses %}
+              <div type="button" class="list-address-item-modal" onclick="{% if type == 'car' %}selectCarAddress('{{ order_id }}', {{ address|json_encode|escape('html_attr') }});{% else %}selectNpAddress('{{ order_id }}', {{ address|json_encode|escape('html_attr') }});{% endif %}" style="text-align: left; width: 100%;">
+                {% if type == 'np_post' or type == 'np_poshtomat' %}
+                  {{ address.np_city_name }}, {{ address.np_post_name }}
+                {% elseif type == 'np_dveri' %}
+                  {{ address.np_city_name }}, {{ address.np_street_name }}, буд. {{ address.np_house }}{% if address.np_apartment %}, кв. {{ address.np_apartment }}{% endif %}
+                {% elseif type == 'car' %}
+                  {{ address.address_1 }}{% if address.np_house %}, буд. {{ address.np_house }}{% endif %}{% if address.np_apartment %}, кв. {{ address.np_apartment }}{% endif %}
+                {% endif %}
+                {% if address.np_customer_name or address.np_customer_lastname %}
+                  <div class="small text-muted" style="margin-left: 18px;">
+                    Отримувач: {{ address.np_customer_lastname }} {{ address.np_customer_name }} {{ address.np_customer_phone }}
+                  </div>
+                {% endif %}
+                {% if address.comment %}
+                  <div class="small text-primary" style="margin-left: 18px; font-style: italic;">
+                    Коментар: {{ address.comment }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-center">У вас немає збережених адрес цього типу.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

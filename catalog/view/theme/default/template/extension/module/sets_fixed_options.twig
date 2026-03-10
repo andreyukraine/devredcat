@@ -1,0 +1,41 @@
+{% if (options) %} 
+<div id="sets-popup-{{ modal_id }}" class="modal fade options" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">{{ modal_title }}</h4>
+            </div>
+            <div class="modal-body">
+                <table class='table table-bordered'>
+                    {% for key,val in options %} 
+                    <tr>
+                        <td>{{ val['name'] }}</td>
+                        <td>
+                            {% if val['value'] is iterable %}
+                                {{ val['value']|join(',') }}
+                                
+                                {% for key2,val2 in val['value'] %} 
+                                    {% if (val['type'] != 'checkbox') %} 
+                                        <input id='set-input-option{{ key }}' type='hidden' name='option[{{ key }}]' value='{{ key2 }}'>
+                                    {% else %} 
+                                        <input id='set-input-option{{ key }}' type='hidden' name='option[{{ key }}][]' value='{{ key2 }}'>
+                                    {% endif %} 
+                                {% endfor %} 
+                            {% else %} 
+                                {{ val['value'] }}
+                                <input id='set-input-option{{ key }}' type='hidden' name='option[{{ key }}]' value='{{ val['value'] }}'>
+                            {% endif %} 
+                        </td>
+                    </tr>
+
+                    {% endfor %} 
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

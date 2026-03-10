@@ -1,0 +1,45 @@
+<form action="{{ action }}" method="post" id="ajax-fogotten-form" enctype="multipart/form-data">
+  <div class="bl-fogotten-reg">
+
+    <div class="bl-inp-block">
+
+      <div class="form-group">
+        <label class="control-label" for="input-email">{{ entry_email }}</label>
+        <input type="text" name="email" value="{{ email }}" placeholder="{{ entry_email }}" id="input-email"
+               class="form-control"/>
+        <div class="for-error error-email"></div>
+      </div>
+
+      {{ captcha }}
+    </div>
+
+    <div class="dflex-row-justify-between">
+      <div class="pull-left d-flex" onclick="ocajaxlogin.appendLoginForm()" style="cursor: pointer">
+        <img class="btn-back" alt="Повернутись" src="/image/back.svg">
+        <span class="bl-bold text-18 hidden-xs">Повернутись</span>
+      </div>
+      <div class="pull-right d-flex">
+        <button class="button" type="button" onclick="ocajaxlogin.fogottenAction(document.getElementById('input-email').value)">
+          <span>{{ text_send }}</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+  {% if redirect %}
+    <input type="hidden" name="redirect" value="{{ redirect }}"/>
+  {% endif %}
+</form>
+<script>
+  $(document).ready(function () {
+    var keycode = '';
+
+    $('#input-email').keypress(function (e) {
+      keycode = (e.keyCode ? e.keyCode : e.which);
+      if (keycode == '13') {
+        ocajaxlogin.fogottenAction();
+      }
+    });
+  });
+
+</script>

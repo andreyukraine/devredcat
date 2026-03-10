@@ -1,0 +1,564 @@
+<div class="modal-dialog ">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title text-21 bl-bold">{% if address_id %}Редагування адреси{% else %}Додавання адреси{% endif %}</h3>
+      <div class="close" data-dismiss="modal" aria-hidden="true">
+        <svg width="25px" height="25px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#000" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path>
+        </svg>
+      </div>
+    </div>
+    <div class="modal-body">
+      <form id="address-form" class="form-horizontal">
+        <input type="hidden" name="address_id" value="{{ address_id }}" />
+        <input type="hidden" name="customer_cod_guid" value="{{ customer_cod_guid }}" />
+
+        {% if address_id or customer_cod_guid %}
+        <div class="form-group required">
+          <label class="col-sm-3 control-label">Назва точки / ПІБ</label>
+          <div class="col-sm-9">
+            <input type="text" name="firstname" value="{{ firstname }}" placeholder="Наприклад: Магазин №1 або ПІБ" class="form-control" readonly="readonly" />
+          </div>
+        </div>
+        {% else %}
+          <input type="hidden" name="firstname" value="{{ firstname }}" />
+        {% endif %}
+
+        <div class="form-group required">
+          <label class="col-sm-3 control-label">Тип доставки</label>
+          <div class="col-sm-9">
+            <select name="type" id="input-type" class="form-control" {% if address_id %}disabled="disabled"{% endif %}>
+              <option value=""> --- Виберіть --- </option>
+              <option value="car" {% if type == 'car' %}selected="selected"{% endif %}>Кур’єр Detta</option>
+              <option value="np_post" {% if type == 'np_post' %}selected="selected"{% endif %}>Нова Пошта (Відділення)</option>
+              <option value="np_poshtomat" {% if type == 'np_poshtomat' %}selected="selected"{% endif %}>Нова Пошта (Поштомат)</option>
+              <option value="np_dveri" {% if type == 'np_dveri' %}selected="selected"{% endif %}>Нова Пошта (На адресу)</option>
+            </select>
+            {% if address_id %}
+              <input type="hidden" name="type" value="{{ type }}" />
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-group required">
+          <label class="col-sm-3 control-label">Місто</label>
+          <div class="col-sm-9" style="position: relative;">
+            <input type="text" name="np_city_name" value="{{ np_city_name ? np_city_name : city }}" id="input-np-city" class="form-control" autocomplete="off" placeholder="Почніть вводити місто..." />
+            <div id="clear-np-city" class="clear-input" style="display: {{ (np_city_name or city) ? 'block' : 'none' }};">
+              <svg width="15px" height="15px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path fill="#999" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path></svg>
+            </div>
+            <input type="hidden" name="np_city_id" value="{{ np_city_id }}" id="input-np-city-id" />
+            <input type="hidden" name="np_city_delivery_id" value="{{ np_city_delivery_id }}" id="input-np-city-delivery-id" />
+            <input type="hidden" name="city" value="{{ city }}" id="input-city-hidden" />
+            <div id="cities-list" class="autocomplete-list"></div>
+          </div>
+        </div>
+
+        <!-- Наша доставка -->
+        <div id="section-car" class="address-section" style="display: none;">
+          <div class="form-group required">
+            <label class="col-sm-3 control-label">Вулиця</label>
+            <div class="col-sm-9" style="position: relative;">
+              <input type="text" name="address_1" value="{{ address_1 }}" placeholder="Введіть вулицю" id="input-car-street" class="form-control" />
+              <div id="clear-car-street" class="clear-input" style="display: {{ address_1 ? 'block' : 'none' }};">
+                <svg width="15px" height="15px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path fill="#999" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path></svg>
+              </div>
+              <div id="car-streets-list" class="autocomplete-list"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label required">Будинок</label>
+            <div class="col-sm-3">
+              <input type="text" name="np_house" value="{{ np_house }}" id="input-car-house" placeholder="№" class="form-control" />
+            </div>
+            <label class="col-sm-3 control-label">Квартира</label>
+            <div class="col-sm-3">
+              <input type="text" name="np_apartment" value="{{ np_apartment }}" id="input-car-apartment" placeholder="№" class="form-control" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Нова Пошта (Common Fields) -->
+        <div id="section-np" class="address-section" style="display: none;">
+          <!-- Відділення / Поштомат -->
+          <div id="section-np-post" style="display: none;">
+            <div class="form-group required">
+              <label class="col-sm-3 control-label" id="label-np-post">Відділення</label>
+              <div class="col-sm-9" style="position: relative;">
+                <input type="text" name="np_post_name" value="{{ np_post_name }}" id="input-np-post" class="form-control" autocomplete="off" />
+                <div id="clear-np-post" class="clear-input" style="display: {{ np_post_name ? 'block' : 'none' }};">
+                  <svg width="15px" height="15px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path fill="#999" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path></svg>
+                </div>
+                <input type="hidden" name="np_post_id" value="{{ np_post_id }}" id="input-np-post-id" />
+                <div id="posts-list" class="autocomplete-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- На адресу (Вулиця) -->
+          <div id="section-np-address" style="display: none;">
+            <div class="form-group required">
+              <label class="col-sm-3 control-label">Вулиця</label>
+              <div class="col-sm-9" style="position: relative;">
+                <input type="text" name="np_street_name" value="{{ np_street_name }}" id="input-np-street" class="form-control" autocomplete="off" />
+                <div id="clear-np-street" class="clear-input" style="display: {{ np_street_name ? 'block' : 'none' }};">
+                  <svg width="15px" height="15px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path fill="#999" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path></svg>
+                </div>
+                <input type="hidden" name="np_street_id" value="{{ np_street_id }}" id="input-np-street-id" />
+                <div id="streets-list" class="autocomplete-list"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-3 control-label required">Будинок</label>
+              <div class="col-sm-3">
+                <input type="text" name="np_house" value="{{ np_house }}" class="form-control" />
+              </div>
+              <label class="col-sm-1 control-label">Поверх</label>
+              <div class="col-sm-2">
+                <input type="text" name="np_level" value="{{ np_level }}" class="form-control" />
+              </div>
+              <label class="col-sm-1 control-label">Кв</label>
+              <div class="col-sm-2">
+                <input type="text" name="np_apartment" value="{{ np_apartment }}" class="form-control" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Отримувач -->
+          <div class="">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-9 text-15 bl-bold bl-np-customer">
+              Отримувач
+            </div>
+          </div>
+
+          <div class="form-group required">
+            <label class="col-sm-3 control-label">Ім'я</label>
+            <div class="col-sm-9">
+              <input type="text" name="np_customer_name" value="{{ np_customer_name }}" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group required">
+            <label class="col-sm-3 control-label">Прізвище</label>
+            <div class="col-sm-9">
+              <input type="text" name="np_customer_lastname" value="{{ np_customer_lastname }}" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group required">
+            <label class="col-sm-3 control-label">Телефон</label>
+            <div class="col-sm-9">
+              <input type="text" name="np_customer_phone" value="{{ np_customer_phone }}" id="input-telephone" class="form-control" />
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer-edit-address">
+      <button type="button" id="button-save-address" class="button">Зберегти</button>
+      <button type="button" class="button" data-dismiss="modal">Скасувати</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.autocomplete-list {
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ccc;
+  display: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.autocomplete-item {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.autocomplete-item:hover {
+  background: #f0f0f0;
+}
+.clear-input {
+  position: absolute;
+  right: 25px;
+  top: 10px;
+  cursor: pointer;
+  z-index: 5;
+}
+.control-label.required:before {
+  content: '* ';
+  color: #f00;
+  font-weight: bold;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+  function toggleSections() {
+    var type = $('#input-type').val();
+    $('.address-section').hide();
+    $('.address-section input, .address-section select, .address-section textarea').attr('disabled', true);
+    $('#section-np-post').hide();
+    $('#section-np-address').hide();
+
+    if (type === 'car') {
+      $('#section-car').show();
+      $('#section-car input, #section-car select, #section-car textarea').attr('disabled', false);
+    } else if (type === 'np_post' || type === 'np_poshtomat' || type === 'np_dveri') {
+      $('#section-np').show();
+      $('#section-np input, #section-np select, #section-np textarea').attr('disabled', false);
+      if (type === 'np_post') {
+        $('#section-np-post').show();
+        $('#section-np-address').hide();
+        $('#section-np-address input').attr('disabled', true);
+        $('#label-np-post').text('Відділення');
+        $('#input-np-post').attr('placeholder', 'Пошук відділення...');
+      } else if (type === 'np_poshtomat') {
+        $('#section-np-post').show();
+        $('#section-np-address').hide();
+        $('#section-np-address input').attr('disabled', true);
+        $('#label-np-post').text('Поштомат');
+        $('#input-np-post').attr('placeholder', 'Пошук поштомату...');
+      } else if (type === 'np_dveri') {
+        $('#section-np-post').hide();
+        $('#section-np-post input').attr('disabled', true);
+        $('#section-np-address').show();
+      }
+    }
+  }
+
+  $('#input-type').on('change', toggleSections);
+  toggleSections();
+
+  {% if mask %}
+  var phoneValue = $('#input-telephone').val().replace(/\D/g, '');
+  if (phoneValue.length === 12 && phoneValue.indexOf('380') === 0) {
+    $('#input-telephone').val(phoneValue.substring(2));
+  } else if (phoneValue.length === 11 && phoneValue.indexOf('80') === 0) {
+    $('#input-telephone').val(phoneValue.substring(1));
+  }
+  $('#input-telephone').mask("{{ mask }}");
+  {% endif %}
+
+  var timer;
+
+  // City Autocomplete
+  $('#input-np-city').on('input', function() {
+    var query = $(this).val();
+    var list = $('#cities-list');
+    clearTimeout(timer);
+
+    if (query.length > 0) {
+      $('#clear-np-city').show();
+    } else {
+      $('#clear-np-city').hide();
+      // Clear dependent fields if input is manually emptied
+      clearDependentFields();
+    }
+
+    if (query.length < 3) {
+      list.hide();
+      return;
+    }
+
+    timer = setTimeout(function() {
+      $.ajax({
+        url: 'index.php?route=extension/shipping/np',
+        type: 'post',
+        data: 'event=city&q=' + encodeURIComponent(query),
+        dataType: 'json',
+        success: function(json) {
+          list.empty().show();
+          if (json.length > 0) {
+            $.each(json, function(i, city) {
+              if (city.ref !== '-') {
+                var $item = $('<div class="autocomplete-item"></div>');
+                $item.text(city.desc);
+                $item.attr('data-ref', city.ref);
+                $item.attr('data-delivery-ref', city.delivery_ref);
+                $item.attr('data-name', city.desc);
+                list.append($item);
+              }
+            });
+          }
+        }
+      });
+    }, 300);
+  });
+
+  function clearDependentFields() {
+    $('#input-np-city-id').val('');
+    $('#input-np-city-delivery-id').val('');
+    $('#input-city-hidden').val('');
+    
+    $('#input-np-post').val('').attr('readonly', false);
+    $('#input-np-post-id').val('');
+    $('#clear-np-post').hide();
+    
+    $('#input-np-street').val('').attr('readonly', false);
+    $('#input-np-street-id').val('');
+    $('#clear-np-street').hide();
+
+    // Clear Car delivery fields
+    $('#input-car-street').val('');
+    $('#input-car-house').val('');
+    $('#input-car-apartment').val('');
+    $('#clear-car-street').hide();
+    $('#car-streets-list').hide();
+  }
+
+  $('#clear-np-city').on('click', function() {
+    $('#input-np-city').val('').attr('readonly', false);
+    $(this).hide();
+    clearDependentFields();
+    $('#cities-list').hide();
+  });
+
+  // Car street clear
+  $('#input-car-street').on('input', function() {
+    var query = $(this).val();
+    var city_ref = $('#input-np-city-id').val();
+    var list = $('#car-streets-list');
+    clearTimeout(timer);
+
+    if (query.length > 0) {
+      $('#clear-car-street').show();
+    } else {
+      $('#clear-car-street').hide();
+    }
+
+    if (!city_ref) {
+       // alert('Спочатку виберіть місто');
+       return;
+    }
+
+    if (query.length < 3) {
+      list.hide();
+      return;
+    }
+
+    timer = setTimeout(function() {
+      $.ajax({
+        url: 'index.php?route=extension/shipping/np',
+        type: 'post',
+        data: 'event=address&ref=' + city_ref + '&q=' + encodeURIComponent(query),
+        dataType: 'json',
+        success: function(json) {
+          list.empty().show();
+          if (json.length > 0) {
+            $.each(json, function(i, street) {
+              if (street.ref !== '-') {
+                var $item = $('<div class="autocomplete-item car-street-item"></div>');
+                $item.text(street.desc);
+                $item.attr('data-name', street.desc);
+                list.append($item);
+              }
+            });
+          }
+        }
+      });
+    }, 300);
+  });
+
+  $(document).on('click', '.car-street-item', function() {
+    $('#input-car-street').val($(this).data('name'));
+    $('#clear-car-street').show();
+    $('#car-streets-list').hide();
+  });
+
+  $('#clear-car-street').on('click', function() {
+    $('#input-car-street').val('');
+    $(this).hide();
+    $('#car-streets-list').hide();
+  });
+
+  $(document).on('click', '#cities-list .autocomplete-item', function() {
+    $('#input-np-city').val($(this).data('name'));//.attr('readonly', true);
+    $('#input-np-city-id').val($(this).data('ref'));
+    $('#input-np-city-delivery-id').val($(this).data('delivery-ref'));
+    $('#input-city-hidden').val($(this).data('name'));
+    $('#clear-np-city').show();
+    $('#cities-list').hide();
+    
+    // Clear dependent fields on city change
+    $('#input-np-post').val('').attr('readonly', false);
+    $('#input-np-post-id').val('');
+    $('#clear-np-post').hide();
+    $('#input-np-street').val('').attr('readonly', false);
+    $('#input-np-street-id').val('');
+    $('#clear-np-street').hide();
+  });
+
+  // Post / Poshtomat Autocomplete
+  $('#input-np-post').on('input', function() {
+    var query = $(this).val();
+    var city_ref = $('#input-np-city-id').val();
+    var list = $('#posts-list');
+    var type = $('#input-type').val();
+    clearTimeout(timer);
+
+    if (query.length > 0) {
+      $('#clear-np-post').show();
+    } else {
+      $('#clear-np-post').hide();
+      $('#input-np-post-id').val('');
+    }
+
+    if (!city_ref) {
+       alert('Спочатку виберіть місто');
+       $(this).val('');
+       return;
+    }
+
+    if (query.length < 2) {
+      list.hide();
+      return;
+    }
+
+    timer = setTimeout(function() {
+      $.ajax({
+        url: 'index.php?route=extension/shipping/np',
+        type: 'post',
+        data: 'event=' + (type === 'np_poshtomat' ? 'poshtomat' : 'post') + '&ref=' + city_ref + '&q=' + encodeURIComponent(query),
+        dataType: 'json',
+        success: function(json) {
+          list.empty().show();
+          if (json.length > 0) {
+            $.each(json, function(i, post) {
+              if (post.ref !== '-') {
+                var $item = $('<div class="autocomplete-item"></div>');
+                $item.text(post.desc);
+                $item.attr('data-ref', post.ref);
+                $item.attr('data-name', post.desc);
+                list.append($item);
+              }
+            });
+          }
+        }
+      });
+    }, 300);
+  });
+
+  $('#clear-np-post').on('click', function() {
+    $('#input-np-post').val('').attr('readonly', false);
+    $('#input-np-post-id').val('');
+    $(this).hide();
+    $('#posts-list').hide();
+  });
+
+  $(document).on('click', '#posts-list .autocomplete-item', function() {
+    $('#input-np-post').val($(this).data('name'));//.attr('readonly', true);
+    $('#input-np-post-id').val($(this).data('ref'));
+    $('#clear-np-post').show();
+    $('#posts-list').hide();
+  });
+
+  // Street Autocomplete
+  $('#input-np-street').on('input', function() {
+    var query = $(this).val();
+    var city_ref = $('#input-np-city-id').val();
+    var list = $('#streets-list');
+    clearTimeout(timer);
+
+    if (query.length > 0) {
+      $('#clear-np-street').show();
+    } else {
+      $('#clear-np-street').hide();
+      $('#input-np-street-id').val('');
+    }
+
+    if (!city_ref) {
+       alert('Спочатку виберіть місто');
+       $(this).val('');
+       return;
+    }
+
+    if (query.length < 3) {
+      list.hide();
+      return;
+    }
+
+    timer = setTimeout(function() {
+      $.ajax({
+        url: 'index.php?route=extension/shipping/np',
+        type: 'post',
+        data: 'event=address&ref=' + city_ref + '&q=' + encodeURIComponent(query),
+        dataType: 'json',
+        success: function(json) {
+          list.empty().show();
+          if (json.length > 0) {
+            $.each(json, function(i, street) {
+              if (street.ref !== '-') {
+                var $item = $('<div class="autocomplete-item"></div>');
+                $item.text(street.desc);
+                $item.attr('data-ref', street.ref);
+                $item.attr('data-name', street.desc);
+                list.append($item);
+              }
+            });
+          }
+        }
+      });
+    }, 300);
+  });
+
+  $('#clear-np-street').on('click', function() {
+    $('#input-np-street').val('').attr('readonly', false);
+    $('#input-np-street-id').val('');
+    $(this).hide();
+    $('#streets-list').hide();
+  });
+
+  $(document).on('click', '#streets-list .autocomplete-item', function() {
+    $('#input-np-street').val($(this).data('name'));//.attr('readonly', true);
+    $('#input-np-street-id').val($(this).data('ref'));
+    $('#clear-np-street').show();
+    $('#streets-list').hide();
+  });
+
+  $(document).click(function(e) {
+    if (!$(e.target).closest('.autocomplete-list, input').length) {
+      $('.autocomplete-list').hide();
+    }
+  });
+
+  $('#button-save-address').on('click', function() {
+    $.ajax({
+      url: 'index.php?route=account/address/saveAddress',
+      type: 'post',
+      data: $('#address-form').serialize(),
+      dataType: 'json',
+      beforeSend: function() {
+        $('#button-save-address').button('loading');
+      },
+      complete: function() {
+        $('#button-save-address').button('reset');
+      },
+      success: function(json) {
+        $('.text-danger, .alert').remove();
+        $('.form-group').removeClass('has-error');
+
+        if (json['error']) {
+          for (i in json['error']) {
+            var element = $('[name="' + i + '"]');
+            if (element.parent().hasClass('input-group')) {
+              element.parent().after('<div class="text-danger">' + json['error'][i] + '</div>');
+            } else {
+              element.after('<div class="text-danger">' + json['error'][i] + '</div>');
+            }
+          }
+          $('.text-danger').parents('.form-group').addClass('has-error');
+        }
+
+        if (json['success']) {
+          location.reload();
+        }
+        
+        if (json['redirect']) {
+          location = json['redirect'];
+        }
+      }
+    });
+  });
+});
+</script>

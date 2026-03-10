@@ -1,0 +1,160 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.ajax-filter label.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.ajax-filter label.disabled input {
+  opacity: 0.5;
+}
+
+.ajax-filter .count {
+  font-size: 0.9em;
+  color: #888;
+  margin-left: 4px;
+}
+
+.active-filters-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 25px;
+  padding: 12px 18px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.active-filters-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #003d3d;
+  margin-right: 5px;
+  white-space: nowrap;
+}
+
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.filter-group:not(:last-child)::after {
+  content: "";
+  height: 20px;
+  width: 1px;
+  background: #ddd;
+  margin-left: 14px;
+}
+
+.filter-group-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  background-color: #003d3d;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  border: 1px solid transparent;
+}
+
+.filter-chip:hover {
+  background-color: #005c5c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chip-close {
+  margin-left: 6px;
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.reset-filters-btn {
+  margin-left: auto;
+  background: white;
+  border: 1px solid #dcdcdc;
+  color: #d9534f;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.products-count {
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.products-count strong {
+  color: #003d3d;
+  font-size: 18px;
+}
+
+@media (max-width: 768px) {
+  .active-filters-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filter-group:not(:last-child)::after {
+    display: none;
+  }
+  
+  .filter-group {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  
+  .reset-filters-btn {
+    align-self: flex-end;
+  }
+}

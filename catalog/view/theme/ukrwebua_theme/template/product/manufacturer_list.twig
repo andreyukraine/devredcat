@@ -1,0 +1,47 @@
+{{ header }}
+
+<div class="top-cat fluid-width">
+  <div class="breadcrumbs container">
+    <h1 class="category-name bl-bold">{{ heading_title }}</h1>
+    <ul class="breadcrumb">
+      {% for breadcrumb in breadcrumbs %}
+        <li><a title="{{ breadcrumb.text }}" href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<div class="fluid-width">
+  <div id="product-manufacturer" class="container">
+    <div class="bl-content row">{{ column_left }}
+      {% if column_left and column_right %}
+        {% set class = 'col-sm-6' %}
+      {% elseif column_left or column_right %}
+        {% set class = 'col-sm-9' %}
+      {% else %}
+        {% set class = 'col-sm-12' %}
+      {% endif %}
+      <div id="content" class="{{ class }}">{{ content_top }}
+        {% if manufacturers %}
+        <div class="akcia-page">
+          {% for manufacturer in manufacturers %}
+            <div class="akcia-row">
+              <div class="akcia-item">
+                <a class="brand-info" title="{{ akcia.name }}" href="{{ manufacturer.href }}">
+                  <div class="b-img">
+                    <div class="brand-image" style="background-image: url('{{ manufacturer.image }}')"></div>
+                  </div>
+                  <div class="cat-main text-21 bl-bold text-center">{{ manufacturer.name }}</div>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        {% else %}
+          <p>{{ text_empty }}</p>
+        {% endif %}
+        {{ content_bottom }}</div>
+      {{ column_right }}</div>
+  </div>
+</div>
+{{ footer }}

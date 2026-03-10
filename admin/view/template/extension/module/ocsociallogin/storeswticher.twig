@@ -1,0 +1,20 @@
+<div style="float: right">
+    <select id="storeswticher">
+        <OPTION value="0">{{ default }}</OPTION>
+        {% for store in all_store %} 
+        <OPTION value="{{ store['id'] }}"  {% if (store['id'] == store_id) %} {{ "selected" }} {% endif %}>{{ store['name'] }}</OPTION>
+         {% endfor %} 
+    </select>
+</div>
+
+<script type="text/javascript">
+    var dataURL = '{{ html_entity_decode(current_url) }}';
+    
+    $(document).ready(function() {
+        $("#storeswticher").change(function() {
+            window.location.href = dataURL + "&store_id=" + $(this).val();
+        });
+    })
+</script>
+
+

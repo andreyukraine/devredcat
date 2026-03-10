@@ -1,0 +1,86 @@
+{% if logged %}
+  <div class="login-form-content">
+    <p><a href="{{ account }}" title="{{ text_account }}">
+        <span class="btn-logout text-18 bl-bold">
+        <img width="35" src="/image/user-reg.svg">
+        {{ text_account }}
+        </span>
+      </a>
+    </p>
+
+    <div class="card-right-menu">
+      <div class="text-18 bl-bold">{{ heading_title_card }}</div>
+      <div class="bl-bots">
+        <div class="bonus-card">
+          <div class="bl-bottom-card">
+            <div class="bl-code">
+              <div class="bl-code-c">
+                <div class="text-code">{{ text_code }}</div>
+                <div class="bonus-card-code">{{ card_code }}</div>
+              </div>
+              <p class="text-phone">{{ text_phone }} : {{ telephone }}</p>
+              <p class="card-sum">{{ text_sum }}: &nbsp; {{ sum }}</p>
+            </div>
+          </div>
+        </div>
+        <img class="bg-card img-responsive" src="/image/discount-card.svg">
+      </div>
+    </div>
+
+
+
+  </div>
+{% else %}
+    <form action="{{ action }}" method="post" id="ajax-login-form" enctype="multipart/form-data">
+      <div class="bl-login-reg">
+
+        <div class="for-error error-warning"></div>
+
+        <div class="form-group">
+          <label class="control-label" for="login-email">{{ entry_email }}</label>
+          <input type="text" name="email" value="{{ email }}" placeholder="{{ entry_email }}" id="login-email"
+                 class="form-control"/>
+          <div class="for-error error-email"></div>
+        </div>
+        <div class="form-group">
+          <label class="control-label" for="input-password">{{ entry_password }}</label>
+          <input type="password" name="password" value="{{ password }}" placeholder="{{ entry_password }}"
+                 id="input-password" class="form-control"/>
+          <div class="for-error error-password"></div>
+        </div>
+        <a id="a-fogotten-link" class="forgotten" href="javascript:void(0);"
+           onclick="ocajaxlogin.appendFogottenForm()">{{ text_forgotten }}</a>
+
+        <div class="dflex-row-justify-between">
+          <button class="button" type="button" onclick="ocajaxlogin.loginAction(document.getElementById('login-email').value, document.getElementById('input-password').value)">
+            <span>{{ button_login }}</span>
+          </button>
+        </div>
+      </div>
+      {% if redirect %}
+        <input type="hidden" name="redirect" value="{{ redirect }}"/>
+      {% endif %}
+    </form>
+{% endif %}
+
+<script>
+  $(document).ready(function () {
+    var keycode = '';
+
+    $('#login-email').keypress(function (e) {
+      keycode = (e.keyCode ? e.keyCode : e.which);
+      if (keycode == '13') {
+        ocajaxlogin.loginAction(document.getElementById('login-email').value, document.getElementById('input-password').value);
+      }
+    });
+
+    $('#input-password').keypress(function (e) {
+      keycode = (e.keyCode ? e.keyCode : e.which);
+      if (keycode == '13') {
+        ocajaxlogin.loginAction(document.getElementById('login-email').value, document.getElementById('input-password').value);
+      }
+    });
+  });
+
+</script>
+

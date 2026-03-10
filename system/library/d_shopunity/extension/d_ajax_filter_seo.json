@@ -1,0 +1,235 @@
+{
+    "codename": "d_ajax_filter_seo",
+    "version": "1.2.5",
+    "name": "Ajax Filter SEO",
+    "description": "Ajax Filter SEO",
+    "index": "extension/module/d_ajax_filter",
+    "author": {
+        "name": "Dreamvention",
+        "email": "info@dreamvention.com",
+        "url": "https://dreamvention.com/"
+    },
+    "opencart_version": [
+        "2.0.1.0",
+        "2.0.1.1",
+        "2.0.2.0",
+        "2.0.3.1",
+        "2.1.0.1",
+        "2.1.0.2",
+        "2.2.0.0",
+        "2.3.0.0",
+        "2.3.0.1",
+        "2.3.0.2",
+        "3.0.0.0",
+        "3.0.1.1",
+        "3.0.1.2",
+        "3.0.2.0",
+        "3.0.3.1"
+    ],
+    "type": "module",
+    "license": {
+        "type": "commercial",
+        "url": "https://shopunity.net/licenses/commercial"
+    },
+    "install": {
+        "url": "extension/module/install&extension=d_ajax_filter"
+    },
+    "support": {
+        "email": "support@dreamvention.com",
+        "url": "https://dreamvention.com/support"
+    },
+    "required": {
+        "d_opencart_patch": ">= 1.0.11",
+        "d_ajax_filter": ">=2.1.5",
+        "d_seo_module": ">=3.1.2",
+        "d_cache": ">= 1.0.0",
+        "d_riot": ">= 3.5.0",
+        "d_bootstrap_rating": ">= 1.0.0",
+        "d_bootstrap_switch": ">= 3.3.5",
+        "d_bootstrap_extra": ">= 1.0.1",
+        "d_rubaxa_sortable": ">= 1.4.1",
+        "d_tinysort": ">= 2.3.7",
+        "d_twig_manager": ">= 1.5.4",
+        "d_simple_html_dom": ">= 2.0.0",
+        "d_admin_style": ">= 1.0.0"
+    },
+    "files": [
+
+        "admin/controller/extension/d_ajax_filter/attribute.php",
+        "admin/controller/extension/d_ajax_filter/option.php",
+
+        "admin/controller/extension/d_ajax_filter_module/attribute.php",
+        "admin/controller/extension/d_ajax_filter_module/ean.php",
+        "admin/controller/extension/d_ajax_filter_module/option.php",
+        "admin/controller/extension/d_ajax_filter_module/tag.php",
+
+        "admin/controller/extension/module/d_ajax_filter_seo.php",
+
+        "admin/language/en-gb/extension/d_ajax_filter/attribute.php",
+        "admin/language/en-gb/extension/d_ajax_filter/option.php",
+
+        "admin/language/english/extension/d_ajax_filter/attribute.php",
+        "admin/language/english/extension/d_ajax_filter/option.php",
+
+        "admin/language/en-gb/extension/module/d_ajax_filter_seo.php",
+
+        "admin/language/english/extension/module/d_ajax_filter_seo.php",
+
+        "admin/model/extension/d_ajax_filter/attribute.php",
+        "admin/model/extension/d_ajax_filter/option.php",
+        "admin/model/extension/d_ajax_filter_module/attribute.php",
+        "admin/model/extension/d_ajax_filter_module/ean.php",
+        "admin/model/extension/d_ajax_filter_module/option.php",
+        "admin/model/extension/d_ajax_filter_module/tag.php",
+
+        "admin/model/extension/module/d_ajax_filter_seo.php",
+
+        "admin/view/javascript/d_ajax_filter/attribute.js",
+        "admin/view/javascript/d_ajax_filter/option.js",
+
+        "admin/view/stylesheet/d_ajax_filter/attribute.css",
+        "admin/view/stylesheet/d_ajax_filter/attribute.css.map",
+        "admin/view/stylesheet/d_ajax_filter/attribute.scss",
+        "admin/view/stylesheet/d_ajax_filter/option.css",
+        "admin/view/stylesheet/d_ajax_filter/option.css.map",
+        "admin/view/stylesheet/d_ajax_filter/option.scss",
+
+        "admin/view/stylesheet/d_ajax_filter_seo.css",
+
+        "admin/view/template/extension/d_ajax_filter/layout_partial/attribute.twig",
+        "admin/view/template/extension/d_ajax_filter/layout_partial/option.twig",
+
+        "admin/view/template/extension/d_ajax_filter/attribute.twig",
+        "admin/view/template/extension/d_ajax_filter/option.twig",
+
+        "catalog/controller/extension/d_ajax_filter/attribute.php",
+        "catalog/controller/extension/d_ajax_filter/category.php",
+        "catalog/controller/extension/d_ajax_filter/ean.php",
+        "catalog/controller/extension/d_ajax_filter/manufacturer.php",
+        "catalog/controller/extension/d_ajax_filter/option.php",
+        "catalog/controller/extension/d_ajax_filter/price.php",
+        "catalog/controller/extension/d_ajax_filter/rating.php",
+        "catalog/controller/extension/d_ajax_filter/stock_status.php",
+        "catalog/controller/extension/d_ajax_filter/tag.php",
+
+        "catalog/model/extension/d_ajax_filter/attribute.php",
+        "catalog/model/extension/d_ajax_filter/category.php",
+        "catalog/model/extension/d_ajax_filter/ean.php",
+        "catalog/model/extension/d_ajax_filter/manufacturer.php",
+        "catalog/model/extension/d_ajax_filter/option.php",
+        "catalog/model/extension/d_ajax_filter/price.php",
+        "catalog/model/extension/d_ajax_filter/rating.php",
+        "catalog/model/extension/d_ajax_filter/stock_status.php",
+        "catalog/model/extension/d_ajax_filter/tag.php",
+
+        "catalog/model/extension/module/d_ajax_filter_seo.php",
+
+        "admin/controller/extension/d_seo_module/d_ajax_filter_seo.php",
+        "admin/controller/extension/d_seo_module_adviser/d_ajax_filter_seo.php",
+        "admin/controller/extension/d_seo_module_manager/d_ajax_filter_seo.php",
+        "admin/controller/extension/d_seo_module_meta/d_ajax_filter_seo.php",
+        "admin/controller/extension/d_seo_module_meta_title/d_ajax_filter_seo.php",
+        "admin/controller/extension/d_seo_module_target_keyword/d_ajax_filter_seo.php",
+        "admin/controller/extension/d_seo_module_url/d_ajax_filter_seo.php",
+        "admin/controller/extension/d_seo_module_url_keyword/d_ajax_filter_seo.php",
+        "admin/controller/extension/d_seo_module_ajax_filter/d_ajax_filter_seo.php",
+
+        "admin/language/en-gb/extension/d_seo_module/d_ajax_filter_seo.php",
+        "admin/language/en-gb/extension/d_seo_module_adviser/d_ajax_filter_seo.php",
+        "admin/language/en-gb/extension/d_seo_module_manager/d_ajax_filter_seo.php",
+        "admin/language/en-gb/extension/d_seo_module_meta/d_ajax_filter_seo.php",
+        "admin/language/en-gb/extension/d_seo_module_url/d_ajax_filter_seo.php",
+
+        "admin/language/english/extension/d_seo_module/d_ajax_filter_seo.php",
+        "admin/language/english/extension/d_seo_module_adviser/d_ajax_filter_seo.php",
+        "admin/language/english/extension/d_seo_module_manager/d_ajax_filter_seo.php",
+        "admin/language/english/extension/d_seo_module_meta/d_ajax_filter_seo.php",
+        "admin/language/english/extension/d_seo_module_url/d_ajax_filter_seo.php",
+
+        "admin/model/extension/d_seo_module/d_ajax_filter_seo.php",
+        "admin/model/extension/d_seo_module_adviser/d_ajax_filter_seo.php",
+        "admin/model/extension/d_seo_module_manager/d_ajax_filter_seo.php",
+        "admin/model/extension/d_seo_module_meta/d_ajax_filter_seo.php",
+        "admin/model/extension/d_seo_module_meta_title/d_ajax_filter_seo.php",
+        "admin/model/extension/d_seo_module_target_keyword/d_ajax_filter_seo.php",
+        "admin/model/extension/d_seo_module_url/d_ajax_filter_seo.php",
+        "admin/model/extension/d_seo_module_url_keyword/d_ajax_filter_seo.php",
+        "admin/model/extension/d_seo_module_ajax_filter/d_ajax_filter_seo.php",
+
+        "catalog/controller/extension/d_seo_module/d_ajax_filter_seo.php",
+        "catalog/controller/extension/d_seo_module_adviser/d_ajax_filter_seo.php",
+        "catalog/controller/extension/d_toolbar/d_ajax_filter_seo.php",
+
+        "catalog/language/en-gb/extension/d_seo_module_adviser/d_ajax_filter_seo.php",
+        "catalog/language/english/extension/d_seo_module_adviser/d_ajax_filter_seo.php",
+
+        "catalog/model/extension/d_seo_module/d_ajax_filter_seo.php",
+        "catalog/model/extension/d_seo_module_adviser/d_ajax_filter_seo.php",
+        "catalog/model/extension/d_toolbar/d_ajax_filter_seo.php",
+
+        "system/config/d_ajax_filter/attribute.php",
+        "system/config/d_ajax_filter/category.php",
+        "system/config/d_ajax_filter/ean.php",
+        "system/config/d_ajax_filter/manufacturer.php",
+        "system/config/d_ajax_filter/option.php",
+        "system/config/d_ajax_filter/price.php",
+        "system/config/d_ajax_filter/rating.php",
+        "system/config/d_ajax_filter/stock_status.php",
+        "system/config/d_ajax_filter/tag.php",
+
+        "system/config/d_ajax_filter_seo.php",
+
+        "system/library/d_shopunity/extension/d_ajax_filter_seo.json"
+
+    ],
+    "dirs": [
+        "admin/controller/extension/d_ajax_filter_seo",
+        "admin/language/en-gb/extension/d_ajax_filter_seo",
+        "admin/language/english/extension/d_ajax_filter_seo",
+        "admin/model/extension/d_ajax_filter_seo",
+        "admin/view/template/extension/d_ajax_filter_seo",
+        "admin/view/template/extension/d_seo_module_ajax_filter"
+    ],
+    "changelog": [
+        {
+            "version": "1.2.5",
+            "change": "Fix bug with canonical"
+        },
+        {
+            "version": "1.2.4",
+            "change": "Fix bug in attribute on layout page"
+        },
+		{
+            "version": "1.2.3",
+            "change": "1.Fix styles for visualize. 2.Update for SEO Module 3.1.2. 3. Support for OC v3.0.3.1"
+        },
+        {
+            "version": "1.2.2",
+            "change": "Fix bugs"
+        },
+        {
+            "version": "1.2.1",
+            "change": "Fix for new SEO Module"
+        },
+        {
+            "version": "1.2.0",
+            "change": "Added support for the new SEO Module"
+        },
+        {
+            "version": "1.1.0",
+            "change": "1.Added support opencart 3.x"
+        },
+        {
+            "version": "1.0.2",
+            "change": "1.Added saving of images and sequence numbers of attributes"
+        },
+        {
+            "version": "1.0.1",
+            "change": "1.Fix bugs"
+        },
+        {
+            "version": "1.0.0",
+            "change": "1.First version"
+        }
+    ]
+}

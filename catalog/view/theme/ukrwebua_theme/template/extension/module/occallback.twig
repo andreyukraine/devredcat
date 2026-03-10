@@ -1,0 +1,88 @@
+<div id="callback-container">
+  <div class="callback-top-close">
+    <h3 class="modal-title text-21 bl-bold">{{ heading_title }}</h3>
+    <img width="25px" height="25px" src="/image/close.svg" onclick='custom_callback.close()' alt="close">
+  </div>
+  <div id="call-main-block">
+    <div class="error"></div>
+    <div class="pb-4">{{ enter_text }}</div>
+    <br>
+    <form method="post" enctype="multipart/form-data" id="call-phone-form">
+      {% if occallback_data.name %}
+        <div class="form-group">
+          <label class="control-label" for="input-name">{{ enter_name }}</label>
+          <input type="text" name="name" value="{{ name }}" class="form-control" id="input-name" placeholder="{{ enter_name }}">
+          <div class="error-field error-name" style="color: red; font-size: 12px;"></div>
+        </div>
+      {% endif %}
+      {% if occallback_data.telephone %}
+        <div class="form-group">
+          <label class="control-label" for="input-telephone">{{ enter_telephone }}</label>
+          <input type="tel" name="telephone" value="{{ telephone }}" class="form-control" id="input-telephone" placeholder="{{ enter_telephone }}">
+          <div class="error-field error-telephone" style="color: red; font-size: 12px;"></div>
+        </div>
+      {% endif %}
+
+      {{ captcha }}
+
+      <input class="input-text" value="" type="hidden" name="url_page"/>
+      {% if occallback.comment %}
+        <div class="form-group">
+          <textarea name="comment" class="form-control" id="InputComment" placeholder="{{ enter_comment }}"></textarea>
+          <div class="error-field error-comment" style="color: red; font-size: 12px;"></div>
+        </div>
+      {% endif %}
+
+      <div class="action">
+        <button type="submit" class="button">{{ button_send }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  $("#input-name, #input-telephone, #InputComment").on("change paste keyup", function() {
+    $(this).removeClass('error_style');
+    $(this).next('.error-field').html(''); // Очищаємо помилку при зміні поля
+  });
+
+  $('#input-telephone').mask("{{ mask }}");
+
+  $('[name="url_page"]').val(window.location.href);
+
+  $('#call-phone-form').on('submit', function(event) {
+    event.preventDefault();
+
+    // Очищаємо всі попередні помилки
+    $('.error-field').html('');
+    $('.form-control').removeClass('error_style');
+
+    $.ajax({
+      type: 'post',
+      url: 'index.php?route=extension/module/occallback/send',
+      dataType: 'json',
+      cache: false,
+      data: $(this).serialize(),
+      success: function(json) {
+        if (json['output']) {
+          $('#call-main-block').html(json['output']);
+        } else if (json['error']) {
+          // Виводимо помилки для кожного поля
+          $.each(json['error'], function(field, errorText) {
+            const $input = $('[name="' + field + '"]');
+            $input.addClass('error_style');
+
+            // Шукаємо відповідний блок для помилки
+            const $errorField = $input.closest('.form-group').find('.error-field');
+            if ($errorField.length) {
+              $errorField.html(errorText);
+            } else {
+              // Якщо блок для помилки не знайдено (наприклад, для captcha)
+              $('.error-' + field).html(errorText);
+            }
+          });
+        }
+      }
+    });
+  });
+</script>

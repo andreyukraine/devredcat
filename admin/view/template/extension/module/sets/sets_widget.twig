@@ -1,0 +1,134 @@
+{{ header }}{{ column_left }} 
+<div id="content">
+
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button type="submit" form="form-sets" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %} 
+                <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+                {% endfor %} 
+            </ul>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        {% if (error_warning) %} 
+        <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }} 
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+        {% endif %} 
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+            </div>
+            <div class="panel-body">
+                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-sets-widget" class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>
+                        <div class="col-sm-10">
+                            <input type='text' value="{{ name }}" name="name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                        <div class="col-sm-10">
+                            <select name="status" id="input-status" class="form-control">
+                                {% if (status) %} 
+                                <option value="1" selected="selected">{{ text_enabled }}</option>
+                                <option value="0">{{ text_disabled }}</option>
+                                {% else %} 
+                                <option value="1">{{ text_enabled }}</option>
+                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                                {% endif %} 
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-status">{{ entry_products }}</label>
+                        <div class="col-sm-10">
+                            <input name="product_name" class="product_name form-control">
+                        </div>
+                    </div>
+
+                    <table class="table products table-bordered">
+                        {% if (product) %} 
+                        {% for p in product %} 
+                        <tr><td><input type="hidden" name="product[{{ p['id'] }}][id]" value="{{ p['id'] }}"><input type="hidden" name="product[{{ p['id'] }}][name]" value="{{ p['name'] }}">{{ p['name'] }}</td><td><i class="fa fa-close del_product"></i></td></tr>
+                        {% endfor %} 
+                        {% endif %} 
+                    </table>
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    $(document).ready(function () {
+        $('.product_name').autocomplete({'source': autocomplete_source,'select': autocomplete_select});
+    });
+
+    $('.products').on('click', '.del_product', function () {
+        $(this).parents('tr').remove();
+        return false;
+    });
+
+    function autocomplete_source(request, response) {
+
+
+        $.ajax({
+            url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+            dataType: 'json',
+            success: function (json) {
+                response($.map(json, function (item) {
+
+                    return {
+                        label: item['name'],
+                        value: item['product_id'],
+                        price: item['price'],
+                        option: item['option']
+                    }
+                }));
+            }
+        });
+    }
+
+    function autocomplete_select(item)
+    {
+        $(".products").append('<tr><td><input type="hidden" name="product[' + item['value'] + '][id]" value="' + item['value'] + '"><input type="hidden" name="product[' + item['value'] + '][name]" value="' + item['label'] + '">' + item['label'] + '</td><td><i class="fa fa-close del_product"></i></td></tr>')
+    }
+
+    $('.products').on('click', '.del_product', function () {
+        $(this).parents('tr').remove();
+        return false;
+    });
+
+    $('#form-sets-widget').on('click', '#add', function () {
+        var data = $('#form-sets-manage input,#form-sets-manage select,#form-sets-manage checkbox').serialize();
+
+        $.ajax({
+            url: 'index.php?route=extension/extension/module/sets_manage/add&user_token={{ user_token }}',
+            method: 'POST',
+            data: data,
+            success: function (json) {
+
+                if (json['error']) {
+                    $("#form-sets-manage .result").html('<div class=\'alert alert-danger\'>' + json['error'] + '</div>')
+                }
+
+                if (json['success']) {
+                    $("#form-sets-manage .result").html('<div class=\'alert alert-success\'>' + json['success'] + '</div>')
+                }
+            }
+        });
+
+        return false;
+    });
+</script>
+{{ footer }}

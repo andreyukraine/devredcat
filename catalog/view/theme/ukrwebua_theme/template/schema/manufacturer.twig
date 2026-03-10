@@ -1,0 +1,31 @@
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "{{ heading_title }}",
+  "itemListElement": [
+    {% for prod in products|slice(0, 3) %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "url": "{{ prod.href }}",
+      "name": "{{ prod.name }}",
+      "image": "{{ prod.thumb }}",
+      "price": "{{ prod.price | replace({'₴': ''}) | trim }}",
+      "priceCurrency": "UAH"
+    }{% if not loop.last %},{% endif %}
+  {% endfor %}
+  ],
+  {% if schema_rating_count > 0 %}
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ schema_raiting }}",
+    "bestRating": 5,
+    "worstRating": 1,
+    "ratingCount": "{{ schema_rating_count }}"
+  },
+  {% endif %}
+  "lowPrice": "{{ schema_min_price }}",
+  "highPrice": "{{ schema_max_price }}"
+}
+</script>

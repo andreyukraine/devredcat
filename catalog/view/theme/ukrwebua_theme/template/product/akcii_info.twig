@@ -1,0 +1,41 @@
+{{ header }}
+<div class="top-cat row fluid-width">
+  <div class="breadcrumbs container">
+    <h1 class="akcia-name bl-bold">{{ name }}</h1>
+    <ul class="breadcrumb">
+      {% for breadcrumb in breadcrumbs %}
+        <li><a title="{{ breadcrumb.text }}" href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+<div class="fluid-width">
+  <div id="akcia-information" class="container bl-content">
+    <div class="row">
+      {% if find %}
+      <div class="col-lg-4">
+        <img title="{{ name }}" class="img-responsive" width="{{ width }}" height="{{ height }}" src="{{ image }}" alt="{{ name }}"/>
+      </div>
+      <div class="col-lg-8">
+        <div class="desc">
+          <h2>{{ text_desc_title }}</h2>
+          <div class="text_desc">
+            {{ desc }}
+          </div>
+        </div>
+        <div class="termin">
+          {% if is_expired %}
+            {{ text_akcia_end }}
+          {% else %}
+            {{ text_termin_title }}{{ text_termin_start }} {{ date_start }} {{ text_termin_end }} {{ date_end }}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+      <p>{{ text_empty }}</p>
+    {% endif %}
+  </div>
+</div>
+</div>
+{{ footer }}

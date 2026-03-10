@@ -1,0 +1,49 @@
+<div class="menu-top-bl fluid-width">
+  <div class="menu-top-content container">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="bls-top-phones">
+          <div class="bl-top-phones-1">
+            <div class="bl-top-title"><h2 class="bl-bold">Телефони</h2></div>
+            <div class="top-phones">
+              <div><a href="tel:{{ telephone }}" target="_blank">{{ telephone }}</a></div>
+              {% if telephone_1 is not empty %}
+                <div><a href="tel:{{ telephone }}" target="_blank">{{ telephone_1 }}</a></div>
+              {% endif %}
+              {% if telephone_1 is not empty %}
+                <div><a href="tel:{{ telephone }}" target="_blank">{{ telephone_2 }}</a></div>
+              {% endif %}
+              {% if telephone_1 is not empty %}
+                <div><a href="tel:{{ telephone }}" target="_blank">{{ telephone_3 }}</a></div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="button" onclick="custom_callback.open();"><svg height="25" id="icon" viewBox="0 0 32 32" width="25" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;"><path d="M24,13H22a3.0033,3.0033,0,0,0-3-3V8A5.0057,5.0057,0,0,1,24,13Z" transform="translate(0)" style="fill: rgb(255, 255, 255);"></path><path d="M28,13H26a7.0078,7.0078,0,0,0-7-7V4A9.01,9.01,0,0,1,28,13Z" transform="translate(0)" style="fill: rgb(255, 255, 255);"></path><path d="M26,29h-.17C6.18,27.87,3.39,11.29,3,6.23A3,3,0,0,1,5.7612,3.0088Q5.88,3,6,3h5.27a2,2,0,0,1,1.86,1.26L14.65,8a2,2,0,0,1-.44,2.16l-2.13,2.15a9.36,9.36,0,0,0,7.58,7.6l2.17-2.15A2,2,0,0,1,24,17.35l3.77,1.51A2,2,0,0,1,29,20.72V26A3,3,0,0,1,26,29ZM6,5a1,1,0,0,0-1.0032.9968q0,.0417.0032.0832C5.46,12,8.41,26,25.94,27a1,1,0,0,0,1.0582-.9382Q27,26.0309,27,26V20.72l-3.77-1.51-2.87,2.85L19.88,22C11.18,20.91,10,12.21,10,12.12l-.06-.48,2.84-2.87L11.28,5Z" transform="translate(0)" style="fill: rgb(255, 255, 255);"></path><rect data-name="&lt;Transparent Rectangle&gt;" height="32" id="_Transparent_Rectangle_" width="32" class="cls-1" style="fill: none;"></rect></svg>Замовити зворотній дзвінок</div>
+
+          <div class="bl-top-phones-2">
+            <div class="bl-top-title"><span class="text-18 bl-bold">Електрона адреса</span></div>
+            <div class="top-email">
+              <div><a title="{{ email_store }}" href="mailto:{{ email_store }}">{{ email_store }}</a></div>
+            </div>
+          </div>
+          <div class="bl-top-phones-2">
+            <div class="bl-top-title"><span class="text-18 bl-bold">Наша адреса</span></div>
+            <div class="top-email">
+              <div>{{ config_address }}</a></div>
+            </div>
+          </div>
+          <div class="bl-top-phones-3">
+            <div class="bl-top-title"><span class="text-18 bl-bold">Час роботи</span></div>
+            <div class="top-open">
+              <div>{{ open|raw }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-9 col-xs-12">
+        {{ map }}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,841 @@
+<form class="form">
+  <input type="hidden" value="{{ order_id }}" name="order_id" id="order-id-{{ order_id }}">
+
+  <div id="bl-np-type-{{ order_id }}" class="bl-np-type" {% if not city_ref %} style="display:none;"{% endif %}>
+
+    <div class="tab-np-type">
+      <div class="radio {{ type == 'post' ? 'select' : '' }}">
+        <div class="line-type-np">
+          <input type="radio" name="shipping_method[{{ order_id }}][shipping_np_option]" value="post"
+                 {% if type == "post" %}checked="checked"{% endif %}
+                 onclick="handleShippingOptionChange('{{ order_id }}', 'post')"/>
+          <div class="bl-np-type-title">
+            На відділення
+          </div>
+        </div>
+        <div id="shipping-np-post-{{ order_id }}" class="shipping-np-post"
+             style="display: {% if type == 'post' %}block{% else %}none{% endif %};">
+
+          <div class="line-np-checkout">
+            <div class="line-np-input">
+              <input type="hidden" value="{{ post_ref }}" name="shipping_method[{{ order_id }}][post_ref]"
+                     id="post-ref-{{ order_id }}">
+
+              <div class="form-group">
+                <div class="inp-post">
+                  <div class="bl-save-address">
+                    {% if has_saved_post and not post_ref %}
+                      <div class="save-addresses" onclick="showSavedAddresses('{{ order_id }}', 'np_post'); return false;">
+                        Вибрати зі збережених
+                      </div>
+                    {% endif %}
+                  </div>
+                  <label class="control-label" for="np-post-{{ order_id }}">{{ input_post }}</label>
+                  <input type="text"
+                         name="shipping_method[{{ order_id }}][post]"
+                         autocomplete="off"
+                         value="{{ post }}"
+                         placeholder="{{ input_post }}"
+                         id="np-post-{{ order_id }}"
+                         oninput="inputPost('{{ order_id }}')"
+                         class="input-np-post form-control"
+                         {% if post_ref %}readonly="readonly"{% endif %}/>
+                  <img id="clear-post-{{ order_id }}" width="20px" height="20px" src="/image/close.svg" class="clear-post"
+                       style="display: {{ post_ref ? 'block' : 'none' }};" onclick="clearPost('{{ order_id }}')">
+                </div>
+                <div id="posts-{{ order_id }}" class="posts" style="display: none"></div>
+              </div>
+
+            </div>
+            <div class="line-np-map"><img width="30px" height="30px" alt="map-np" src="/image/map.svg"
+                                          title="Обрати на мапі"
+                                          onclick="showNpMap('{{ order_id }}', 'post'); return false;"></div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <div class="radio {{ type == 'postomat' ? 'select' : '' }}">
+        <div class="line-type-np">
+          <input type="radio" name="shipping_method[{{ order_id }}][shipping_np_option]" value="postomat"
+                 {% if type == "postomat" %}checked="checked"{% endif %}
+                 onclick="handleShippingOptionChange('{{ order_id }}', 'postomat')"/>
+          <div class="bl-np-type-title">
+            На поштомат
+          </div>
+        </div>
+        <div id="shipping-np-postomat-{{ order_id }}" class="shipping-np-postomat"
+             style="display: {% if type == 'postomat' %}block{% else %}none{% endif %};">
+
+          <div class="line-np-checkout">
+            <div class="line-np-input">
+              <input type="hidden" value="{{ postomat_ref }}" name="shipping_method[{{ order_id }}][postomat_ref]"
+                     id="postomat-ref-{{ order_id }}">
+              <div class="form-group">
+                <div class="inp-postomat">
+                  <div class="bl-save-address">
+                    {% if has_saved_postomat and not postomat_ref %}
+                      <div class="save-addresses" onclick="showSavedAddresses('{{ order_id }}', 'np_poshtomat'); return false;">
+                        Вибрати зі збережених
+                      </div>
+                    {% endif %}
+                  </div>
+                  <label class="control-label" for="np-postomat-{{ order_id }}">Виберіть номер або адресу поштомату</label>
+                  <input type="text"
+                         name="shipping_method[{{ order_id }}][postomat]"
+                         autocomplete="off"
+                         value="{{ postomat }}"
+                         placeholder="Виберіть номер або адресу поштомату"
+                         id="np-postomat-{{ order_id }}"
+                         oninput="inputPostomat('{{ order_id }}')"
+                         class="input-np-postomat form-control"
+                         {% if postomat_ref %}readonly="readonly"{% endif %}/>
+
+                  <img id="clear-postomat-{{ order_id }}" width="20px" height="20px" src="/image/close.svg" class="clear-postomat" style="display: {{ postomat_ref ? 'block' : 'none' }};" onclick="clearPostomat('{{ order_id }}')">
+                </div>
+                <div id="postomats-{{ order_id }}" class="postomats" style="display: none"></div>
+              </div>
+            </div>
+            <div class="line-np-map"><img width="30px" height="30px" alt="map-np" src="/image/map.svg"
+                                          title="Обрати на мапі"
+                                          onclick="showNpMap('{{ order_id }}', 'poshtomat'); return false;"></div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="radio {{ type == 'address' ? 'select' : '' }}">
+        <div class="line-type-np">
+          <div>
+            <input type="radio" name="shipping_method[{{ order_id }}][shipping_np_option]" value="address"
+                   {% if type == "address" %}checked="checked"{% endif %}
+                   onclick="handleShippingOptionChange('{{ order_id }}', 'address')"/>
+          </div>
+          <div class="bl-np-type-title" onclick="handleShippingOptionChange('{{ order_id }}', 'address')">На адресу
+          </div>
+        </div>
+        <div id="shipping-np-address-{{ order_id }}" class="shipping-np-address"
+             style="display: {% if type == 'address' %}block{% else %}none{% endif %};">
+
+          <input type="hidden" value="{{ address_ref }}" name="shipping_method[{{ order_id }}][address_ref]"
+                 id="address-ref-{{ order_id }}">
+
+
+          <div class="form-group">
+            <div class="inp-addresses">
+              <div class="bl-save-address">
+                {% if has_saved_address and not address_ref %}
+                  <div class="save-addresses" onclick="showSavedAddresses('{{ order_id }}', 'np_dveri'); return false;">
+                    Вибрати зі збережених
+                  </div>
+                {% endif %}
+              </div>
+              <label class="control-label" for="np-address-{{ order_id }}">{{ input_address }}</label>
+              <input type="text"
+                     name="shipping_method[{{ order_id }}][address]"
+                     autocomplete="off"
+                     value="{{ address }}"
+                     placeholder="{{ input_address }}"
+                     id="np-address-{{ order_id }}"
+                     oninput="inputAddress('{{ order_id }}')"
+                     class="input-np-address form-control"
+                     {% if address_ref %}readonly="readonly"{% endif %}/>
+
+              <img id="clear-address-{{ order_id }}" width="20px" height="20px" src="/image/close.svg" class="clear-address"
+                   style="display: {{ address_ref ? 'block' : 'none' }};" onclick="clearAddress('{{ order_id }}')"/>
+            </div>
+            <div id="addresses-{{ order_id }}" class="addresses" style="display: none"></div>
+          </div>
+
+
+          <div class="address_param">
+            <div class="bl-address-param form-group">
+              <label class="control-label" for="address-house-{{ order_id }}">{{ input_house }}</label>
+              <input type="text" class="form-control" name="shipping_method[{{ order_id }}][address_house]"
+                     value="{{ address_house }}" id="address-house-{{ order_id }}" placeholder="{{ input_house }}"
+                     oninput="inputHouse('{{ order_id }}')">
+            </div>
+            <div class="bl-address-param form-group">
+              <label class="control-label" for="address-apartment-{{ order_id }}">{{ input_apartment }}</label>
+              <input type="text" class="form-control" name="shipping_method[{{ order_id }}][address_apartment]"
+                     value="{{ address_apartment }}" id="address-apartment-{{ order_id }}"
+                     placeholder="{{ input_apartment }}" oninput="inputApartment('{{ order_id }}')">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="np-recipient-fields">
+      <div class="recipient-toggle bl-bold">
+        <a href="javascript:void(0);" onclick="toggleRecipient('{{ order_id }}')">Отримувач (якщо відрізняється)</a>
+      </div>
+      <div id="recipient-container-{{ order_id }}" class="bl-recipient-container"
+           style="display: {{ (np_customer_lastname or np_customer_name or np_customer_phone) ? 'block' : 'none' }};">
+        <div class="row" style="margin-left: -5px; margin-right: -5px;">
+          <div class="col-sm-4" style="padding-left: 5px; padding-right: 5px;">
+            <div class="form-group" style="margin-bottom: 10px; margin-left: 0; margin-right: 0;">
+              <label class="control-label">Прізвище</label>
+              <input type="text" name="shipping_method[{{ order_id }}][np_customer_lastname]"
+                     value="{{ np_customer_lastname }}" placeholder="Прізвище" class="form-control"
+                     oninput="custom_block.debounceSaveShipping('{{ order_id }}')">
+            </div>
+          </div>
+          <div class="col-sm-4" style="padding-left: 5px; padding-right: 5px;">
+            <div class="form-group" style="margin-bottom: 10px; margin-left: 0; margin-right: 0;">
+              <label class="control-label">Ім'я</label>
+              <input type="text" name="shipping_method[{{ order_id }}][np_customer_name]" value="{{ np_customer_name }}"
+                     placeholder="Ім'я" class="form-control"
+                     oninput="custom_block.debounceSaveShipping('{{ order_id }}')">
+            </div>
+          </div>
+          <div class="col-sm-4" style="padding-left: 5px; padding-right: 5px;">
+            <div class="form-group" style="margin-bottom: 10px; margin-left: 0; margin-right: 0;">
+              <label class="control-label">Телефон</label>
+              <input type="text" name="shipping_method[{{ order_id }}][np_customer_phone]"
+                     value="{{ np_customer_phone }}" placeholder="Телефон" class="form-control"
+                     id="np-customer-phone-{{ order_id }}"
+                     oninput="custom_block.debounceSaveShipping('{{ order_id }}')">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="address-comment-wrapper bl-bold">
+      <div class="title-address-comment">
+        <a href="javascript:void(0);" onclick="toggleAddressComment(this);">Додати коментар до адреси</a>
+      </div>
+      <div class="address-comment-textarea" style="display: {{ comment ? 'block' : 'none' }};">
+        <div class="form-group">
+          <label class="control-label" for="address-comment-{{ order_id }}">Додатковий коментар по адресі доставки</label>
+          <textarea id="address-comment-{{ order_id }}" name="shipping_method[{{ order_id }}][comment]" class="form-control" rows="1" placeholder="" oninput="custom_block.debounceSaveShipping('{{ order_id }}')">{{ comment }}</textarea>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</form>
+
+<script>
+
+  /**
+   * Фіксація введення номера будинку
+   */
+  function inputHouse(order_id) {
+    custom_block.debounceSaveShipping(order_id);
+  }
+
+  /**
+   * Фіксація введення номера квартири
+   */
+  function inputApartment(order_id) {
+    custom_block.debounceSaveShipping(order_id);
+  }
+
+  /**
+   * Пошук відділень Нової Пошти
+   */
+  function inputPost(order_id) {
+    var inputPost = $('#np-post-' + order_id);
+    var postRef = $('#post-ref-' + order_id);
+    var cityRef = $('#city-ref-' + order_id);
+    var resultPost = $('#posts-' + order_id);
+
+    if (inputPost.val().length > 0) {
+      $('#clear-post-' + order_id).show();
+    } else {
+      $('#clear-post-' + order_id).hide();
+      postRef.val("");
+    }
+
+    clearTimeout(postInputTimer);
+    var query = inputPost.val().trim();
+
+    if (query.length === 0) {
+      resultPost.hide();
+      return;
+    }
+
+    postInputTimer = setTimeout(function () {
+      $.ajax({
+        url: 'index.php?route=extension/shipping/np',
+        type: 'post',
+        data: '&event=post&ref=' + cityRef.val() + '&q=' + query,
+        dataType: 'json',
+        beforeSend: function () {
+          resultPost.show().css({
+            'position': 'absolute',
+            'z-index': '999',
+            'width': inputPost.outerWidth() + 'px',
+            'background': '#fff',
+            'border': '1px solid #ccc',
+            'overflow-y': 'auto',
+            'max-height': '230px',
+            'border-radius': '0px 0px 4px 4px'
+          }).html('<div class="loading" style="padding: 5px 10px;"><i class="fa fa-spinner fa-spin"></i> Пошук...</div>');
+        },
+        success: function (json) {
+          resultPost.show().html("");
+
+          $.each(json, function (index, post) {
+            if (post['ref'] !== '-') {
+              $('<div></div>', {
+                'id': post['id'],
+                'class': 'row_item',
+                'text': post['desc'],
+                'data-name': post['desc'],
+                'data-ref': post['ref']
+              }).appendTo(resultPost).on('click', function () {
+                resultPost.hide().html('');
+                inputPost.val(this.dataset.name).attr('readonly', true);
+                postRef.val(this.dataset.ref);
+                $('#clear-post-' + order_id).show();
+                if (typeof custom_block !== 'undefined' && typeof custom_block.updateShipping === 'function') {
+                  custom_block.updateShipping(order_id);
+                }
+              });
+            } else {
+              $('<div></div>', {
+                'class': 'row_item disabled',
+                'text': post['desc'],
+                'css': {'color': '#999', 'cursor': 'not-allowed'}
+              }).appendTo(resultPost);
+            }
+          });
+        }
+      });
+    }, 300);
+  }
+
+  /**
+   * Пошук адрес Нової Пошти
+   */
+  function inputAddress(order_id) {
+    var inputAddress = $('#np-address-' + order_id);
+    var addressesRef = $('#address-ref-' + order_id);
+    var cityRef = $('#city-ref-' + order_id);
+    var resultAddress = $('#addresses-' + order_id);
+
+    if (inputAddress.val().length > 0) {
+      $('#clear-address-' + order_id).show();
+    } else {
+      $('#clear-address-' + order_id).hide();
+      addressesRef.val("");
+    }
+
+    clearTimeout(postInputTimer);
+    var query = inputAddress.val().trim();
+
+    if (query.length === 0) {
+      resultAddress.hide();
+      return;
+    }
+
+    postInputTimer = setTimeout(function () {
+      $.ajax({
+        url: 'index.php?route=extension/shipping/np',
+        type: 'post',
+        data: '&event=address&ref=' + cityRef.val() + '&q=' + query,
+        dataType: 'json',
+        beforeSend: function () {
+          resultAddress.show().css({
+            'position': 'absolute',
+            'z-index': '999',
+            'width': inputAddress.outerWidth() + 'px',
+            'background': '#fff',
+            'border': '1px solid #ccc',
+            'overflow-y': 'auto',
+            'max-height': '230px',
+            'border-radius': '0px 0px 4px 4px'
+          }).html('<div class="loading" style="padding: 5px 10px;"><i class="fa fa-spinner fa-spin"></i> Пошук...</div>');
+        },
+        success: function (json) {
+          resultAddress.show().html("");
+
+          $.each(json, function (index, post) {
+            if (post['ref'] !== '-') {
+              $('<div></div>', {
+                'id': post['id'],
+                'class': 'row_item',
+                'text': post['desc'],
+                'data-name': post['desc'],
+                'data-ref': post['ref']
+              }).appendTo(resultAddress).on('click', function () {
+                resultAddress.hide().html('');
+                inputAddress.val(this.dataset.name).attr('readonly', true);
+                addressesRef.val(this.dataset.ref);
+                $('#clear-address-' + order_id).show();
+                if (typeof custom_block !== 'undefined' && typeof custom_block.updateShipping === 'function') {
+                  custom_block.updateShipping(order_id);
+                }
+              });
+            } else {
+              $('<div></div>', {
+                'class': 'row_item disabled',
+                'text': post['desc'],
+                'css': {'color': '#999', 'cursor': 'not-allowed'}
+              }).appendTo(resultAddress);
+            }
+          });
+        }
+      });
+    }, 300);
+  }
+
+  /**
+   * Очищення вибору відділення
+   */
+  function clearPost(order_id, skipUpdate) {
+    $('#np-post-' + order_id).val("").attr('readonly', false);
+    $('#post-ref-' + order_id).val("");
+    $('#posts-' + order_id).hide();
+    $('#clear-post-' + order_id).hide();
+
+    if (!skipUpdate && typeof custom_block !== 'undefined' && typeof custom_block.updateShipping === 'function') {
+      return custom_block.updateShipping(order_id);
+    }
+    return (typeof $ !== 'undefined' && $.when) ? $.when() : Promise.resolve();
+  }
+
+  /**
+   * Пошук поштоматів Нової Пошти
+   */
+  function inputPostomat(order_id) {
+    var inputPostomat = $('#np-postomat-' + order_id);
+    var postomatRef = $('#postomat-ref-' + order_id);
+    var cityRef = $('#city-ref-' + order_id);
+    var resultPostomat = $('#postomats-' + order_id);
+
+    if (inputPostomat.val().length > 0) {
+      $('#clear-postomat-' + order_id).show();
+    } else {
+      $('#clear-postomat-' + order_id).hide();
+      postomatRef.val("");
+    }
+
+    clearTimeout(postInputTimer);
+    var query = inputPostomat.val().trim();
+
+    if (query.length === 0) {
+      resultPostomat.hide();
+      return;
+    }
+
+    postInputTimer = setTimeout(function () {
+      $.ajax({
+        url: 'index.php?route=extension/shipping/np',
+        type: 'post',
+        data: '&event=poshtomat&ref=' + cityRef.val() + '&q=' + query,
+        dataType: 'json',
+        beforeSend: function () {
+          resultPostomat.show().css({
+            'position': 'absolute',
+            'z-index': '999',
+            'width': inputPostomat.outerWidth() + 'px',
+            'background': '#fff',
+            'border': '1px solid #ccc',
+            'overflow-y': 'auto',
+            'max-height': '230px',
+            'border-radius': '0px 0px 4px 4px'
+          }).html('<div class="loading" style="padding: 5px 10px;"><i class="fa fa-spinner fa-spin"></i> Пошук...</div>');
+        },
+        success: function (json) {
+          resultPostomat.show().html("");
+
+          $.each(json, function (index, post) {
+            if (post['ref'] !== '-') {
+              $('<div></div>', {
+                'id': post['id'],
+                'class': 'row_item',
+                'text': post['desc'],
+                'data-name': post['desc'],
+                'data-ref': post['ref']
+              }).appendTo(resultPostomat).on('click', function () {
+                resultPostomat.hide().html('');
+                inputPostomat.val(this.dataset.name).attr('readonly', true);
+                postomatRef.val(this.dataset.ref);
+                $('#clear-postomat-' + order_id).show();
+                if (typeof custom_block !== 'undefined' && typeof custom_block.updateShipping === 'function') {
+                  custom_block.updateShipping(order_id);
+                }
+              });
+            } else {
+              $('<div></div>', {
+                'class': 'row_item disabled',
+                'text': post['desc'],
+                'css': {'color': '#999', 'cursor': 'not-allowed'}
+              }).appendTo(resultPostomat);
+            }
+          });
+        }
+      });
+    }, 300);
+  }
+
+  /**
+   * Очищення вибору поштомату
+   */
+  function clearPostomat(order_id, skipUpdate) {
+    $('#np-postomat-' + order_id).val("").attr('readonly', false);
+    $('#postomat-ref-' + order_id).val("");
+    $('#postomats-' + order_id).hide();
+    $('#clear-postomat-' + order_id).hide();
+
+    if (!skipUpdate && typeof custom_block !== 'undefined' && typeof custom_block.updateShipping === 'function') {
+      return custom_block.updateShipping(order_id);
+    }
+    return (typeof $ !== 'undefined' && $.when) ? $.when() : Promise.resolve();
+  }
+
+  /**
+   * Очищення вибору адреси
+   */
+  function clearAddress(order_id, skipUpdate) {
+    $('#np-address-' + order_id).val("").attr('readonly', false);
+    $('#address-ref-' + order_id).val("");
+    $('#address-house-' + order_id).val("");
+    $('#address-apartment-' + order_id).val("");
+    $('#addresses-' + order_id).hide();
+    $('#clear-address-' + order_id).hide();
+
+    if (!skipUpdate && typeof custom_block !== 'undefined' && typeof custom_block.updateShipping === 'function') {
+      return custom_block.updateShipping(order_id);
+    }
+    return (typeof $ !== 'undefined' && $.when) ? $.when() : Promise.resolve();
+  }
+
+  /**
+   * Очищення полів отримувача
+   */
+  function clearRecipient(order_id) {
+    $('[name="shipping_method[' + order_id + '][np_customer_lastname]"]').val('');
+    $('[name="shipping_method[' + order_id + '][np_customer_name]"]').val('');
+    $('[name="shipping_method[' + order_id + '][np_customer_phone]"]').val('');
+    $('#recipient-container-' + order_id).hide();
+  }
+
+  /**
+   * Перемикання відображення полів отримувача
+   */
+  function toggleRecipient(order_id) {
+    $('#recipient-container-' + order_id).toggle();
+  }
+
+  /**
+   * Оновлення інформації про безкоштовну доставку у батьківському блоці
+   */
+  function updateNpFreeCost(order_id, option) {
+    var $priceInfo = $('input[name="shipping_method[' + order_id + '][shipping_np_option]"][value="' + option + '"]').closest('.line-type-np').find('.np-price-info');
+    if ($priceInfo.length) {
+      var html = $priceInfo.html();
+      $('#shipping-options-np-' + order_id).closest('.radio-shipping-method').find('.free-cost').html(html);
+    }
+  }
+
+  /**
+   * Вибір типу опції доставки (відділення, адреса)
+   */
+  function handleShippingOptionChange(order_id, option) {
+    $('.alert, .text-danger, .custom-text-danger').not('.shipping-method-error').remove();
+    $('.has-error').removeClass('has-error');
+    clearRecipient(order_id);
+
+    // Update 'select' class on radio containers for NP options
+    $('#bl-np-type-' + order_id + ' .radio').removeClass('select');
+    $('#bl-np-type-' + order_id + ' .np-price-info').removeClass('select');
+
+    var $selectedRadio = $('input[name="shipping_method[' + order_id + '][shipping_np_option]"][value="' + option + '"]').closest('.radio');
+    $selectedRadio.addClass('select');
+    $selectedRadio.find('.np-price-info').addClass('select');
+
+    updateNpFreeCost(order_id, option);
+
+    // Hide all map buttons first
+    $('#bl-np-type-' + order_id + ' .show-map').hide();
+
+    if (option === 'post') {
+      $('#shipping-np-post-' + order_id).show();
+      $selectedRadio.find('.show-map').show();
+      $('#shipping-np-address-' + order_id).hide();
+      $('#shipping-np-postomat-' + order_id).hide();
+      clearAddress(order_id, true);
+      clearPostomat(order_id, true);
+    } else if (option === 'address') {
+      $('#shipping-np-post-' + order_id).hide();
+      $('#shipping-np-address-' + order_id).show();
+      $('#shipping-np-postomat-' + order_id).hide();
+      clearPost(order_id, true);
+      clearPostomat(order_id, true);
+    } else if (option === 'postomat') {
+      $('#shipping-np-post-' + order_id).hide();
+      $('#shipping-np-address-' + order_id).hide();
+      $('#shipping-np-postomat-' + order_id).show();
+      $selectedRadio.find('.show-map').show();
+      clearPost(order_id, true);
+      clearAddress(order_id, true);
+    }
+
+    // Збереження вибору на сервері
+    if (typeof custom_block !== 'undefined' && typeof custom_block.updateShipping === 'function') {
+      custom_block.updateShipping(order_id).then(function () {
+        if (typeof custom_block.update_option === 'function') {
+          return custom_block.update_option(order_id, option);
+        }
+      }).then(function () {
+        // Після оновлення опції перемальовуємо блоки
+        custom_block.render_order('shipping', order_id);
+        custom_block.render('total');
+        custom_block.render('button');
+      }).catch(function (err) {
+        console.warn('Shipping option update error:', err);
+        // Навіть у разі помилки пробуємо перемалювати блоки, щоб інтерфейс не "зависав"
+        custom_block.render_order('shipping', order_id);
+        custom_block.render('total');
+      });
+    }
+  }
+
+  /**
+   * Відображення модального вікна зі збереженими адресами Нової Пошти
+   */
+  window.showSavedAddresses = function (order_id, type) {
+    var city_ref = $('#city-ref-' + order_id).val();
+    var city_name = $('#np-city-' + order_id).val();
+    $.ajax({
+      url: 'index.php?route=extension/module/custom/shipping/getSavedAddresses',
+      type: 'post',
+      data: {
+        order_id: order_id,
+        type: type,
+        city_ref: city_ref,
+        city_name: city_name
+      },
+      dataType: 'json',
+      success: function (json) {
+        if (json['html']) {
+          $('#modal-np-addresses').remove();
+          $('body').append(json['html']);
+          $('#modal-np-addresses').modal('show');
+          document.body.classList.add('body-no-scroll');
+          $('#modal-np-addresses').on('hidden.bs.modal', function () {
+            document.body.classList.remove('body-no-scroll');
+          });
+        } else if (json['error']) {
+          alert(json['error']);
+        }
+      }
+    });
+  };
+
+  window.selectNpAddress = function (order_id, address) {
+    if (typeof event !== 'undefined' && event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    $('#modal-np-addresses').modal('hide');
+
+    clearRecipient(order_id);
+
+    // Fill common fields (Recipient)
+    if (address.np_customer_name) $('[name="shipping_method[' + order_id + '][np_customer_name]"]').val(address.np_customer_name);
+    if (address.np_customer_lastname) $('[name="shipping_method[' + order_id + '][np_customer_lastname]"]').val(address.np_customer_lastname);
+    if (address.np_customer_phone) {
+      var phone = address.np_customer_phone.replace(/\D/g, '');
+      if (phone.length === 12 && phone.indexOf('380') === 0) {
+        phone = phone.substring(2);
+      } else if (phone.length === 11 && phone.indexOf('80') === 0) {
+        phone = phone.substring(1);
+      }
+      $('[name="shipping_method[' + order_id + '][np_customer_phone]"]').val(phone).trigger('input');
+    }
+
+    if (address.np_customer_name || address.np_customer_lastname || address.np_customer_phone) {
+      $('#recipient-container-' + order_id).show();
+    } else {
+      $('#recipient-container-' + order_id).hide();
+    }
+
+    // Fill comment
+    if (address.comment) {
+      $('[name="shipping_method[' + order_id + '][comment]"]').val(address.comment);
+      $('[name="shipping_method[' + order_id + '][comment]"]').closest('.address-comment-textarea').show();
+      $('[name="shipping_method[' + order_id + '][comment]"]').parent().show();
+    } else {
+      $('[name="shipping_method[' + order_id + '][comment]"]').val('');
+      $('[name="shipping_method[' + order_id + '][comment]"]').closest('.address-comment-textarea').hide();
+      $('[name="shipping_method[' + order_id + '][comment]"]').parent().hide();
+    }
+
+    if (address.type === 'np_post') {
+      $('#np-post-' + order_id).val(address.np_post_name).attr('readonly', true);
+      $('#post-ref-' + order_id).val(address.np_post_id);
+      $('#clear-post-' + order_id).show();
+    } else if (address.type === 'np_poshtomat') {
+      $('#np-postomat-' + order_id).val(address.np_post_name).attr('readonly', true);
+      $('#postomat-ref-' + order_id).val(address.np_post_id);
+      $('#clear-postomat-' + order_id).show();
+    } else if (address.type === 'np_dveri') {
+      $('#np-address-' + order_id).val(address.np_street_name).attr('readonly', true);
+      $('#address-ref-' + order_id).val(address.np_street_id);
+      $('#address-house-' + order_id).val(address.np_house);
+      $('#address-apartment-' + order_id).val(address.np_apartment);
+      $('#clear-address-' + order_id).show();
+    }
+
+    if (typeof custom_block !== 'undefined' && typeof custom_block.updateShipping === 'function') {
+      custom_block.updateShipping(order_id).then(function () {
+        custom_block.render_order('shipping', order_id);
+      });
+    }
+  };
+
+  {% if mask %}
+  $('#np-customer-phone-{{ order_id }}').mask("{{ mask }}");
+  {% endif %}
+
+  $(document).ready(function () {
+    var initialOption = $('input[name="shipping_method[{{ order_id }}][shipping_np_option]"]:checked').val();
+    if (initialOption) {
+      updateNpFreeCost('{{ order_id }}', initialOption);
+    }
+
+    $('#modal-np-map').on('hidden.bs.modal', function () {
+      document.body.classList.remove('body-no-scroll');
+    });
+  });
+
+</script>
+
+
+<script>
+  var npMap;
+  var npMarkers = [];
+  var googleMapsLoading = false;
+
+  function loadGoogleMaps(callback) {
+    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
+      callback();
+      return;
+    }
+    if (googleMapsLoading) {
+      var checkLoaded = setInterval(function () {
+        if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
+          clearInterval(checkLoaded);
+          callback();
+        }
+      }, 100);
+      return;
+    }
+    googleMapsLoading = true;
+    var script = document.createElement('script');
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDOByDDJtXvfnZt-rXbnpeG6KTR3BMusRc&libraries=places&language=uk';
+    script.async = true;
+    script.defer = true;
+    script.onload = callback;
+    document.head.appendChild(script);
+  }
+
+  window.showNpMap = function (order_id, type) {
+    var city_ref = $('#city-ref-' + order_id).val();
+    if (!city_ref) {
+      alert('Будь ласка, спочатку оберіть місто');
+      return;
+    }
+
+    $('#modal-np-map').modal('show');
+    $('#np-map-loading').show();
+
+    loadGoogleMaps(function () {
+      if (!npMap) {
+        npMap = new google.maps.Map(document.getElementById('np-map-container'), {
+          zoom: 12,
+          center: {lat: 50.4501, lng: 30.5234} // Center on Kiev by default
+        });
+      }
+
+      // Clear markers
+      for (var i = 0; i < npMarkers.length; i++) {
+        npMarkers[i].setMap(null);
+      }
+      npMarkers = [];
+
+      $.ajax({
+        url: 'index.php?route=extension/shipping/np',
+        type: 'post',
+        data: {
+          event: type,
+          ref: city_ref,
+          q: ''
+        },
+        dataType: 'json',
+        beforeSend: function () {
+          document.body.classList.add('body-no-scroll');
+        },
+        success: function (json) {
+          $('#np-map-loading').hide();
+          var bounds = new google.maps.LatLngBounds();
+          var hasValidCoords = false;
+
+          $.each(json, function (index, item) {
+            if (item.lat && item.lon && item.ref !== '-') {
+              var pos = {lat: parseFloat(item.lat), lng: parseFloat(item.lon)};
+              var marker = new google.maps.Marker({
+                position: pos,
+                map: npMap,
+                title: item.desc
+              });
+
+              var infowindow = new google.maps.InfoWindow({
+                content: '<div style="padding: 10px;">' +
+                  '<strong>' + item.desc + '</strong><br><br>' +
+                  '<button class="btn btn-primary btn-sm" onclick="selectNpFromMap(\'' + order_id + '\', \'' + type + '\', \'' + item.ref + '\', \'' + item.desc.replace(/'/g, "\\'").replace(/"/g, '&quot;') + '\')">Вибрати</button>' +
+                  '</div>'
+              });
+
+              marker.addListener('click', function () {
+                infowindow.open(npMap, marker);
+              });
+
+              npMarkers.push(marker);
+              bounds.extend(pos);
+              hasValidCoords = true;
+            }
+          });
+
+          if (hasValidCoords) {
+            npMap.fitBounds(bounds);
+          }
+        },
+        error: function () {
+          $('#np-map-loading').hide();
+          document.body.classList.remove('body-no-scroll');
+          alert('Помилка завантаження даних');
+        }
+      });
+    });
+  };
+
+  window.selectNpFromMap = function (order_id, type, ref, desc) {
+    if (type === 'post') {
+      $('#np-post-' + order_id).val(desc).attr('readonly', true);
+      $('#post-ref-' + order_id).val(ref);
+      $('#clear-post-' + order_id).show();
+    } else {
+      $('#np-postomat-' + order_id).val(desc).attr('readonly', true);
+      $('#postomat-ref-' + order_id).val(ref);
+      $('#clear-postomat-' + order_id).show();
+    }
+
+    $('#modal-np-map').modal('hide');
+
+    if (typeof custom_block !== 'undefined' && typeof custom_block.updateShipping === 'function') {
+      custom_block.updateShipping(order_id).then(function () {
+        custom_block.render_order('shipping', order_id);
+      });
+    }
+  };
+</script>

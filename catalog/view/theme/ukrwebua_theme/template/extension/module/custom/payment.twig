@@ -1,0 +1,54 @@
+<div class="block-order-model bl-custom-order" id="payment-{{ order_id }}" {% if not city_ref %}style="display:none;"{% endif %}>
+  <div class="text-21 bl-bold">{{ heading_payment }}</div>
+  <br>
+  {% if (error_warning) %}
+    <div class="alert alert-warning"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}</div>
+  {% endif %}
+
+  <div>
+    {% if (payment_methods) %}
+      <div id="custom-payment-methods-{{ order_id }}" class="bl-payment-methods">
+        {% for code, payment_method in payment_methods %}
+          <div class="radio-payment-method {{ payment_method.default ? 'select' : '' }}">
+            <div class="payment-row">
+              {% if payment_method.default %}
+                <input type="radio" name="payment_method[{{ order_id }}][code]" data-order="{{ order_id }}"
+                       value="{{ code }}" checked="checked"
+                       onclick="handlePaymentMethodChange('{{ code }}', '{{ order_id }}')"/>
+              {% else %}
+                <input type="radio" name="payment_method[{{ order_id }}][code]" data-order="{{ order_id }}"
+                       value="{{ code }}" onclick="handlePaymentMethodChange('{{ code }}', '{{ order_id }}')"/>
+              {% endif %}
+              <div class="bl-checkout-desc">
+                  <span class="title-payment text-18 bl-bold">
+                    <div class="bl-payment-method-title">
+                    {{ payment_method['title'][lang]['title'] }}
+
+                    {% if payment_method['descs'][lang]['desc'] is not empty %}
+                      <div class="desc">{{ payment_method['descs'][lang]['desc'] }}</div>
+                      </div>
+                    {% endif %}
+                  </span>
+
+
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    function handlePaymentMethodChange(code, order_id) {
+      $('.alert, .text-danger').remove();
+      $('.has-error').removeClass('has-error');
+
+      // Update 'select' class on radio containers for payment
+      $('#custom-payment-methods-' + order_id + ' .radio-payment-method').removeClass('select');
+      $('input[name="payment_method[' + order_id + '][code]"][value="' + code + '"]').closest('.radio-payment-method').addClass('select');
+
+      custom_block.payment(code, order_id);
+    }
+  </script>
+</div>

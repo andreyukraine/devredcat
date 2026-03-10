@@ -1,0 +1,30 @@
+<div class="bl-blog-category">
+  {% for category in categories %}
+    {% if category.blog_category_id == blog_category_id %}
+      <div class="name-cat-menu bl-blog-item text-18 bl-bold">
+        <div><a title="{{ category.name }}" href="{{ category.href }}" class="active">{{ category.name }}</a></div>
+        <span class="count-prod-menu" style="background-color: #f6f7f7">{{ category.count }}</span>
+      </div>
+      {% if category.children %}
+        {% for child in category.children %}
+          {% if child.blog_category_id == child_id %}
+            <div class="name-cat-menu bl-blog-item">
+              <div><a title="{{ child.name }}" href="{{ child.href }}" class="active">{{ child.name }}</a></div>
+              <span class="count-prod-menu" style="background-color: #f6f7f7">{{ child.count }}</span>
+            </div>
+          {% else %}
+            <div class="name-cat-menu bl-blog-item">
+              <div><a title="{{ child.name }}" href="{{ child.href }}" class="">{{ child.name }}</a></div>
+              <span class="count-prod-menu" style="background-color: #f6f7f7">{{ child.count }}</span>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% else %}
+      <div class="name-cat-menu bl-blog-item text-18 bl-bold">
+        <div><a title="{{ category.name }}" href="{{ category.href }}" class="">{{ category.name }}</a></div>
+        <span class="count-prod-menu" style="background-color: #f6f7f7">{{ category.count }}</span>
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>

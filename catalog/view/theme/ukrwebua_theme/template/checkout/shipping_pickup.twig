@@ -1,0 +1,30 @@
+<div id="popup-pickup" class="modal-dialog modal-dialog-centered">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">
+        <h3 class="bl-bold">{{ title_pickup_warehouse }}</h3>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="bl-dialog-warehouses">
+        {% for warehouse in warehouses %}
+          <div class="row contact-store-line{% if pickup-id > 0 %} select{% endif %}">
+            <div class="col-sm-3">
+              <img src="{{ warehouse.image }}" alt="{{ warehouse.address }}" title="{{ warehouse.address }}" class="img-thumbnail">
+            </div>
+            <div class="col-sm-9">
+              <strong id="warehouse-id" data-id="{{ warehouse.warehouse_id }}">{{ warehouse.address }}</strong>
+              {% if warehouse.working_hours is not empty %}
+                <br>
+                <strong>{{ title_working_hours_warehouse }}</strong>
+                {{ warehouse.working_hours|raw }}
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+

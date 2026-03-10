@@ -1,0 +1,84 @@
+<div class="menu-fix-top-line menu-fix-list">
+  <ul class="list-group">
+    {% for category in categories %}
+      <li class="menu-item {% if category.children %}has-child{% endif %}" data-index="{{ category.id }}">
+        <div class="name-cat-menu text-18 bl-bold">
+          <a title="{{ category.name }}" href="{{ category.href }}" class="bl-bold">{{ category.name }}</a>
+          <span class="count-prod-menu{% if not category.children %}-notsub{% endif %}" style="background-color: {{ category.color }}">{{ category.count }}</span>
+        </div>
+        {% if category.children %}
+          <span class="open-submenu" data-index="{{ category.id }}"></span>
+        {% endif %}
+      </li>
+    {% endfor %}
+
+    {% if manufacturer_total or discont_total %}
+      <li class="dop-menu visible-xs">
+        <ul class="list-unstyled">
+          <li class="menu-item has-child" data-index="6060">
+            <div class="name-cat-menu text-18 bl-bold">
+              <a title="Бренди" href="/brands">
+                <div class="menu-disconts">
+                  <div><img width="30px" height="30px" src="/image/brands.svg" alt="Бренди"></div>
+                  <div>Бренди</div>
+                </div>
+              </a>
+              <a title="Бренди" href="/brands" class="bl-bold"><span class="count-prod-menu">{{ manufacturer_total }}</span></a>
+            </div>
+            <a title="Бренди" href="/brands" class="bl-bold"><span class="open-submenu"></span></a>
+          </li>
+          <li class="menu-item has-child" data-index="6060">
+            <div class="name-cat-menu text-18 bl-bold">
+              <a title="Акції" href="/discont">
+                <div class="menu-disconts">
+                  <div><img width="30px" height="30px" alt="Акції" src="/image/sales.svg"></div>
+                  <div>Товари зі знижками</div>
+                </div>
+              </a>
+              <a title="Акції" href="/discont" class="bl-bold"><span class="count-prod-menu">{{ discont_total }}</span></a>
+            </div>
+            <a title="Акції" href="/discont" class="bl-bold"><span class="open-submenu"></span></a>
+          </li>
+        </ul>
+      </li>
+    {% endif %}
+
+  </ul>
+</div>
+<div class="minimalist-tab" style="position: relative; height: 100%;">
+  {% for category in categories %}
+    {% if category.children %}
+      <div class="minimalist-tab-content" data-index="{{ category.id }}" data-parent-index="root" data-title="{{ category.name }}">
+        <div class="menu-dropdown">
+          {% for child in category.children %}
+            <div class="dropdown-item">
+              <div class="name-cat-menu text-18 bl-bold">
+                <a title="{{ child.name }}" href="{{ child.href }}" class="bl-bold">{{ child.name }}</a>
+                <span class="count-prod-menu{% if not child.children %}-notsub{% endif %}" style="background-color: {{ child.color }}">{{ child.count }}</span>
+              </div>
+              {% if child.children %}
+                <span class="open-submenu" data-index="{{ child.id }}"></span>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% for child in category.children %}
+        {% if child.children %}
+          <div class="minimalist-tab-content" data-index="{{ child.id }}" data-parent-index="{{ category.id }}" data-title="{{ child.name }}">
+            <div class="menu-dropdown">
+              {% for subchild in child.children %}
+                <div class="dropdown-item">
+                  <div class="name-cat-menu text-18">
+                    <a title="{{ subchild.name }}" class="bl-bold" href="{{ subchild.href }}">{{ subchild.name }}</a>
+                    <span class="count-prod-menu" style="background-color: {{ subchild.color }}">{{ subchild.count }}</span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+</div>

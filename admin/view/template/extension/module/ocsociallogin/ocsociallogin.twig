@@ -1,0 +1,77 @@
+{{ header }} 
+
+{{ column_left }} 
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button  type="submit" form="form-ocsociallogin"   data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+            </div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %} 
+                    <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+                {% endfor %} 
+            </ul>
+             {% if (success is defined) %} 
+                <div class="alert alert-success">
+                    <i class="fa fa-check-circle"></i> {{ success }} 
+                </div>
+            {% endif %} 
+            {#
+            # Start Changes to show the Free Module Message
+            # @date 22-06-2024
+            # @modifier Nikhil Aggarwal
+            #}
+            <div class="alert alert-info"><i class="fa fa-info"></i> {{ free_module_link }}</div>
+            {# Changes end by Nikhil #}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {{ storeSwticher }} 
+                    <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ tab_general_setting }}</h3>
+                </div>
+                <div class="panel-body" style="clear: both">
+                    {{ tab_common }} 
+                     <div class="tab-content"> 
+                    <form action="{{ action }}"  method="post" enctype="multipart/form-data" id="form-ocsociallogin" class="form-horizontal">
+                        <div class="form-group"> 
+                            <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                            <div class="col-sm-10">
+                                <select name="ocsociallogin_status" id="ocsociallogin_status" class="form-control">
+                                    {% if (ocsociallogin_status) %}
+                                        <option value="1" selected="selected">{{ text_enabled }}</option>
+                                        <option value="0">{{ text_disabled }}</option>
+                                    {% else %} 
+                                        <option value="1">{{ text_enabled }}</option>
+                                        <option value="0" selected="selected">{{ text_disabled }}</option>
+                                    {% endif %} 
+                                </select>
+                            </div>
+                        </div> 
+                        <div class="form-group"> 
+                            <label class="col-sm-2 control-label" for="input-status">{{ text_include_font_awesome }}</label>
+                            <div class="col-sm-10">
+                                <select name="ocsociallogin_include_font_awesome" id="ocsociallogin_include_font_awesome" class="form-control">
+                                    {% if (ocsociallogin_include_font_awesome) %}
+                                        <option value="1" selected="selected">{{ text_yes }}</option>
+                                        <option value="0">{{ text_no }}</option>
+                                    {% else %} 
+                                        <option value="1">{{ text_yes }}</option>
+                                        <option value="0" selected="selected">{{ text_no }}</option>
+                                    {% endif %} 
+                                </select>
+                            </div>
+                        </div> 
+                    </form>
+                     </div>    
+                </div>    
+            </div>    
+        </div>
+    </div>
+</div>
+
+{{ footer }}
+
+
+

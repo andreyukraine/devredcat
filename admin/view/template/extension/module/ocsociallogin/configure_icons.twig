@@ -1,0 +1,76 @@
+{{ header }}{{ column_left }} 
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <a href="{{ add_new }}" data-toggle="tooltip" title="{{ text_add_new }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i></a>
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+            </div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %} 
+                    <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+                {% endfor %} 
+            </ul>
+            {% if (success is defined) %} 
+                <div class="alert alert-success">
+                    <i class="fa fa-check-circle"></i> {{ success }} 
+                </div>
+            {% endif %} 
+             {% if (warning is defined) %} 
+                <div class="alert alert-danger">
+                    <i class="fa fa-check-circle"></i> {{ warning }} 
+                </div>
+            {% endif %} 
+            {#
+            # Start Changes to show the Free Module Message
+            # @date 22-06-2024
+            # @modifier Nikhil Aggarwal
+            #}
+            <div class="alert alert-info"><i class="fa fa-info"></i> {{ free_module_link }}</div>
+            {# Changes end by Nikhil #}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+
+                    <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+                </div>
+                <div class="panel-body" style="clear: both">
+                    {{ tab_common }} 
+                    <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <td class="text_left">{{ layout_id }}</td>
+                                    <td class="text-left">{{ text_layout_name }}</td>
+                                    <td class="text-left">{{text_icon_type }}</td>
+                                    <td class="text-left">{{text_hover_effect }}</td>
+                                    <td class="text-left">{{text_alignment }}</td>
+                                    <td class="text-right">{{text_action }}</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if (icons is not empty) %} 
+                                    {% for icon in icons %} 
+                                        <tr>
+                                         <td class="text-left">{{ icon['id'] }}</td>   
+                                         <td class="text-left">{{ icon['name'] }}</td>
+                                         <td class="text-left">{% if (icon['icon_type'] == 'small_circular') %}{{ text_small_circular }}{% elseif (icon['icon_type'] == 'small_rectangular') %}{{ text_small_rectangular }}{% elseif (icon['icon_type'] == 'small_rounded') %}{{ text_small_rounded }}{% elseif (icon['icon_type'] == 'large_rectangular') %}{{ text_large_rectangular }}{% elseif (icon['icon_type'] == 'large_rounded') %}{{ text_large_rounded }}{% endif %}</td>
+                                         <td class="text-left">{% if (icon['hover_effect'] == 'highlight') %}{{ text_highlight }}{% elseif (icon['hover_effect'] == 'zoom') %}{{ text_zoom }}{% elseif (icon['hover_effect'] == 'rotate') %}{{ text_rotate }}{% endif %}</td>
+                                         <td class="text-left">{% if (icon['alignment'] == 'horizontal') %}{{ text_horizontal }}{% elseif (icon['alignment'] == 'vertical') %}{{ text_vertical }}{% endif %}</td>  
+                                         <td class="text-right"><a href="{{icon['edit'] }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
+                                         <a href="{{icon['delete'] }}" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-warning"><i class="fa fa-trash-o"></i></a> </td> 
+                                        </tr>
+                                    {% endfor %} 
+                                {% else %}       
+                                    <tr>
+                                        <td colspan="6" class="text-center">{{ no_result_message }}</td>
+                                    </tr>
+                                {% endif %} 
+                            </tbody>
+                        </table>    
+                </div>    
+            </div>
+        </div>
+    </div>
+</div>    
+{{ footer }}
+

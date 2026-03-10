@@ -1,0 +1,54 @@
+<div id="review-content">
+  <div class="callback-top-close">
+    <h3 class="modal-title text-21 bl-bold">{{ heading_title_add_review }}</h3>
+    <img width="25px" height="25px" src="/image/close.svg" onclick='custom_review.hide()' alt="close">
+  </div>
+  <br>
+  <form id="form-review">
+    <input type="hidden" name="product_id" value="{{ product_id }}">
+
+    <div class="form-group required">
+      <label class="control-label bl-bold text-18" for="stars">{{ entry_rating }}</label>
+      <div id="stars">
+        <input type="radio" name="rating" value="5" id="rating-5"/>
+        <label for="rating-5" class="star-icon"></label>
+
+        <input type="radio" name="rating" value="4" id="rating-4"/>
+        <label for="rating-4" class="star-icon"></label>
+
+        <input type="radio" name="rating" value="3" id="rating-3"/>
+        <label for="rating-3" class="star-icon"></label>
+
+        <input type="radio" name="rating" value="2" id="rating-2"/>
+        <label for="rating-2" class="star-icon"></label>
+
+        <input type="radio" name="rating" value="1" id="rating-1"/>
+        <label for="rating-1" class="star-icon"></label>
+      </div>
+      <div class="for-error error-rating"></div>
+    </div>
+
+
+    <div class="form-group required">
+        <label class="control-label bl-bold text-18" for="input-name">{{ entry_name }}</label>
+        <input name="name" type="text" id="input-name" value="{{ firstname }}" class="form-control">
+      <div class="for-error error-name"></div>
+    </div>
+
+    <div class="form-group required">
+        <label class="control-label bl-bold text-18" for="input-review">{{ entry_review }}</label>
+        <textarea name="text" rows="5" id="input-review" class="form-control"></textarea>
+        <div class="help-block">{{ text_note }}</div>
+        <div class="for-error error-text"></div>
+    </div>
+
+    {{ captcha }}
+
+    <div class="buttons clearfix">
+      <div class="pull-right">
+        <button type="button" id="button-review" onclick="custom_review.send()" data-loading-text="{{ text_loading }}"
+                class="btn btn-primary">{{ button_continue }}</button>
+      </div>
+    </div>
+  </form>
+</div>

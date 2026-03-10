@@ -1,0 +1,236 @@
+<div id="shipping-{{ order_id }}" class="block-order-model">
+
+<div id="shipping-np-city-{{ order_id }}" class="shipping-np-city">
+
+  <div class="bl-city-order">
+    <input type="hidden" value="{{ city_ref }}" name="shipping_method[{{ order_id }}][city_ref]" id="city-ref-{{ order_id }}">
+    <input type="hidden" value="{{ city_delivery_ref }}" name="shipping_method[{{ order_id }}][city_delivery_ref]" id="city-delivery-ref-{{ order_id }}">
+    <div class="text-21 bl-bold">{{ entry_city }}</div>
+    <br>
+    <div class="bl-city">
+    <div class="bl-inp-city form-group">
+      <div class="inp-city">
+      <label class="control-label" for="np-city-{{ order_id }}">{{ input_city }}</label>
+      <input type="text"
+             name="shipping_method[{{ order_id }}][city]"
+             autocomplete="off"
+             value="{{ city }}"
+             placeholder="{{ input_city }}"
+             id="np-city-{{ order_id }}"
+             oninput="inputCity('{{ order_id }}')"
+             class="np-city form-control"
+        {% if city_ref %} readonly="readonly"{% endif %}/>
+        <div id="clear-city-{{ order_id }}" class="clear-city" {% if not city_ref %}style="display: none"{% endif %}
+             onclick="clearCity('{{ order_id }}')">
+          <img width="20px" height="20px" src="/image/close.svg">
+        </div>
+      </div>
+      <div id="cites-{{ order_id }}" class="cites" style="display: none"></div>
+    </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="shipping-methods-wrapper-{{ order_id }}" {% if not city_ref %}style="display:none;"{% endif %} class="bl-custom-order">
+  <div class="text-21 bl-bold">{{ heading_shipping }}</div>
+  <br>
+  {% if (error_warning) %}
+    <div class="alert alert-warning"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}</div>
+  {% endif %}
+
+    <div id="shipping-methods-list-{{ order_id }}">
+      {% if (shipping_methods) %}
+        <div id="custom-shipping-methods-{{ order_id }}" class="bl-shipping-methods">
+          {% for key, shipping_method in shipping_methods %}
+            {% set shipping_code = shipping_method['code'] %}
+            <div class="radio-shipping-method {{ (shipping_method['code'] == code or not code) and not shipping_method['error'] ? 'select' : '' }}">
+              <div class="shipping-row{{ shipping_method['error'] ? ' disabled' : '' }}">
+                {% if (shipping_method['code'] == code or not code) and not shipping_method['error'] %}
+                  {% set code = shipping_method['code'] %}
+                  <input type="radio" name="shipping_method[{{ order_id }}][code]" value="{{ shipping_method['code'] }}" data-code="{{ key }}" checked="checked" onclick="handleShippingMethodChange('{{ shipping_method['code'] }}', '{{ order_id }}')"/>
+                  {% else %}
+                  <input type="radio" name="shipping_method[{{ order_id }}][code]" value="{{ shipping_method['code'] }}" data-code="{{ key }}" {{ shipping_method['error'] ? 'disabled="disabled"' : '' }} onclick="handleShippingMethodChange('{{ shipping_method['code'] }}', '{{ order_id }}')"/>
+                  {% endif %}
+                <div class="bl-checkout-desc">
+                  <span class="title-shipping">
+                    <div class="bl-shipping-method-title">
+                      <div class="text-18 bl-bold">{{ shipping_method['title'] }}</div>
+                      <div class="shipping-method-error" {{ not shipping_method['error'] ? 'style="display:none"' : '' }}>{{ shipping_method['error']|raw }}</div>
+                      {% if (shipping_method['desc'] is not empty) %}
+                        <div class="desc">{{ shipping_method['desc']|raw }}</div>
+                      {% endif %}
+                    </div>
+                    {% if  shipping_method.minimum > 0 or shipping_method['free'] is not empty%}
+                      <div class="free-cost">
+                        {% if shipping_method.minimum is defined and shipping_method.minimum > 0 %}
+                           <div class="minimum">Мінімальне замовлення: <span class="b-bold">{{ shipping_method['minimum'] }}₴</span></div>
+                        {% endif %}
+                        {% if (shipping_method['free'] is not empty) %}
+                          {% if shipping_method['free'] > 0 %}
+                            <div class="free">Безкоштовно від: <span class="b-bold">{{ shipping_method['free'] }}₴</span></div>
+                          {% endif %}
+                        {% endif %}
+                        {% if shipping_code == 'np' %}
+                          <div class="cost">Вартість: <span class="b-bold">{{ (shipping_method['free'] > 0 and cart_total >= shipping_method['free']) ? '0₴' : 'за тарифами перевізника' }}</span></div>
+                        {% else %}
+                          {% if (shipping_method['cost'] is not empty) %}
+                            {% if shipping_method['free'] > 0 and cart_total >= shipping_method['free'] %}
+                              <div class="cost">Вартість: <span class="b-bold">0₴</span></div>
+                            {% elseif shipping_method['cost'] > 0 %}
+                              <div class="cost">Вартість: <span class="b-bold">{{ shipping_method['cost'] }}₴</span></div>
+                            {% else %}
+                              <div class="cost">Вартість: <span class="b-bold">0₴</span></div>
+                            {% endif %}
+                          {% endif %}
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                  </span>
+                </div>
+              </div>
+              <div id="shipping-options-{{ shipping_method['code'] }}-{{ order_id }}" class="bl-shipping-options">
+                {% if delivery_options %}
+                  {{ delivery_options[shipping_code][order_id] }}
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+</div>
+</div>
+
+<script>
+  // Глобальний таймер для пошуку
+  if (typeof postInputTimer === 'undefined') {
+    var postInputTimer;
+  }
+
+  /**
+   * Пошук міст через API Нової Пошти
+   */
+  function inputCity(order_id) {
+    var inputCityElem = $('#np-city-' + order_id);
+    var resultCityElem = $('#cites-' + order_id);
+    var blCityOrder = $('.inp-city');
+
+    clearTimeout(postInputTimer);
+    var query = inputCityElem.val().trim();
+
+    if (query.length === 0) {
+      resultCityElem.hide();
+      return;
+    }
+
+    postInputTimer = setTimeout(() => {
+      $.ajax({
+        url: 'index.php?route=extension/shipping/np',
+        type: 'post',
+        data: '&event=city&q=' + query,
+        dataType: 'json',
+        beforeSend: function () {
+          resultCityElem.show().css({
+            'position': 'absolute',
+            'z-index': '999',
+            'width': inputCityElem.outerWidth() + 'px',
+            'left': inputCityElem.position().left + 'px',
+            'top': (inputCityElem.position().top + blCityOrder.outerHeight()) + 'px',
+            'background': '#fff',
+            'border': '1px solid #ccc'
+          }).html('<div class="loading" style="padding: 5px 10px;"><i class="fa fa-spinner fa-spin"></i> Пошук...</div>');
+        },
+        success: function (json) {
+          resultCityElem.show().html("");
+
+          $.each(json, function (index, city) {
+            if (city['ref'] !== '-') {
+              var row_item = $('<div></div>', {
+                'class': 'row_item',
+                'text': city['desc'],
+                'data-name': city['desc'],
+                'data-ref': city['ref'],
+                'data-delivery-ref': city['delivery_ref']
+              }).appendTo(resultCityElem);
+
+              row_item.on('click', function () {
+                resultCityElem.hide();
+                inputCityElem.val(this.dataset.name).attr('readonly', true);
+                $('#city-ref-' + order_id).val(this.dataset.ref);
+                $('#city-delivery-ref-' + order_id).val(this.dataset.deliveryRef);
+                
+                $('#clear-city-' + order_id).show();
+                
+                // Примусово показуємо блоки, оскільки місто обрано
+                $('#shipping-methods-wrapper-' + order_id).show();
+                $('#payment-' + order_id).show();
+
+                // Послідовне оновлення сесії та блоків
+                custom_block.updateShipping(order_id).then(() => {
+                  custom_block.render('total');
+                  custom_block.render('button');
+                  return custom_block.render_order('shipping', order_id);
+                }).then(() => {
+                  return custom_block.render_order('payment', order_id);
+                });
+              });
+            } else {
+              $('<div></div>', {
+                'class': 'row_item disabled',
+                'text': city['desc'],
+                'css': { 'color': '#999', 'cursor': 'not-allowed' }
+              }).appendTo(resultCityElem);
+            }
+          });
+        }
+      });
+    }, 300);
+  }
+
+  /**
+   * Очищення міста
+   */
+  function clearCity(order_id) {
+    $('#np-city-' + order_id).val('').attr('readonly', false);
+    $('#city-ref-' + order_id).val('');
+    $('#city-delivery-ref-' + order_id).val('');
+    $('#cites-' + order_id).hide();
+    $('#clear-city-' + order_id).hide();
+    
+    // Миттєво приховуємо блоки в інтерфейсі
+    $('#shipping-methods-wrapper-' + order_id).hide();
+    $('#payment-' + order_id).hide();
+
+    // Очищаємо сесію та примусово оновлюємо блоки
+    $.ajax({
+      url: 'index.php?route=extension/module/custom/shipping/clearCity',
+      dataType: 'json',
+      success: function() {
+        custom_block.updateShipping(order_id).then(() => {
+          custom_block.render('total');
+          custom_block.render('button');
+          return custom_block.render_order('shipping', order_id);
+        }).then(() => {
+          return custom_block.render_order('payment', order_id);
+        });
+      }
+    });
+  }
+
+  function handleShippingMethodChange(code, order_id) {
+    $('.alert, .text-danger, .custom-text-danger').not('.shipping-method-error').remove();
+    $('.shipping-method-error').hide().empty();
+    $('.has-error').removeClass('has-error');
+    
+    // Update 'select' class on radio-shipping-method containers
+    $('#shipping-methods-list-' + order_id + ' .radio-shipping-method').removeClass('select');
+    $('input[name="shipping_method[' + order_id + '][code]"][value="' + code + '"]').closest('.radio-shipping-method').addClass('select');
+
+    custom_block.shipping(code, order_id);
+  }
+
+  $('[id^="shipping-"] [name^="shipping_method"]').on('input', function () {
+    $(this).closest('.has-error').removeClass('has-error').find('.text-danger, .custom-text-danger').remove();
+  });
+</script>

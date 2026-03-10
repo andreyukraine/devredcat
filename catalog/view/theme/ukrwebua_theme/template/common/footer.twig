@@ -1,0 +1,234 @@
+<footer>
+  <div class="footer-bottom fluid-width">
+    <div class="footer-bottom-inner container">
+      <div class="container-footer">
+        <div class="footer-top-bl">
+
+          <div class="bl-footer-contact">
+            <div class="footer-col-bl">
+              <div class="footer-title-bl">{{ text_category }}</div>
+              <div class="fotter-content-bl">
+                {% for manufacture in manufactures %}
+                  <div class="menu-item">
+                    <div class="name-cat-menu">
+                      <a title="{{ manufacture.name }}" href="{{ manufacture.href }}">{{ manufacture.name }}</a>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="footer-col-bl">
+              <div class="footer-title-bl">{{ text_information }}</div>
+              <div class="fotter-content-bl">
+                {% if menu_bottom %}
+                  {{ menu_bottom }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="bl-footer-contact">
+            <div class="footer-col-bl">
+              <div class="footer-title-bl">{{ text_contacts }}</div>
+              <div class="fotter-content-bl">
+                <div class="f-phone">
+                  <div>
+                    <a title="{{ telephone }}" href="tel:{{ telephone }}" target="_blank">{{ telephone }}</a>
+                  </div>
+                  {% if telephone_1 is not empty %}
+                    <div>
+                      <a title="{{ telephone_1 }}" href="tel:{{ telephone_1 }}" target="_blank">{{ telephone_1 }}</a>
+                    </div>
+                  {% endif %}
+                  {% if telephone_2 is not empty %}
+                    <div>
+                      <a title="{{ telephone_2 }}" href="tel:{{ telephone_2 }}" target="_blank">{{ telephone_2 }}</a>
+                    </div>
+                  {% endif %}
+                  {% if telephone_3 is not empty %}
+                    <div>
+                      <a title="{{ telephone_3 }}" href="tel:{{ telephone_3 }}" target="_blank">{{ telephone_3 }}</a>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+
+                <div class="footer-title-bl">{{ text_write_my }}</div>
+                <div class="fotter-content-bl">
+                  <a title="{{ email }}" href="mailto:{{ email }}">{{ email }}</a>
+                </div>
+
+            </div>
+
+            <div class="footer-col-bl">
+              <div class="footer-title-bl">{{ text_open }}</div>
+              <div class="fotter-content-bl">
+                {{ open|raw }}
+              </div>
+              <div class="footer-title-bl">{{ text_social }}</div>
+
+              <div class="f-soc-bl">
+                {% if config_soc_telegram %}
+                  <div>
+                    <a title="telegram" href="{{ config_soc_telegram }}" target="_blank">
+                      <img width="30px" height="30px" alt="telegram" src="/catalog/view/theme/ukrwebua_theme/image/telegram.svg"></a>
+                  </div>
+                {% endif %}
+                {% if config_soc_facebook %}
+                  <div>
+                    <a title="facebook" href="{{ config_soc_facebook }}" target="_blank">
+                      <img width="30px" height="30px" alt="facebook" src="/catalog/view/theme/ukrwebua_theme/image/facebook.svg"></a>
+                  </div>
+                {% endif %}
+                {% if config_soc_instagram %}
+                  <div>
+                    <a title="instagram" href="{{ config_soc_instagram }}" target="_blank">
+                      <img width="30px" height="30px" alt="instagram" src="/catalog/view/theme/ukrwebua_theme/image/instagram.svg"></a>
+                  </div>
+                {% endif %}
+                {% if config_soc_youtube %}
+                  <div>
+                    <a title="youtube" href="{{ config_soc_youtube }}" target="_blank">
+                      <img width="30px" height="30px" alt="youtube" src="/catalog/view/theme/ukrwebua_theme/image/youtube.svg"></a>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-copyright fluid-width">
+    <div class="footer-bottom-inner container">
+      <div class="footer-bottom-bl">
+        <div class="bl-footer-info">
+          <img class="footer-bottom-bl-logo" alt="{{ name }}" height="25" width="200" src="/image/logo-footer.svg">
+          <p>© Інтернет-магазин «{{ config_name }}» {{ powered }}. усі права захищені.</p>
+          {% if config_last_update is not empty %}
+            <p class="bl-last-update">Оновлено: {{ config_last_update }}</p>
+          {% endif %}
+        </div>
+        <div class="f-payment">
+          <div class="list-paument">
+            <div><img height="44" width="44" alt="visa" src="/image/visa.svg"></div>
+            <div><img height="44" width="44" alt="mastercard" src="/image/mastercard.svg"></div>
+          </div>
+          <p>{{ text_copiring }}</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="back-top"><img class="img-responsive" height="50" width="15" alt="{{ backtop }}" src="/image/chevron-up.svg"></div>
+  {{ menu }}
+</footer>
+
+<div id="ajax-lock-block"></div>
+
+<script>
+  function getCookie(name) {
+    var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+    return matches ? decodeURIComponent(matches[1]) : 'undefined';
+  }
+
+  function get_popup() {
+    $.ajax({
+      url: "index.php?route=extension/module/ocpopups",
+      type: "post",
+      dataType: "json",
+      cache: false,
+      success: function (json) {
+
+        custom_popup.open(json['html']);
+      }
+    });
+  }
+
+  function get_ocpolicy() {
+    if ($('#ocpolicy').length === 0) {
+      $.ajax({
+        url: "index.php?route=extension/module/ocpolicy",
+        type: "post",
+        dataType: "json",
+        cache: false,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest' // Ensure this is correctly set
+        },
+        success: function (json) {
+          if (json['text_ocpolicy']) {
+            var html = '<div id="ocpolicy" class="fixed-bottom fluid-width"><div class="container"><div class="row"><div class="ocpolicy-bl col-lg-12 d-flex align-items-center justify-content-between flex-column flex-md-row"><div class="ocpolicy-text">' + json['text_ocpolicy'] + ' ' + json['url'] + '</div><button type="button" class="button" id="ocpolicy-btn">' + json['ocpolicy_accept'] + '</button></div></div></div></div>';
+
+            $('body').append(html);
+
+            $(document).on('click', '#ocpolicy-btn', function () {
+              $('#ocpolicy').addClass('hidden');
+              const date = new Date(json['ocpolicy_day_now'].replace(/-/g, "/"));
+              date.setTime(date.getTime() + (json['max_day'] * 24 * 60 * 60 * 1000));
+              document.cookie = json['ocpolicy_value'] + '=1; path=/; expires=' + date.toUTCString();
+            });
+          }
+        },
+        error: function (e, t, i) {
+          alert(i + "\r\n" + e.statusText + "\r\n" + e.responseText)
+        }
+      });
+    }
+  }
+
+  window.addEventListener('scroll', initLazyModules, {passive: true});
+  window.addEventListener('mousemove', initLazyModules, {passive: true});
+  window.addEventListener('touchstart', initLazyModules, {passive: true});
+
+  var lazyModulesStarted = false;
+  function initLazyModules() {
+    if (lazyModulesStarted) return;
+    lazyModulesStarted = true;
+
+    // Видаляємо слухачів
+    window.removeEventListener('scroll', initLazyModules);
+    window.removeEventListener('mousemove', initLazyModules);
+    window.removeEventListener('touchstart', initLazyModules);
+
+    // Запускаємо модулі
+    if (typeof get_ocpolicy === 'function' && getCookie('{{ ocpolicy_value }}') === 'undefined') {
+      get_ocpolicy();
+    }
+
+    if (typeof get_popup === 'function' && getCookie('ocpopup') === 'undefined') {
+      //get_popup();
+    }
+  }
+
+  window.addEventListener('load', function () {
+    // hide #back-top first
+    $("#back-top").hide();
+    // fade in #back-top
+    $(function () {
+      $(window).scroll(function () {
+        if ($(this).scrollTop() > $('body').height() / 3) {
+          $('#back-top').fadeIn();
+        } else {
+          $('#back-top').fadeOut();
+        }
+      });
+      // scroll body to 0px on click
+      $('#back-top').click(function () {
+        $('body,html').animate({scrollTop: 0}, 800);
+        return false;
+      });
+    });
+  });
+
+</script>
+
+<script src="/catalog/view/javascript/maskedinput.js" defer></script>
+
+{% for script in scripts %}
+  <script src="{{ script }}"></script>
+{% endfor %}
+
+</body></html>

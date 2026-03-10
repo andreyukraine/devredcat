@@ -1,0 +1,67 @@
+<div id="brands-carousel" class="menu-recent">
+    <div class="brand-title module-title">
+      <div class="bl-title-module">
+        <h2 class="bl-bold">{{ text_heading_title }}</h2>
+      </div>
+    </div>
+    <div class="brand-box-style">
+      {% if brands %}
+        <div class="brand-container slider row">
+          {% for brand in brands %}
+            <div class="items-brands col-lg-2">
+              <div class="brand-image">
+                <a title="{{ brand.name }}" href="{{ brand.href }}"><img width="200px" height="200px" src="{{ brand.image }}" alt="{{ brand.name }}" class="img-responsive"/></a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>{{ text_empty }}</p>
+      {% endif %}
+    </div>
+</div>
+<script>
+  $(document).ready(function () {
+    var windowWidth = $(window).width();
+
+    setTimeout(function () {
+
+      var brandsNavSlider = $(".brand-container");
+
+      brandsNavSlider.on('init', function (slick) {
+        brandsNavSlider.css('opacity', 1);
+      });
+
+      // Функція для визначення кількості слайдів, що показуються в залежності від ширини вікна
+      function getSlidesToShow() {
+        var windowWidth = $(window).width();
+        if (windowWidth < 375) {
+          return 2;
+        } else if (windowWidth < 480) {
+          return 2;
+        } else if (windowWidth < 768) {
+          return 2;
+        } else if (windowWidth < 992) {
+          return 3;
+        } else if (windowWidth < 1200) {
+          return 4;
+        } else {
+          return 5; // значення за замовчуванням
+        }
+      }
+
+      var itemsToShow = getSlidesToShow();
+
+      brandsNavSlider.not('.slick-initialized').slick({
+        slidesToShow: itemsToShow,
+        slidesToScroll: itemsToShow,
+        autoplay: true,
+        speed: 500,
+        arrows: true,
+        fade: false,
+        dots: true
+      });
+
+    }, 200);
+  });
+</script>

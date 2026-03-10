@@ -1,0 +1,93 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+            </div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="container-fluid">
+        {% if error %}
+            <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+        {% endif %}
+        {% if success %}
+            <div class="alert alert-success alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ success_text }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+        {% endif %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ heading_title }}</h3>
+                <span class="pull-right">{{ text_info }}</span>
+            </div>
+            <div class="panel-body">
+
+                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+                    <input type="hidden" name="id" value="{{ item.id }}">
+                    <div class="tab-content">
+                        <div class="tab-pane active form-horizontal" id="tab-main">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="title">{{ l_title }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="title" value="{{ item.title }}" id="title" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="title">{{ l_text }}</label>
+                                <div class="col-sm-10">
+                                    <textarea name="text" id="title" class="form-control" data-toggle="summernote" data-lang="ru-RU" required>{{ item.text }}</textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="title">{{ l_date_start }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="date_start" value="" data-date-format="YYYY-MM-DD" value="{{ item.date_start }}" class="form-control date_start">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="title">{{ l_date_end }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="date_end" value="" data-date-format="YYYY-MM-DD" value="{{ item.date_end }}" class="form-control date_end">
+                                </div>
+                            </div>
+                            <div class="buttons pull-right">
+                                <input type="submit" name="save" value="{{ save }}" class="btn btn-success"/>
+                                <a href="{{ cancel }}" class="btn btn-danger">{{ button_cancel }}</a>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="view/javascript/summernote/summernote.js"></script>
+<link href="view/javascript/summernote/summernote.css" rel="stylesheet" />
+<script type="text/javascript" src="view/javascript/summernote/summernote-image-attributes.js"></script> 
+<script type="text/javascript" src="view/javascript/summernote/opencart.js"></script> 
+<script type="text/javascript">
+    
+        $('.date_start').datetimepicker({
+            language: 'ru',
+            defaultDate:"{{ item.date_start }}",
+            pickTime: false
+        });
+        $('.date_end').datetimepicker({
+            language: 'ru',
+            defaultDate:"{{ item.date_end }}",
+            pickTime: false
+        });
+</script>
+{{ footer }}

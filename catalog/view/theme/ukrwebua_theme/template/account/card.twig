@@ -1,0 +1,56 @@
+{{ header }}
+<div class="fluid-width">
+<div class="top-cat">
+  <div class="fluid-width">
+  <div class="breadcrumbs container">
+    <h1 class="category-name">{{ heading_title }}</h1>
+    <ul class="breadcrumb">
+      {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+  </div>
+</div>
+<div id="card" class="container layer-category">
+  {% if error_warning %}
+  <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}</div>
+  {% endif %}
+  <div class="row">
+    <div id="content">
+      <form action="{{ action }}" method="post" enctype="multipart/form-data" class="form-horizontal">
+        <fieldset>
+          <div class="row">
+          {% if card_code is not empty %}
+            <div class="col-md-6 col-lg-offset-3">
+              <div class="bonus-card">
+                  <div class="bonus-card-number text-right" style="width: 100%">{{ card_number }}</div>
+                  <div class="bl-code">
+                    <div class="text-code">{{ text_code }}</div>
+                    <div class="bonus-card-code">{{ card_code }}</div>
+                  </div>
+                <div class="bl-code">
+                  <div class="text-phone">{{ text_phone }}</div>
+                  <div class="bonus-card-phone">{{ telephone }}</div>
+                </div>
+                <br>
+                <p class="card-sum">{{ text_sum }}: &nbsp; {{ sum }}</p>
+                <p class="card-percent">{{ text_percent }}: &nbsp; {{ percent }}%</p>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="col-md-6 col-lg-offset-3">
+            <p>{{ text_not_card }}</p>
+          </div>
+          {% endif %}
+        </fieldset>
+        <div class="buttons clearfix">
+          <div class="pull-left"><a href="{{ back }}" class="button">{{ button_back }}</a></div>
+        </div>
+      </form>
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+</div>
+{{ footer }}

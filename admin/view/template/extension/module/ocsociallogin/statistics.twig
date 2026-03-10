@@ -1,0 +1,223 @@
+{{ header }}{{ column_left }} 
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+            </div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %} 
+                    <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+                {% endfor %} 
+            </ul>
+            {#
+            # Start Changes to show the Free Module Message
+            # @date 22-06-2024
+            # @modifier Nikhil Aggarwal
+            #}
+            <div class="alert alert-info"><i class="fa fa-info"></i> {{ free_module_link }}</div>
+            {# Changes end by Nikhil #}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+
+                    <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+                </div>
+                <div class="panel-body" style="clear: both">
+                    {{ tab_common }} 
+                      <div class="col-sm-12" >
+                          <div class="col-sm-6">
+                             <center><h2>{{ text_register_user }}</h2></center>
+                             <canvas id="registeruserchart" width="450px" height="250px"></canvas>
+                         </div>
+                         <div class="col-sm-6">
+                             <center><h2>{{text_login_user }}</h2></center>
+                             <canvas id="loginuserchart" width="450px" height="250px"></canvas>
+                         </div> 
+                       </div>
+                </div>
+                <div class="panel-body" style="clear: both">
+                    <br/>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr> 
+                                <td class="text-left">{{ text_srno }}</td>
+                                <td class="text-left">{{ text_account_type }}</td>
+                                <td class="text-left">{{ text_register_user }}</td>
+                                <td class="text-right">{{ text_login_user }}</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                             {% if (result is not empty) %}
+ {% set i = 1 %}
+ {% for result in result %} 
+ 
+                                    <tr>
+                                        <td class="text-left">{{i }}</td>
+                                        <td class="text-left">{{ result['type'] }}</td>
+                                        <td class="text-left">{{ result['register'] }}</td>
+                                        <td class="text-right">{{ result['login'] }}</td>
+                                    </tr>
+                                    {% set i = i + 1 %}
+ {% endfor %}
+ {% else %}       
+                                <tr>
+                                    <td colspan="4" class="text-center">{{ no_result_message }}</td>
+                                </tr>
+                            {% endif %} 
+                        </tbody>
+                    </table> 
+                </div>
+            </div> 
+             <div class="panel panel-default">
+                 
+                     <div class="panel-heading">
+
+                    <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_total_registration }}</h3>
+                </div>
+                  <div class="row">
+                      <div class="col-sm-6"></div>
+                  <div class="col-sm-6 text-right">
+                       <div class="form-group">
+                        <div class="col-sm-9">
+                               <input type="text" name="search_email" class="form-control"  id="search_email" placeholder="{{ text_email }}" value="{{ search_email }}" ></div>
+                               <div class="col-sm-3"> <button type="button" id="button-filter" class="btn btn-primary"><i class="fa fa-search"></i> {{ button_search }}</button></div>
+                       </div>
+                       </div>
+                  </div>
+                 <div class="panel-body" style="clear: both">
+                     <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr> 
+                                <td class="text-left">{{ text_srno }}</td>
+                                 <td class="text-left">{% if (sort == 'name') %} 
+                                    <a href="{{ sort_name }}" class="{{ order }}">{{ text_full_name }}</a>
+                                    {% else %} 
+                                    <a href="{{ sort_name }}">{{ text_full_name }}</a>
+                                    {% endif %} 
+                                 </td> 
+                                 <td class="text-left">{% if (sort == 'email') %} 
+                                    <a href="{{ sort_email }}" class="{{ order }}">{{ text_email }}</a>
+                                    {% else %} 
+                                    <a href="{{ sort_email }}">{{ text_email }}</a>
+                                    {% endif %} 
+                                 </td>
+                                 <td class="text-right">{% if (sort == 'type') %} 
+                                    <a href="{{ sort_registration }}" class="{{ order }}">{{ text_registered_through }}</a>
+                                    {% else %} 
+                                    <a href="{{ sort_registration }}">{{ text_registered_through }}</a>
+                                    {% endif %} 
+                                 </td>
+<!--                                <td class="text-left">{{ text_full_name }}</td>
+                                <td class="text-left">{{ text_email }}</td>
+                                <td class="text-right">{{ text_registered_through }}</td>-->
+                                <td class="text-right">{{ text_login_count }}</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                             {% if (result_detail is not empty) %}
+ {% set i = 1 %}
+ {% for result in result_detail %} 
+ 
+                                    <tr>
+                                        <td class="text-left">{{i }}</td>
+                                        <td class="text-left">{{ result['name'] }}</td>
+                                        <td class="text-left">{{ result['email'] }}</td>
+                                        <td class="text-right">{{ result['login_via'] }}</td>
+                                         <td class="text-right">{{ result['total_login'] }}</td>
+                                        
+                                    </tr>
+                                    {% set i = i + 1 %}
+ {% endfor %}
+ {% else %}       
+                                <tr>
+                                    <td colspan="5" class="text-center">{{ no_result_message }}</td>
+                                </tr>
+                            {% endif %} 
+                        </tbody>
+                    </table> 
+                      <div class="row">
+                    <div class="col-sm-6 text-left">{{ pagination }}</div>
+                    <div class="col-sm-6 text-right">{{ results }}</div>
+                </div>
+                 </div>
+                </div> 
+            </div>    
+        </div>
+    </div>
+</div>
+<script src="view/javascript/ocsociallogin/canvasgraph.js" type="text/javascript"></script>
+<script>
+    $('#button-filter').on('click', function() {
+       
+	var url = '{{ current_url }}';
+
+	var search_email = $('#search_email').val();
+
+	if (search_email) {
+		url += '&email=' + encodeURIComponent(search_email);
+	}
+
+	
+	location = url;
+});
+var ctx = document.getElementById('loginuserchart');
+var ctxe = document.getElementById('registeruserchart');
+var loginuserchart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            {% for key,value in login_detail %} 
+            '{{ value["type"] }}',
+            {% endfor %} ],   
+        datasets: [{
+            label: '{{ text_login_user }}',
+            data: [{% for key,value in login_detail %} 
+        '{{ value["count"] }}',
+            {% endfor %}],
+            backgroundColor: [
+                'rgba(255, 99, 132,1)',
+                'rgba(54, 162, 235,1)',
+                'rgba(255, 206, 86,1)',
+                'rgba(75, 192, 192,1)',
+                'rgba(153, 102, 255,1)',
+                'rgba(255, 159, 64,1)',
+                'rgba(0,255,0,1)',
+                'rgba(255,0,255,1)',
+                'rgba(255,0,0,1)'
+            ],
+             borderWidth: 0
+        }]
+    }
+});
+var registeruserchart = new Chart(ctxe, {
+    type: 'doughnut',
+    data: {
+        labels: [
+             {% for key,value in register_detail %} 
+            '{{ value["type"] }}',
+            {% endfor %} ],   
+        datasets: [{
+            label: '{{ text_register_user }}',
+            data: [{% for key,value in register_detail %} 
+             '{{ value["count"] }}',
+             {% endfor %}],
+            backgroundColor: [
+                'rgba(255, 99, 132,1)',
+                'rgba(54, 162, 235,1)',
+                'rgba(255, 206, 86,1)',
+                'rgba(75, 192, 192,1)',
+                'rgba(153, 102, 255,1)',
+                'rgba(255, 159, 64,1)',
+                'rgba(0,255,0,1)',
+                'rgba(255,0,255,1)',
+                'rgba(255,0,0,1)'
+            ],
+                    borderWidth: 0
+            
+        }]
+    }
+});
+</script>
+{{ footer }} 
+

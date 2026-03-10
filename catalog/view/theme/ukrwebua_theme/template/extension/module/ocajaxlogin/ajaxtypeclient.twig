@@ -1,0 +1,73 @@
+<div class="login-section-select-type flex-50 p-l-15">
+  <form id="registerTypeForm">
+    <div class="bl-item-radio-reg">
+      <input id="client" type="radio" name="customer_type" class="custom-control-input" value="1" required>
+      <label class="custom-control-label" for="client">
+        <div class="line-type-reg">
+          <div class="login-section-select-type-item-icon"><img src="/image/client_reg.svg" alt=""></div>
+          <div class="bl-item-type-name"><p class="login-section-select-type-item-title">Я - власник тварини</p>
+            <p class="login-section-select-type-item-text">Проста реєстрація для роздрібних покупців</p></div>
+        </div>
+      </label>
+    </div>
+    <div class="bl-item-radio-reg">
+      <input id="wholesaler" type="radio" name="customer_type" class="custom-control-input" value="2">
+      <label class="custom-control-label" for="wholesaler">
+        <div class="line-type-reg">
+          <div class="login-section-select-type-item-icon"><img src="/image/wholesaler_reg.svg" alt=""></div>
+          <div class="bl-item-type-name"><p class="login-section-select-type-item-title">Оптовий покупець</p>
+            <p class="login-section-select-type-item-text">Зоомагазини та інтернет-магазини</p></div>
+        </div>
+      </label>
+    </div>
+    <div class="bl-item-radio-reg">
+      <input id="nursery" type="radio" name="customer_type" class="custom-control-input" value="3">
+      <label class="custom-control-label" for="nursery">
+        <div class="line-type-reg">
+          <div class="login-section-select-type-item-icon"><img src="/image/nursery_reg.svg" alt=""></div>
+          <div class="bl-item-type-name"><p class="login-section-select-type-item-title">Розплідник</p>
+            <p class="login-section-select-type-item-text">Заводчики тварин та розплідники</p></div>
+        </div>
+      </label>
+    </div>
+
+    <div class="buttons">
+      <div class="dflex-row-justify-between">
+        <div class="pull-left d-flex" onclick="ocajaxlogin.appendLoginForm()" style="cursor: pointer">
+          <img class="btn-back" alt="Повернутись" src="/image/back.svg">
+          <span class="bl-bold text-18 hidden-xs">Повернутись</span>
+        </div>
+        <div class="pull-right">
+          <input type="submit" value="{{ button_continue }}" class="button"/>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  var reg_form = document.getElementById('registerTypeForm');
+  if (reg_form) {
+    reg_form.addEventListener('submit', function (e) {
+      e.preventDefault(); // Запобігаємо стандартній відправці форми
+
+      // Отримуємо обране значення
+      const selectedType = document.querySelector('input[name="customer_type"]:checked').value;
+
+      // Викликаємо відповідну функцію в залежності від обраного типу
+      switch (selectedType) {
+        case '1': // Власник тварини
+          ocajaxlogin.appendRegisterForm();
+          break;
+        case '2': // Оптовий покупець
+          ocajaxlogin.appendRegisterFormWholesaler();
+          break;
+        case '3': // Розплідник
+          ocajaxlogin.appendRegisterFormBreeder();
+          break;
+        default:
+          console.error('Невідомий тип користувача');
+      }
+    });
+  }
+</script>

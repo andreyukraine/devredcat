@@ -1,0 +1,801 @@
+{{ header }} 
+<link href="view/stylesheet/ocsociallogin/icons.css" rel="stylesheet" />
+<script src="view/javascript/ocsociallogin/velovalidation.js" type="text/javascript"></script>
+{{ column_left }} 
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button id="ocsociallogin_icon_save"  data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+                 <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+            </div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %} 
+                    <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+                {% endfor %} 
+            </ul>
+            {% if (already_exist is defined) %} 
+                <div class="alert alert-danger">
+                    <i class="fa fa-check-circle"></i> {{ already_exist }} 
+                </div>
+            {% endif %} 
+             <div id="error_message"></div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+                </div>
+                <div class="panel-body" style="clear: both">
+                    {{ tab_common }} 
+                    <div class="tab-content"> 
+                         <form  method="post" id="form-ocsocialloginicon" class="form-horizontal">
+                            <div class="form-group required">
+                                <label class="col-sm-2 control-label" for="input-width">{{ text_button_layout_name }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="layout_name" value="{{ layout_name }}" placeholder="{{ text_button_layout_name }}" id="name" class="form-control" />
+                                </div>
+                            </div>
+                              <div class="form-group"> 
+                                <label class="col-sm-2 control-label">
+                                    <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{{ title_choose_logins }}">
+                                        {{ text_choose_logins }} 
+                                    </span>
+                                </label>
+                                <div class="col-sm-10">
+                                    <select name="choose_login[]" id="choose_login" class="form-control" multiple>
+                                       
+                                        <option value="facebook"  {% if ("facebook" in choose_login)  %} {{ 'selected' }}{% endif %} >{{ text_facebook }}</option>
+                                        <option value="google" {% if ("google" in choose_login) %} {{ 'selected' }}{% endif %}>{{ text_google }}</option>
+                                        <option value="linkedin" {% if ("linkedin" in choose_login) %} {{ 'selected' }}{% endif %}>{{ text_linkedin }}</option>
+<!--                                        <option value="live" {% if ("live" in choose_login) %} {{ 'selected' }}{% endif %}>{{ text_live }}</option>-->
+                                        <option value="twitter" {% if ("twitter" in choose_login) %} {{ 'selected' }}{% endif %}>{{ text_twitter }}</option>
+                                        <option value="yahoo" {% if ("yahoo" in choose_login) %} {{ 'selected' }}{% endif %}>{{ text_yahoo }}</option>
+                                        <option value="amazon" {% if ("amazon" in choose_login) %} {{ 'selected' }}{% endif %}>{{ text_amazon }}</option>
+                                        <option value="instagram" {% if ("instagram" in choose_login) %} {{ 'selected' }}{% endif %} >{{ text_instagram }}</option>
+                                        <option value="paypal" {% if ("paypal" in choose_login) %} {{ 'selected' }}{% endif %}>{{ text_paypal }}</option>
+                                </select>
+                                </div>
+                            </div>
+                            <div class="form-group"> 
+                                <label class="col-sm-2 control-label" for="input-status">{{ text_icon_type }}</label>
+                                <div class="col-sm-10">
+                                    <select name="icon_type" id="icon_type" class="form-control">
+                                        <option value="small_circular" {% if (icon_type == 'small_circular') %} {{ 'selected' }}{% endif %}>{{ text_small_circular }}</option>
+                                        <option value="small_rectangular" {% if (icon_type == 'small_rectangular') %} {{ 'selected' }}{% endif %}>{{ text_small_rectangular }}</option>
+                                        <option value="small_rounded" {% if (icon_type == 'small_rounded') %} {{ 'selected' }}{% endif %}>{{ text_small_rounded }}</option>
+                                        <option value="large_rounded" {% if (icon_type == 'large_rounded') %} {{ 'selected' }}{% endif %}>{{ text_large_rounded }}</option>
+                                        <option value="large_rectangular" {% if (icon_type == 'large_rectangular') %} {{ 'selected' }}{% endif %} >{{ text_large_rectangular }}</option>
+                                    </select>
+                                </div>
+                            </div> 
+                            <div class="form-group"> 
+                                <label class="col-sm-2 control-label" for="input-status">{{ text_hover_effect }}</label>
+                                <div class="col-sm-10">
+                                    <select name="hover_effect" id="hover_effect" class="form-control">
+                                        <option value="highlight" {% if (hover_effect == 'highlight') %} {{ 'selected' }}{% endif %}>{{ text_highlight }}</option>
+                                        <option value="zoom" {% if (hover_effect == 'zoom') %} {{ 'selected' }}{% endif %}>{{ text_zoom }}</option>
+                                        <option value="rotate" {% if (hover_effect == 'rotate') %} {{ 'selected' }}{% endif %} >{{ text_rotate }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                             <div class="form-group"> 
+                                <label class="col-sm-2 control-label" for="input-status">{{ text_alignment }}</label>
+                                <div class="col-sm-10">
+                                    <select name="alignment" id="alignment" class="form-control">
+                                           <option value="horizontal" {% if (alignment == 'horizontal') %} {{ 'selected' }}{% endif %}>{{ text_horizontal }}</option>
+                                            <option value="vertical" {% if (alignment == 'vertical') %} {{ 'selected' }}{% endif %}>{{ text_vertical }}</option>
+                                    </select>
+                                </div>
+                            </div> 
+                            <div class="form-group"> 
+                                <label class="col-sm-2 control-label" for="input-status">{{ text_button_color }}</label>
+                                <div class="col-sm-10">
+                                    <select name="button_color" id="button_color" class="form-control">
+                                           <option value="0" >{{ default }}</option>
+                                            <option value="1" {% if (button_color == '1') %} {{ 'selected' }}{% endif %}>{{ text_customize }}</option>
+                                    </select>
+                                </div>
+                            </div> 
+                             <div class="form-group" id="select_color" {% if (button_color == 0) %}
+ {{ 'style="display:none"' }}
+ {% endif %} >
+                                <div class="form-group">  
+                                    <label class="col-sm-2 control-label" for="input-status">{{ text_name }}</label>
+                                    <label class="col-sm-3 control-label" for="input-status">{{ text_icon_color }}</label>
+                                    <label class="col-sm-3 control-label" for="input-status">{{ text_text_color }}</label>
+                                    <label class="col-sm-3 control-label" for="input-status">{{ text_preview }}</label>
+                                </div>
+                                <div class="form-group"> 
+                                    <label class="col-sm-2 control-label" for="input-status">{{ text_facebook }}</label> 
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ facebook_icon_color }}" class="mColorPicker facebook iconcolor form-control" name="color[facebook][icon]"  id="color_0" style="background-color: {{ facebook_icon_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_0" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                   
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ facebook_text_color }}" class="mColorPicker facebook textcolor form-control" name="color[facebook][text]"  id="color_2" style="background-color: {{ facebook_text_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_2" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3" align="right">
+                                       <div id="icon_facebook_small_circular" {% if (icon_type != 'small_circular') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div class="kbsocial-icons icon-circle small-facebook" ><i  style="background-color:{{ facebook_icon_color }}; color:{{ facebook_text_color }};" class="fa fa-facebook"></i></div>
+                                       </div>
+                                       <div id="icon_facebook_small_rectangular" {% if (icon_type != 'small_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div class="kbsocial-icons icon-flat" ><i style="background-color:{{ facebook_icon_color }}; color:{{ facebook_text_color }};" class="fa fa-facebook"></i></div>
+                                       </div>
+                                       <div id="icon_facebook_small_rounded" {% if (icon_type != 'small_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div class="kbsocial-icons icon-rounded" ><i style="background-color:{{ facebook_icon_color }}; color:{{ facebook_text_color }};" class="fa fa-facebook"></i></div>
+                                       </div>
+                                       <div id="icon_facebook_large_rounded" {% if (icon_type != 'large_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div style="background-color:{{ facebook_icon_color }}; color:{{ facebook_text_color }};" class="btn kbazm-social kbazm-btn kbazm-pill kbazm-facebook" ><i class="fa fa-facebook"></i>{{ login_with_facebook }}</div>
+                                       </div>
+                                       <div id="icon_facebook_large_rectangular" {% if (icon_type != 'large_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                           <div style="background-color:{{ facebook_icon_color }}; color:{{ facebook_text_color }};" class="btn kbazm-social kbazm-btn kbazm-facebook" ><i class="fa fa-facebook"></i>{{ login_with_facebook }}</div>
+                                       </div> 
+                                    </div>
+                                </div>
+                                 <div class="form-group"> 
+                                    <label class="col-sm-2 control-label" for="input-status">{{ text_google }}</label> 
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ google_icon_color }}" class="mColorPicker google iconcolor form-control" name="color[google][icon]"  id="color_4" style="background-color: {{ google_icon_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_4" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                   
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ google_text_color }}" class="mColorPicker google textcolor form-control" name="color[google][text]"  id="color_6" style="background-color: {{ google_text_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_6" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3" align="right">
+                                        <div id="icon_google_small_circular" {% if (icon_type != 'small_circular') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div  class="kbsocial-icons icon-circle" ><i style="background-color:{{ google_icon_color }}; color:{{ google_text_color }};" class="fa fa-google"></i></div>
+                                        </div>
+                                        <div id="icon_google_small_rectangular" {% if (icon_type != 'small_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div class="kbsocial-icons icon-flat" ><i style="background-color:{{ google_icon_color }}; color:{{ google_text_color }};" class="fa fa-google"></i></div>
+                                        </div>
+                                        <div id="icon_google_small_rounded" {% if (icon_type != 'small_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div class="kbsocial-icons icon-rounded" ><i style="background-color:{{ google_icon_color }}; color:{{ google_text_color }};" class="fa fa-google"></i></div>
+                                        </div>
+                                        <div id="icon_google_large_rounded" {% if (icon_type != 'large_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div style="background-color:{{ google_icon_color }}; color:{{ google_text_color }};" class="btn kbazm-social kbazm-btn kbazm-pill kbazm-google" ><i class="fa fa-google"></i>{{ login_with_google }}</div>
+                                        </div>
+                                        <div id="icon_google_large_rectangular" {% if (icon_type != 'large_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div style="background-color:{{ google_icon_color }}; color:{{ google_text_color }};" class="btn kbazm-social kbazm-btn kbazm-google" ><i class="fa fa-google"></i>{{ login_with_google }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="form-group"> 
+                                    <label class="col-sm-2 control-label" for="input-status">{{text_linkedin }}</label> 
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ linkedin_icon_color }}" class="mColorPicker linkedin iconcolor form-control" name="color[linkedin][icon]"  id="color_7" style="background-color: {{ linkedin_icon_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_7" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                   
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ linkedin_text_color }}" class="mColorPicker linkedin textcolor form-control" name="color[linkedin][text]"  id="color_9" style="background-color: {{ linkedin_text_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_9" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3" align="right">
+                                        <div id="icon_linkedin_small_circular" {% if (icon_type != 'small_circular') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div class="kbsocial-icons icon-circle" ><i style="background-color:{{ linkedin_icon_color }}; color:{{ linkedin_text_color }};" class="fa fa-linkedin"></i></div>
+                                        </div>
+                                        <div id="icon_linkedin_small_rectangular" {% if (icon_type != 'small_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div class="kbsocial-icons icon-flat" ><i style="background-color:{{ linkedin_icon_color }}; color:{{ linkedin_text_color }};" class="fa fa-linkedin"></i></div>
+                                        </div>
+                                        <div id="icon_linkedin_small_rounded" {% if (icon_type != 'small_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div class="kbsocial-icons icon-rounded" ><i style="background-color:{{ linkedin_icon_color }}; color:{{ linkedin_text_color }};" class="fa fa-linkedin"></i></div>
+                                        </div>
+                                        <div id="icon_linkedin_large_rounded" {% if (icon_type != 'large_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div style="background-color:{{ linkedin_icon_color }}; color:{{ linkedin_text_color }};" class="btn kbazm-social kbazm-btn kbazm-pill kbazm-linkedin" ><i class="fa fa-linkedin"></i>{{ login_with_linked }}</div>
+                                        </div>
+                                        <div id="icon_linkedin_large_rectangular" {% if (icon_type != 'large_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div style="background-color:{{ linkedin_icon_color }}; color:{{ linkedin_text_color }};" class="btn kbazm-social kbazm-btn kbazm-linkedin" ><i class="fa fa-linkedin"></i>{{ login_with_linked }}</div>
+                                        </div>
+                                    </div> 
+                                </div>
+<!--                                 <div class="form-group"> 
+                                    <label class="col-sm-2 control-label" for="input-status">{{text_live }}</label> 
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ live_icon_color }}" class="mColorPicker live iconcolor form-control" name="color[live][icon]"  id="color_10" style="background-color: {{ live_icon_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_10" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                     <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ live_text_color }}" class="mColorPicker live textcolor form-control" name="color[live][text]"  id="color_12" style="background-color: {{ live_text_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_12" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3" align="right">
+                                       <div id="icon_live_small_circular" {% if (icon_type != 'small_circular') %} {{ 'style="display:none"' }}{% endif %} >
+                                        <div class="kbsocial-icons icon-circle" ><i style="background-color:{{ live_icon_color }}; color:{{ live_text_color }};" class="fa fa-windows"></i></div>
+                                      </div>
+                                      <div id="icon_live_small_rectangular" {% if (icon_type != 'small_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                        <div class="kbsocial-icons icon-flat" ><i style="background-color:{{ live_icon_color }}; color:{{ live_text_color }};" class="fa fa-windows"></i></div>
+                                      </div>
+                                      <div id="icon_live_small_rounded" {% if (icon_type != 'small_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                        <div class="kbsocial-icons icon-rounded" ><i style="background-color:{{ live_icon_color }}; color:{{ live_text_color }};" class="fa fa-windows"></i></div>
+                                      </div>
+                                      <div id="icon_live_large_rounded" {% if (icon_type != 'large_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                        <div style="background-color:{{ live_icon_color }}; color:{{ live_text_color }};" class="btn kbazm-social kbazm-btn kbazm-pill kbazm-windows" ><i class="fa fa-windows"></i>{{ login_with_live }}</div>
+                                      </div>
+                                      <div id="icon_live_large_rectangular" {% if (icon_type != 'large_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                         <div style="background-color:{{ live_icon_color }}; color:{{ live_text_color }};" class="btn kbazm-social kbazm-btn kbazm-windows" ><i class="fa fa-windows"></i>{{ login_with_live }}</div>
+                                      </div>
+                                    </div> 
+                                  </div>-->
+                                 <div class="form-group"> 
+                                    <label class="col-sm-2 control-label" for="input-status">{{text_twitter }}</label> 
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ twitter_icon_color }}" class="mColorPicker twitter iconcolor form-control" name="color[twitter][icon]"  id="color_13" style="background-color: {{ twitter_icon_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_13" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ twitter_text_color }}" class="mColorPicker twitter textcolor form-control" name="color[twitter][text]"  id="color_15" style="background-color: {{ twitter_text_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_15" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3" align="right">
+                                        <div id="icon_twitter_small_circular" {% if (icon_type != 'small_circular') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div class="kbsocial-icons icon-circle" ><i style="background-color:{{ twitter_icon_color }}; color:{{ twitter_text_color }};" class="fa fa-twitter"></i></div>
+                                        </div>
+                                            <div id="icon_twitter_small_rectangular" {% if (icon_type != 'small_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                        <div class="kbsocial-icons icon-flat" ><i style="background-color:{{ twitter_icon_color }}; color:{{ twitter_text_color }};" class="fa fa-twitter"></i></div>
+                                        </div>
+                                            <div id="icon_twitter_small_rounded" {% if (icon_type != 'small_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                        <div class="kbsocial-icons icon-rounded" ><i style="background-color:{{ twitter_icon_color }}; color:{{ twitter_text_color }};" class="fa fa-twitter"></i></div>
+                                        </div>
+                                            <div id="icon_twitter_large_rounded" {% if (icon_type != 'large_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                        <div style="background-color:{{ twitter_icon_color }}; color:{{ twitter_text_color }};" class="btn kbazm-social kbazm-btn kbazm-pill kbazm-twitter" ><i class="fa fa-twitter"></i>{{ login_with_twitter }}</div>
+                                        </div>
+                                        <div id="icon_twitter_large_rectangular" {% if (icon_type != 'large_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div style="background-color:{{ twitter_icon_color }}; color:{{ twitter_text_color }};" class="btn kbazm-social kbazm-btn kbazm-twitter" ><i class="fa fa-twitter"></i>{{ login_with_twitter }}</div>
+                                        </div>
+                                    </div>   
+                                </div>
+                                 <div class="form-group"> 
+                                    <label class="col-sm-2 control-label" for="input-status">{{text_yahoo }}</label> 
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ yahoo_icon_color }}" class="mColorPicker yahoo iconcolor form-control" name="color[yahoo][icon]"  id="color_16" style="background-color: {{ yahoo_icon_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_16" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                   <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ yahoo_text_color }}" class="mColorPicker yahoo textcolor form-control" name="color[yahoo][text]"  id="color_18" style="background-color: {{ yahoo_text_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_18" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3" align="right">
+                                        <div id="icon_yahoo_small_circular" {% if (icon_type != 'small_circular') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div class="kbsocial-icons icon-circle" ><i style="background-color:{{ yahoo_icon_color }}; color:{{ yahoo_text_color }};" class="fa fa-yahoo"></i></div>
+                                        </div>
+                                        <div id="icon_yahoo_small_rectangular" {% if (icon_type != 'small_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div class="kbsocial-icons icon-flat" ><i style="background-color:{{ yahoo_icon_color }}; color:{{ yahoo_text_color }};" class="fa fa-yahoo"></i></div>
+                                        </div>
+                                        <div id="icon_yahoo_small_rounded" {% if (icon_type != 'small_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div class="kbsocial-icons icon-rounded" ><i style="background-color:{{ yahoo_icon_color }}; color:{{ yahoo_text_color }};" class="fa fa-yahoo"></i></div>
+                                        </div>
+                                        <div id="icon_yahoo_large_rounded" {% if (icon_type != 'large_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div style="background-color:{{ yahoo_icon_color }}; color:{{ yahoo_text_color }};" class="btn kbazm-social kbazm-btn kbazm-pill kbazm-yahoo" ><i class="fa fa-yahoo"></i>{{ login_with_yahoo }}</div>
+                                        </div>
+                                        <div id="icon_yahoo_large_rectangular" {% if (icon_type != 'large_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                           <div style="background-color:{{ yahoo_icon_color }}; color:{{ yahoo_text_color }};" class="btn kbazm-social kbazm-btn kbazm-yahoo" ><i class="fa fa-yahoo"></i>{{ login_with_yahoo }}</div>
+                                        </div>                                        
+                                    </div>                                
+                                 </div>
+                                 <div class="form-group"> 
+                                    <label class="col-sm-2 control-label" for="input-status">{{text_amazon }}</label> 
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ amazon_icon_color }}" class="mColorPicker amazon iconcolor form-control" name="color[amazon][icon]"  id="color_19" style="background-color: {{ amazon_icon_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_19" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ amazon_text_color }}" class="mColorPicker amazon textcolor form-control" name="color[amazon][text]"  id="color_21" style="background-color: {{ amazon_text_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_21" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3" align="right">
+                                        <div id="icon_amazon_small_circular" {% if (icon_type != 'small_circular') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div class="kbsocial-icons icon-circle" ><i style="background-color:{{ amazon_icon_color }}; color:{{ amazon_text_color }};" class="fa fa-amazon"></i></div>
+                                        </div>
+                                        <div id="icon_amazon_small_rectangular" {% if (icon_type != 'small_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div class="kbsocial-icons icon-flat" ><i style="background-color:{{ amazon_icon_color }}; color:{{ amazon_text_color }};" class="fa fa-amazon"></i></div>
+                                        </div>
+                                        <div id="icon_amazon_small_rounded" {% if (icon_type != 'small_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div class="kbsocial-icons icon-rounded" ><i style="background-color:{{ amazon_icon_color }}; color:{{ amazon_text_color }};" class="fa fa-amazon"></i></div>
+                                        </div>
+                                        <div id="icon_amazon_large_rounded" {% if (icon_type != 'large_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div style="background-color:{{ amazon_icon_color }}; color:{{ amazon_text_color }};" class="btn kbazm-social kbazm-btn kbazm-pill kbazm-amazon" ><i class="fa fa-amazon"></i>{{ login_with_amazon }}</div>
+                                        </div>
+                                        <div id="icon_amazon_large_rectangular" {% if (icon_type != 'large_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                           <div style="background-color:{{ amazon_icon_color }}; color:{{ amazon_text_color }};" class="btn kbazm-social kbazm-btn kbazm-amazon" ><i class="fa fa-amazon"></i>{{ login_with_amazon }}</div>
+                                        </div>                                        
+                                    </div>    
+                                </div>
+                                 <div class="form-group"> 
+                                    <label class="col-sm-2 control-label" for="input-status">{{text_instagram }}</label> 
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ instagram_icon_color }}" class="mColorPicker instagram iconcolor form-control" name="color[instagram][icon]"  id="color_22" style="background-color: {{ instagram_icon_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_22" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                       <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ instagram_text_color }}" class="mColorPicker  instagram textcolor form-control" name="color[instagram][text]"  id="color_24" style="background-color: {{ instagram_text_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_24" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3" align="right">
+                                        <div id="icon_instagram_small_circular" {% if (icon_type != 'small_circular') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div class="kbsocial-icons icon-circle" ><i style="background-color:{{ instagram_icon_color }}; color:{{ instagram_text_color }};" class="fa fa-instagram"></i></div>
+                                          </div>
+                                          <div id="icon_instagram_small_rectangular" {% if (icon_type != 'small_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div class="kbsocial-icons icon-flat" ><i style="background-color:{{ instagram_icon_color }}; color:{{ instagram_text_color }};" class="fa fa-instagram"></i></div>
+                                          </div>
+                                          <div id="icon_instagram_small_rounded" {% if (icon_type != 'small_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div class="kbsocial-icons icon-rounded" ><i style="background-color:{{ instagram_icon_color }}; color:{{ instagram_text_color }};" class="fa fa-instagram"></i></div>
+                                          </div>
+                                          <div id="icon_instagram_large_rounded" {% if (icon_type != 'large_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div style="background-color:{{ instagram_icon_color }}; color:{{ instagram_text_color }};" class="btn kbazm-social kbazm-btn kbazm-pill kbazm-instagram" ><i class="fa fa-instagram"></i>{{ login_with_instagram }}</div>
+                                          </div>
+                                          <div id="icon_instagram_large_rectangular" {% if (icon_type != 'large_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                             <div style="background-color:{{ instagram_icon_color }}; color:{{ instagram_text_color }};" class="btn kbazm-social kbazm-btn kbazm-instagram" ><i class="fa fa-instagram"></i>{{ login_with_instagram }}</div>
+                                          </div>
+                                    </div>   
+                                </div>
+                                 <div class="form-group"> 
+                                    <label class="col-sm-2 control-label" for="input-status">{{text_paypal }}</label> 
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ paypal_icon_color }}" class="mColorPicker paypal iconcolor form-control" name="color[paypal][icon]"  id="color_25" style="background-color: {{ paypal_icon_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_25" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                            <input type="text" data-hex="true" value="{{ paypal_text_color }}" class="mColorPicker paypal textcolor form-control" name="color[paypal][text]"  id="color_27" style="background-color: {{ paypal_text_color }}; color: white;" readonly >
+                                            <span style="cursor:pointer;" id="icp_color_27" class="mColorPickerTrigger input-group-addon" data-mcolorpicker="true"><img src="{{ constant('HTTPS_SERVER') }}view/image/ocsociallogin/color.png" style="border:0;margin:0 0 0 3px" align="absmiddle"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3" align="right">
+                                        <div id="icon_paypal_small_circular" {% if (icon_type != 'small_circular') %} {{ 'style="display:none"' }}{% endif %} >
+                                            <div class="kbsocial-icons icon-circle" ><i style="background-color:{{ paypal_icon_color }}; color:{{ paypal_text_color }};" class="fa fa-paypal"></i></div>
+                                        </div>
+                                        <div id="icon_paypal_small_rectangular" {% if (icon_type != 'small_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div class="kbsocial-icons icon-flat" ><i style="background-color:{{ paypal_icon_color }}; color:{{ paypal_text_color }};" class="fa fa-paypal"></i></div>
+                                        </div>
+                                        <div id="icon_paypal_small_rounded" {% if (icon_type != 'small_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div class="kbsocial-icons icon-rounded" ><i style="background-color:{{ paypal_icon_color }}; color:{{ paypal_text_color }};" class="fa fa-paypal"></i></div>
+                                        </div>
+                                        <div id="icon_paypal_large_rounded" {% if (icon_type != 'large_rounded') %} {{ 'style="display:none"' }}{% endif %} >
+                                          <div style="background-color:{{ paypal_icon_color }}; color:{{ paypal_text_color }};" class="btn kbazm-social kbazm-btn kbazm-pill kbazm-paypal" ><i class="fa fa-paypal"></i>{{ login_with_paypal }}</div>
+                                        </div>
+                                        <div id="icon_paypal_large_rectangular" {% if (icon_type != 'large_rectangular') %} {{ 'style="display:none"' }}{% endif %} >
+                                           <div style="background-color:{{ paypal_icon_color }}; color:{{ paypal_text_color }};" class="btn kbazm-social kbazm-btn kbazm-paypal" ><i class="fa fa-paypal"></i>{{ login_with_paypal }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                             </div> 
+                         </form>    
+                    </div>    
+                </div>    
+            </div>
+        </div>
+    </div>
+</div> 
+<script src="view/javascript/ocsociallogin/jquery.colorpicker.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function () {
+     var error_message = '{{ form_error_message }}';
+    velovalidation.setErrorLanguage({
+            empty_field: '{{ error_empty_field }}',
+    });
+    
+    $("#button_color").change(function() {
+        if($(this).val() == 0) {
+            $("#select_color").hide();
+        } else {
+            $("#select_color").show();
+        }
+    });
+     $("#icon_type").change(function() {
+        if($(this).val() == 'small_circular') {
+            $("#icon_facebook_small_circular").show();
+            $("#icon_facebook_small_rectangular").hide();
+            $("#icon_facebook_small_rounded").hide();
+            $("#icon_facebook_large_rounded").hide();
+            $("#icon_facebook_large_rectangular").hide();
+            $("#icon_google_small_circular").show();
+            $("#icon_google_small_rectangular").hide();
+            $("#icon_google_small_rounded").hide();
+            $("#icon_google_large_rounded").hide();
+            $("#icon_google_large_rectangular").hide();
+            $("#icon_linkedin_small_circular").show();
+            $("#icon_linkedin_small_rectangular").hide();
+            $("#icon_linkedin_small_rounded").hide();
+            $("#icon_linkedin_large_rounded").hide();
+            $("#icon_linkedin_large_rectangular").hide();
+            $("#icon_live_small_circular").show();
+            $("#icon_live_small_rectangular").hide();
+            $("#icon_live_small_rounded").hide();
+            $("#icon_live_large_rounded").hide();
+            $("#icon_live_large_rectangular").hide();
+            $("#icon_twitter_small_circular").show();
+            $("#icon_twitter_small_rectangular").hide();
+            $("#icon_twitter_small_rounded").hide();
+            $("#icon_twitter_large_rounded").hide();
+            $("#icon_twitter_large_rectangular").hide();
+            $("#icon_yahoo_small_circular").show();
+            $("#icon_yahoo_small_rectangular").hide();
+            $("#icon_yahoo_small_rounded").hide();
+            $("#icon_yahoo_large_rounded").hide();
+            $("#icon_yahoo_large_rectangular").hide();
+            $("#icon_amazon_small_circular").show();
+            $("#icon_amazon_small_rectangular").hide();
+            $("#icon_amazon_small_rounded").hide();
+            $("#icon_amazon_large_rounded").hide();
+            $("#icon_amazon_large_rectangular").hide();
+            $("#icon_instagram_small_circular").show();
+            $("#icon_instagram_small_rectangular").hide();
+            $("#icon_instagram_small_rounded").hide();
+            $("#icon_instagram_large_rounded").hide();
+            $("#icon_instagram_large_rectangular").hide();
+            $("#icon_paypal_small_circular").show();
+            $("#icon_paypal_small_rectangular").hide();
+            $("#icon_paypal_small_rounded").hide();
+            $("#icon_paypal_large_rounded").hide();
+            $("#icon_paypal_large_rectangular").hide();
+        } else if($(this).val() == 'small_rectangular') {
+            $("#icon_facebook_small_circular").hide();
+            $("#icon_facebook_small_rectangular").show();
+            $("#icon_facebook_small_rounded").hide();
+            $("#icon_facebook_large_rounded").hide();
+            $("#icon_facebook_large_rectangular").hide();
+            $("#icon_google_small_circular").hide();
+            $("#icon_google_small_rectangular").show();
+            $("#icon_google_small_rounded").hide();
+            $("#icon_google_large_rounded").hide();
+            $("#icon_google_large_rectangular").hide();
+            $("#icon_linkedin_large_rectangular").hide();
+            $("#icon_linkedin_small_circular").hide();
+            $("#icon_linkedin_small_rectangular").show();
+            $("#icon_linkedin_small_rounded").hide();
+            $("#icon_linkedin_large_rounded").hide();
+            $("#icon_linkedin_large_rectangular").hide();
+            $("#icon_live_small_circular").hide();
+            $("#icon_live_small_rectangular").show();
+            $("#icon_live_small_rounded").hide();
+            $("#icon_live_large_rounded").hide();
+            $("#icon_live_large_rectangular").hide();
+            $("#icon_twitter_small_circular").hide();
+            $("#icon_twitter_small_rectangular").show();
+            $("#icon_twitter_small_rounded").hide();
+            $("#icon_twitter_large_rounded").hide();
+            $("#icon_twitter_large_rectangular").hide();
+            $("#icon_yahoo_small_circular").hide();
+            $("#icon_yahoo_small_rectangular").show();
+            $("#icon_yahoo_small_rounded").hide();
+            $("#icon_yahoo_large_rounded").hide();
+            $("#icon_yahoo_large_rectangular").hide();
+            $("#icon_amazon_large_rectangular").hide();
+            $("#icon_amazon_small_circular").hide();
+            $("#icon_amazon_small_rectangular").show();
+            $("#icon_amazon_small_rounded").hide();
+            $("#icon_amazon_large_rounded").hide();
+            $("#icon_amazon_large_rectangular").hide();
+            $("#icon_instagram_small_circular").hide();
+            $("#icon_instagram_small_rectangular").show();
+            $("#icon_instagram_small_rounded").hide();
+            $("#icon_instagram_large_rounded").hide();
+            $("#icon_instagram_large_rectangular").hide();
+            $("#icon_paypal_small_circular").hide();
+            $("#icon_paypal_small_rectangular").show();
+            $("#icon_paypal_small_rounded").hide();
+            $("#icon_paypal_large_rounded").hide();
+            $("#icon_paypal_large_rectangular").hide();
+        } else if($(this).val() == 'small_rounded') {
+            $("#icon_facebook_small_circular").hide();
+            $("#icon_facebook_small_rectangular").hide();
+            $("#icon_facebook_small_rounded").show();
+            $("#icon_facebook_large_rounded").hide();
+            $("#icon_facebook_large_rectangular").hide();
+            $("#icon_google_small_circular").hide();
+            $("#icon_google_small_rectangular").show();
+            $("#icon_google_small_rounded").hide();
+            $("#icon_google_large_rounded").hide();
+            $("#icon_google_large_rectangular").hide();
+            $("#icon_linkedin_small_circular").hide();
+            $("#icon_linkedin_small_rectangular").hide();
+            $("#icon_linkedin_small_rounded").show();
+            $("#icon_linkedin_large_rounded").hide();
+            $("#icon_linkedin_large_rectangular").hide();
+            $("#icon_live_small_circular").hide();
+            $("#icon_live_small_rectangular").hide();
+            $("#icon_live_small_rounded").show();
+            $("#icon_live_large_rounded").hide();
+            $("#icon_live_large_rectangular").hide();
+            $("#icon_twitter_small_circular").hide();
+            $("#icon_twitter_small_rectangular").hide();
+            $("#icon_twitter_small_rounded").show();
+            $("#icon_twitter_large_rounded").hide();
+            $("#icon_twitter_large_rectangular").hide();
+            $("#icon_yahoo_small_circular").hide();
+            $("#icon_yahoo_small_rectangular").show();
+            $("#icon_yahoo_small_rounded").hide();
+            $("#icon_yahoo_large_rounded").hide();
+            $("#icon_yahoo_large_rectangular").hide();
+            $("#icon_amazon_small_circular").hide();
+            $("#icon_amazon_small_rectangular").hide();
+            $("#icon_amazon_small_rounded").show();
+            $("#icon_amazon_large_rounded").hide();
+            $("#icon_amazon_large_rectangular").hide();
+            $("#icon_instagram_small_circular").hide();
+            $("#icon_instagram_small_rectangular").hide();
+            $("#icon_instagram_small_rounded").show();
+            $("#icon_instagram_large_rounded").hide();
+            $("#icon_instagram_large_rectangular").hide();
+            $("#icon_paypal_small_circular").hide();
+            $("#icon_paypal_small_rectangular").hide();
+            $("#icon_paypal_small_rounded").show();
+            $("#icon_paypal_large_rounded").hide();
+            $("#icon_paypal_large_rectangular").hide();
+        } else if($(this).val() ==  'large_rectangular') {
+            $("#icon_facebook_small_circular").hide();
+            $("#icon_facebook_small_rectangular").hide();
+            $("#icon_facebook_small_rounded").hide();
+            $("#icon_facebook_large_rounded").hide();
+            $("#icon_facebook_large_rectangular").show();
+            $("#icon_google_small_circular").hide();
+            $("#icon_google_small_rectangular").hide();
+            $("#icon_google_small_rounded").hide();
+            $("#icon_google_large_rounded").hide();
+            $("#icon_google_large_rectangular").show();
+            $("#icon_linkedin_small_circular").hide();
+            $("#icon_linkedin_small_rectangular").hide();
+            $("#icon_linkedin_small_rounded").hide();
+            $("#icon_linkedin_large_rounded").hide();
+            $("#icon_linkedin_large_rectangular").show();
+            $("#icon_live_small_circular").hide();
+            $("#icon_live_small_rectangular").hide();
+            $("#icon_live_small_rounded").hide();
+            $("#icon_live_large_rounded").hide();
+            $("#icon_live_large_rectangular").show();
+            $("#icon_twitter_small_circular").hide();
+            $("#icon_twitter_small_rectangular").hide();
+            $("#icon_twitter_small_rounded").hide();
+            $("#icon_twitter_large_rounded").hide();
+            $("#icon_twitter_large_rectangular").show();
+            $("#icon_yahoo_small_circular").hide();
+            $("#icon_yahoo_small_rectangular").hide();
+            $("#icon_yahoo_small_rounded").hide();
+            $("#icon_yahoo_large_rounded").hide();
+            $("#icon_yahoo_large_rectangular").show();
+            $("#icon_amazon_small_circular").hide();
+            $("#icon_amazon_small_rectangular").hide();
+            $("#icon_amazon_small_rounded").hide();
+            $("#icon_amazon_large_rounded").hide();
+            $("#icon_amazon_large_rectangular").show();
+            $("#icon_instagram_small_circular").hide();
+            $("#icon_instagram_small_rectangular").hide();
+            $("#icon_instagram_small_rounded").hide();
+            $("#icon_instagram_large_rounded").hide();
+            $("#icon_instagram_large_rectangular").show();
+            $("#icon_paypal_small_circular").hide();
+            $("#icon_paypal_small_rectangular").hide();
+            $("#icon_paypal_small_rounded").hide();
+            $("#icon_paypal_large_rounded").hide();
+            $("#icon_paypal_large_rectangular").show();
+        } else if($(this).val() == 'large_rounded') {
+            $("#icon_facebook_small_circular").hide();
+            $("#icon_facebook_small_rectangular").hide();
+            $("#icon_facebook_small_rounded").hide();
+            $("#icon_facebook_large_rounded").show();
+            $("#icon_facebook_large_rectangular").hide();
+            $("#icon_google_small_circular").hide();
+            $("#icon_google_small_rectangular").hide();
+            $("#icon_google_small_rounded").hide();
+            $("#icon_google_large_rounded").show();
+            $("#icon_google_large_rectangular").hide();
+            $("#icon_linkedin_small_circular").hide();
+            $("#icon_linkedin_small_rectangular").hide();
+            $("#icon_linkedin_small_rounded").hide();
+            $("#icon_linkedin_large_rounded").show();
+            $("#icon_linkedin_large_rectangular").hide();
+            $("#icon_live_small_circular").hide();
+            $("#icon_live_small_rectangular").hide();
+            $("#icon_live_small_rounded").hide();
+            $("#icon_live_large_rounded").show();
+            $("#icon_live_large_rectangular").hide();
+            $("#icon_twitter_small_circular").hide();
+            $("#icon_twitter_small_rectangular").hide();
+            $("#icon_twitter_small_rounded").hide();
+            $("#icon_twitter_large_rounded").show();
+            $("#icon_twitter_large_rectangular").hide();
+            $("#icon_yahoo_small_circular").hide();
+            $("#icon_yahoo_small_rectangular").hide();
+            $("#icon_yahoo_small_rounded").hide();
+            $("#icon_yahoo_large_rounded").show();
+            $("#icon_yahoo_large_rectangular").hide();
+            $("#icon_amazon_small_circular").hide();
+            $("#icon_amazon_small_rectangular").hide();
+            $("#icon_amazon_small_rounded").hide();
+            $("#icon_amazon_large_rounded").show();
+            $("#icon_amazon_large_rectangular").hide();
+            $("#icon_instagram_small_circular").hide();
+            $("#icon_instagram_small_rectangular").hide();
+            $("#icon_instagram_small_rounded").hide();
+            $("#icon_instagram_large_rounded").show();
+            $("#icon_instagram_large_rectangular").hide();
+            $("#icon_paypal_small_circular").hide();
+            $("#icon_paypal_small_rectangular").hide();
+            $("#icon_paypal_small_rounded").hide();
+            $("#icon_paypal_large_rounded").show();
+            $("#icon_paypal_large_rectangular").hide();
+
+        }
+    });
+    
+    
+    $("#ocsociallogin_icon_save").click(function() {
+        var error = false;
+        $(".has-error").removeClass("has-error");
+        $(".text-danger").remove();
+
+        var name_mandatory = velovalidation.checkMandatory($('#name'));
+        var choose_login_mandatory = velovalidation.checkMultiMandatory($('#choose_login'));
+
+        if (name_mandatory != true) {
+            error = true;
+            $("#name").parent().parent().addClass("has-error");
+            $("#name").after('<div class="text-danger">' + name_mandatory + '</span>');
+        } 
+
+        if (choose_login_mandatory != true) {
+            error = true;
+            $("#choose_login").parent().parent().addClass("has-error");
+            $("#choose_login").after('<div class="text-danger">' + choose_login_mandatory + '</span>');
+        } 
+
+        if (error) {
+         $('#error_message').html('<div class="alert alert-danger"><i class="fa fa-check-circle">' + error_message + '</i></div>');
+           return false;
+        } else {
+           $("#form-ocsocialloginicon").submit();
+        }
+    });    
+    
+    $(".mColorPicker").each(function() {
+        var rgb = $(this).css("backgroundColor");
+        rgb=rgb.replace(/[^\d,]/g, '').split(",");
+        var y = 2.99 * rgb[0] + 5.87 * rgb[1] + 1.14 * rgb[2];
+        if (y >= 1275) {
+            $(this).css('color','black');
+        } else {
+            $(this).css('color','white');
+        }
+    }); 
+        
+    $(".mColorPicker").each(function() {
+        $(this).change(function() {
+            var color = $(this).val();
+            
+            if($(this).hasClass("facebook")) {
+                if($(this).hasClass("iconcolor")) {
+                    $(".kbazm-facebook").css("background", color);
+                    $(".fa-facebook").css("background", color);
+                } else if($(this).hasClass("textcolor")) {
+                    $(".kbazm-facebook").css("color", color);
+                    $(".fa-facebook").css("color", color);
+                } 
+            }
+            
+            if($(this).hasClass("google")) {
+                if($(this).hasClass("iconcolor")) {
+                    $(".kbazm-google").css("background", color);
+                    $(".fa-google").css("background", color);
+                } else if($(this).hasClass("textcolor")) {
+                    $(".kbazm-google").css("color", color);
+                    $(".fa-google").css("color", color);
+                } 
+            }
+            
+            if($(this).hasClass("linkedin")) {
+                if($(this).hasClass("iconcolor")) {
+                    $(".kbazm-linkedin").css("background", color);
+                    $(".fa-linkedin").css("background", color);
+                } else if($(this).hasClass("textcolor")) {
+                    $(".kbazm-linkedin").css("color", color);
+                    $(".fa-linkedin").css("color", color);
+                } 
+            }
+            
+            if($(this).hasClass("live")) {
+                if($(this).hasClass("iconcolor")) {
+                    $(".kbazm-windows").css("background", color);
+                    $(".fa-windows").css("background", color);
+                } else if($(this).hasClass("textcolor")) {
+                    $(".kbazm-windows").css("color", color);
+                    $(".fa-windows").css("color", color);
+                } 
+            }
+            
+            if($(this).hasClass("twitter")) {
+                if($(this).hasClass("iconcolor")) {
+                    $(".kbazm-twitter").css("background", color);
+                    $(".fa-twitter").css("background", color);
+                } else if($(this).hasClass("textcolor")) {
+                    $(".kbazm-twitter").css("color", color);
+                    $(".fa-twitter").css("color", color);
+                } 
+            }
+            
+            if($(this).hasClass("yahoo")) {
+                if($(this).hasClass("iconcolor")) {
+                    $(".kbazm-yahoo").css("background", color);
+                    $(".fa-yahoo").css("background", color);
+                } else if($(this).hasClass("textcolor")) {
+                    $(".kbazm-yahoo").css("color", color);
+                    $(".fa-yahoo").css("color", color);
+                } 
+            }
+            
+            if($(this).hasClass("amazon")) {
+                if($(this).hasClass("iconcolor")) {
+                    $(".kbazm-amazon").css("background", color);
+                    $(".fa-amazon").css("background", color);
+                } else if($(this).hasClass("textcolor")) {
+                    $(".kbazm-amazon").css("color", color);
+                    $(".fa-amazon").css("color", color);
+                } 
+            }
+            
+            if($(this).hasClass("instagram")) {
+                if($(this).hasClass("iconcolor")) {
+                    $(".kbazm-instagram").css("background", color);
+                    $(".fa-instagram").css("background", color);
+                } else if($(this).hasClass("textcolor")) {
+                    $(".kbazm-instagram").css("color", color);
+                    $(".fa-instagram").css("color", color);
+                } 
+            }
+            
+            if($(this).hasClass("paypal")) {
+                if($(this).hasClass("iconcolor")) {
+                    $(".kbazm-paypal").css("background", color);
+                    $(".fa-paypal").css("background", color);
+                } else if($(this).hasClass("textcolor")) {
+                    $(".kbazm-paypal").css("color", color);
+                    $(".fa-paypal").css("color", color);
+                } 
+            }
+            
+            
+            
+            
+        })
+    });
+
+});
+</script>
+{{ footer }}

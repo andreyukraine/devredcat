@@ -1,0 +1,21 @@
+<script>
+  // Додаємо перевірку window.beginCheckoutSent
+  if (window.location.pathname.includes('/checkout') && !window.beginCheckoutSent) {
+    window.beginCheckoutSent = true; // Встановлюємо прапорець, що подію відправлено
+
+    sendGA4Event("begin_checkout", {
+      items: [
+        {% for product in products %}
+        {
+          item_name: "{{ product.name|escape('js') }}",
+          item_id: "{{ product.product_id }}",
+          price: {{ product.price }},
+          item_brand: "{{ product.manufacturer|default('not set')|escape('js') }}",
+          item_category: "{{ product.category }}",
+          quantity: {{ product.quantity }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+    });
+  }
+</script>

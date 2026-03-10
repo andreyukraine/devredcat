@@ -1,0 +1,212 @@
+<div class="menuview-container">
+  <div id="menuview-content">
+    <div class="bl-f-m-content">
+      <div class="menu-logo-container">
+        <div id="logo" class="fix-logo">
+          {% if logo %}
+            <a title="{{ home }}" href="{{ home }}">
+              <img width="103px" height="50px" src="{{ logo }}" title="{{ name }}" alt="{{ name }}"/></a>
+          {% else %}
+            <a title="{{ home }}" href="{{ home }}">{{ name }}</a>
+          {% endif %}
+        </div>
+        <img class="menu-fix-close" title="{{ text_close }}" width="25px" height="25px" src="/image/close.svg" onclick='ocmenuview.close()' alt="close">
+      </div>
+
+      <div class="menu-fix-top-menu hidden" id="shared-submenu-header">
+        <img class="menu-fix-close" width="25px" height="25px" src="/image/close.svg" onclick='ocmenuview.close()' alt="{{ text_close }}">
+        <div class="menu-fix-title">
+          <span class="back-button rm_mobile_menu_back-icon"></span>
+          <div class="text-21 bl-bold" id="submenu-shared-title"></div>
+        </div>
+      </div>
+
+      <div class="menu-fix-top">
+        <div class="menu-fix-title">
+          <h3 id="type-text" class="bl-bold">{{ type_text }}</h3>
+        </div>
+
+        <div id="bl-toogle" class="toggle-container {{ type_class }}">
+          <span id="type-text-check">{{ type_check }}</span>
+          <label class="toggle-switch-menu" for="category-toggle-{{ unique_id }}">
+            <input type="checkbox"
+                   id="category-toggle-{{ unique_id }}"
+                   {% if category_type > 0 %}checked{% endif %}
+                   data-param="notifications_enabled">
+            <span class="toggle-slider"></span>
+            <span class="visually-hidden">Перемикач категорії {{ type_check }}</span>
+          </label>
+        </div>
+
+
+      </div>
+
+      <div id="bl-menu-type">
+      <div class="menu-fix-top-line menu-fix-list">
+        <ul class="list-group">
+          {% for category in categories %}
+            <li class="menu-item {% if category.children %}has-child{% endif %}" data-index="{{ category.id }}">
+              <div class="name-cat-menu text-18 bl-bold">
+                <a title="{{ category.name }}" href="{{ category.href }}" class="bl-bold">{{ category.name }}</a>
+                <span class="count-prod-menu{% if not category.children %}-notsub{% endif %}" style="background-color: {{ category.color }}">{{ category.count }}</span>
+              </div>
+              {% if category.children %}
+                <span class="open-submenu" data-index="{{ category.id }}"></span>
+              {% endif %}
+            </li>
+          {% endfor %}
+
+          {% if manufacturer_total or discont_total %}
+            <li class="dop-menu visible-xs">
+              <ul class="list-unstyled">
+                <li class="menu-item has-child" data-index="6060">
+                  <div class="name-cat-menu text-18 bl-bold">
+                    <a title="Бренди" href="/brands">
+                      <div class="menu-disconts">
+                        <div><img width="30px" height="30px" src="/image/brands.svg" alt="Бренди"></div>
+                        <div>Бренди</div>
+                      </div>
+                    </a>
+                    <a title="Бренди" href="/brands" class="bl-bold"><span class="count-prod-menu">{{ manufacturer_total }}</span></a>
+                  </div>
+                  <a title="Бренди" href="/brands" class="bl-bold"><span class="open-submenu"></span></a>
+                </li>
+                <li class="menu-item has-child" data-index="6060">
+                  <div class="name-cat-menu text-18 bl-bold">
+                    <a title="Акції" href="/discont">
+                      <div class="menu-disconts">
+                        <div><img width="30px" height="30px" alt="Акції" src="/image/sales.svg"></div>
+                        <div>Товари зі знижками</div>
+                      </div>
+                    </a>
+                    <a title="Акції" href="/discont" class="bl-bold"><span class="count-prod-menu">{{ discont_total }}</span></a>
+                  </div>
+                  <a title="Акції" href="/discont" class="bl-bold"><span class="open-submenu"></span></a>
+                </li>
+              </ul>
+            </li>
+          {% endif %}
+
+        </ul>
+      </div>
+      <div class="minimalist-tab" style="position: relative; height: 100%;">
+          {% for category in categories %}
+            {% if category.children %}
+              <div class="minimalist-tab-content" data-index="{{ category.id }}" data-parent-index="root" data-title="{{ category.name }}">
+                <div class="menu-dropdown">
+                  {% for child in category.children %}
+                    <div class="dropdown-item">
+                      <div class="name-cat-menu text-18 bl-bold">
+                        <a title="{{ child.name }}" href="{{ child.href }}" class="bl-bold">{{ child.name }}</a>
+                        <span class="count-prod-menu{% if not child.children %}-notsub{% endif %}" style="background-color: {{ child.color }}">{{ child.count }}</span>
+                      </div>
+                      {% if child.children %}
+                        <span class="open-submenu" data-index="{{ child.id }}"></span>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+              {% for child in category.children %}
+                {% if child.children %}
+                  <div class="minimalist-tab-content" data-index="{{ child.id }}" data-parent-index="{{ category.id }}" data-title="{{ child.name }}">
+                    <div class="menu-dropdown">
+                      {% for subchild in child.children %}
+                        <div class="dropdown-item">
+                          <div class="name-cat-menu text-18">
+                            <a title="{{ subchild.name }}" class="bl-bold" href="{{ subchild.href }}">{{ subchild.name }}</a>
+                            <span class="count-prod-menu" style="background-color: {{ subchild.color }}">{{ subchild.count }}</span>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        </div>
+    </div>
+
+    </div>
+  </div>
+
+  <div id="menuview-bg-block" onclick="ocmenuview.close()"></div>
+
+  <div class="lightbox-container lbo-quickview"></div>
+
+  <input type="hidden" id="qv-text-close" value="{{ text_close }}"/>
+
+</div>
+
+<script>
+  $(document).ready(function () {
+    // Скрыть все подменю
+    function hideAllSubmenus() {
+      $('.minimalist-tab-content').removeClass('active');
+      $('.menu-logo-container').addClass('hidden');
+      $('.menu-fix-top-line').addClass('hidden');
+      $('.menu-fix-top').addClass('hidden');
+      $('#shared-submenu-header').addClass('hidden');
+    }
+
+    // Показать корневое меню
+    function showRootMenu() {
+      hideAllSubmenus();
+      
+      $('.menu-fix-list').removeClass('hidden');
+      $('.more-menu').removeClass('hidden');
+      $('.menu-logo-container').removeClass('hidden');
+      $('.menu-fix-top-line').removeClass('hidden');
+      $('.menu-fix-top').removeClass('hidden');
+
+      $('#shared-submenu-header').addClass('hidden');
+    }
+
+    // Обработчик открытия категории
+    $(document).on('click', '.open-submenu', function (event) {
+      var categoryId = $(this).data('index');
+      hideAllSubmenus();
+      
+      $('.menu-fix-list').addClass('hidden');
+      $('.more-menu').addClass('hidden');
+
+      var submenu = $('.minimalist-tab-content[data-index="' + categoryId + '"]');
+      if (submenu.length) {
+        submenu.addClass('active');
+        var title = submenu.data('title') || '';
+        if (title.length > 30) {
+            title = title.substring(0, 30) + '...';
+        }
+        $('#submenu-shared-title').text(title);
+        $('#shared-submenu-header').removeClass('hidden');
+      }
+    });
+
+    // Обработчик кнопки "Назад"
+    $(document).on('click', '.back-button', function () {
+      var currentMenu = $('.minimalist-tab-content.active');
+      var parentIndex = currentMenu.data('parent-index');
+
+      currentMenu.removeClass('active');
+
+      if (parentIndex === "root") {
+        showRootMenu();
+      } else {
+        var parentMenu = $('.minimalist-tab-content[data-index="' + parentIndex + '"]');
+        if (parentMenu.length) {
+          parentMenu.addClass('active');
+          var title = parentMenu.data('title') || '';
+          if (title.length > 30) {
+              title = title.substring(0, 30) + '...';
+          }
+          $('#submenu-shared-title').text(title);
+          $('#shared-submenu-header').removeClass('hidden');
+        }
+      }
+    });
+
+    // Начальная инициализация
+    showRootMenu();
+  });
+</script>

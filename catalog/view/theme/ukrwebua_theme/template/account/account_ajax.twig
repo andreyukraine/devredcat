@@ -1,0 +1,178 @@
+<div class="col-lg-6">
+
+  <div class="bl-conditions">
+    <div class="text-18 bl-bold">Додатково:</div>
+    <br>
+    <div class="conditions-groups">
+      <div class="debit-total">
+        <div class="debit-title-line">
+          <div class="text-18">Відтермінування оплати (днів):</div>
+          <div class="text-32 sum-debit-total">{{ delay_pay }}</div>
+        </div>
+        <div class="debit-title-line">
+          <div class="text-18">Термін резервування (днів):</div>
+          <div class="text-21 sum-bonus-total">{{ delay_reserv }}</div>
+        </div>
+      </div>
+    </div>
+    <br>
+  </div>
+
+  <div class="bl-bots">
+    <div class="bonus-card">
+      <div class="bl-bottom-card">
+        <div class="bl-code">
+          <div class="bl-code-c">
+            <div class="text-code">{{ text_code }}</div>
+            <div class="bonus-card-code">{{ card_code }}</div>
+          </div>
+          <p class="text-phone">{{ text_phone }} : {{ telephone }}</p>
+          <p class="card-sum">{{ text_sum }}: &nbsp; {{ sum }}</p>
+        </div>
+      </div>
+    </div>
+    <img class="bg-card img-responsive" src="/image/discount-card.svg">
+  </div>
+
+  {% if customer_address %}
+    <div class="bl-pricelist hidden-xs hidden-sm">
+      <span class="text-18 bl-bold">Прайс-лист</span>
+      <br>
+      <div id="generate-pricelist" class="button">Завантажити прайс з моєю ціною</div>
+    </div>
+  {% endif %}
+</div>
+
+<div class="col-lg-6">
+
+  <div class="bl-debit">
+    <div class="text-18 bl-bold">Заборгованість:</div>
+    <br>
+    <div class="debit-groups{% if debit_total >= 0 %}-not{% endif %}">
+      <div class="debit-total">
+        <div class="debit-title-line">
+          <div class="text-18">Загалом:</div>
+          <div class="text-32 sum-debit-total">{{ debit_total }}</div>
+        </div>
+        <div class="debit-title-line">
+          <div class="text-18">Бонусний рахунок:</div>
+          <div class="text-21 sum-bonus-total">{{ bonus_total }}</div>
+        </div>
+      </div>
+      {% if orders %}
+        <div class="debit-list">
+          <p>Список незакритих рахунків:</p>
+          <div>
+            {% for ord in orders %}
+                <div class="debit-line">
+                  <div class="debit-line-order">{{ ord.number }} від {{ ord.date }}</div>
+                  <div class="debit-line-sum">- {{ ord.sum_debit }} ₴</div>
+                </div>
+            {% endfor %}
+
+          </div>
+        </div>
+      {% endif %}
+    </div>
+    <br>
+  </div>
+
+  <div class="text-18 bl-bold">Мої персональні знижки</div>
+  <br>
+  {% if price_groups %}
+    <div id="price_groups">
+      {% for price_group in price_groups %}
+        <p>{{ price_group.name }} - {{ price_group.percent }}%</p>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>{{ text_discont_empty }}</p>
+  {% endif %}
+</div>
+
+{% if customer_address %}
+  <div class="bl-pricelist hidden-md hidden-lg">
+    <div class="col-xs-12 col-sm-12">
+      <span class="text-21 bl-bold">Прайс-лист</span>
+      <br>
+      <div id="generate-pricelist" class="button">Завантажити прайс з моєю ціною</div>
+      <script>
+        // генерація прайс-листа
+        $(document).on('click', '#generate-pricelist', function () {
+
+          const button = $(this);
+          const originalText = button.text();
+
+          // Змінюємо текст кнопки
+          button.text('Формуємо, зачекайте...').prop('disabled', true);
+
+          // Відправляємо AJAX запит
+          $.ajax({
+            url: 'index.php?route=account/account/generate_pricelist',
+            type: 'post',
+            data: {ajax: true},
+            dataType: 'json',
+            xhr: function () {
+              var xhr = new XMLHttpRequest();
+
+              // Відстежуємо прогрес завантаження
+              xhr.addEventListener('progress', function (e) {
+                if (e.lengthComputable) {
+                  var percentComplete = (e.loaded / e.total) * 100;
+                }
+              });
+
+              return xhr;
+            },
+            beforeSend: function () {
+              // Можна додати спінер або інший індикатор
+            },
+            success: function (json) {
+              if (json.status) {
+                // Якщо файл успішно створено, завантажуємо його
+                if (json.download_url) {
+                  window.location.href = json.download_url;
+                }
+                button.text('Завантажити прайс з моєю ціною').prop('disabled', false);
+              } else {
+                // Помилка
+                alert('Помилка при генерації прайс-листа: ' + json.error);
+                button.text(originalText).prop('disabled', false);
+              }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+              // Перевіряємо, чи відповідь містить HTML
+              if (xhr.responseText.trim().startsWith('{') && xhr.responseText.trim().endsWith('}')) {
+                // Спроба парсити як JSON
+                try {
+                  const response = JSON.parse(xhr.responseText);
+                  if (response.error) {
+                    alert('Помилка: ' + response.error);
+                  } else {
+                    alert('Невідома помилка');
+                  }
+                } catch (e) {
+                  alert('Помилка обробки відповіді: ' + thrownError);
+                }
+              } else {
+                // Це HTML помилка
+                alert('Серверна помилка. Будь ласка, спробуйте пізніше.');
+                console.error('HTML response:', xhr.responseText);
+              }
+
+              button.text(originalText).prop('disabled', false);
+            },
+            complete: function () {
+              // Автоматично скидаємо через 5 секунд, якщо ще не змінено
+              setTimeout(function () {
+                if (button.text() === 'Формуємо, зачекайте...') {
+                  button.text('Завантажити прайс з моєю ціною').prop('disabled', false);
+                }
+              }, 5000);
+            }
+          });
+        });
+      </script>
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,28 @@
+{% if reviews %}
+{% for review in reviews %}
+<table class="table">
+  <tr>
+    <td style="width: 50%;"><span class="text-18 bl-bold">{{ review.author }}</span></td>
+    <td class="text-right">{{ review.date_added }}</td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <p>{{ review.text }}</p>
+      <div class="ratings">
+        <div class="rating-box">
+          {% for i in 1..5 %}
+            {% if i <= review.rating %}
+              <div class="active"></div>
+            {% else %}
+              <div class="deactive"></div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+  </tr>
+</table>
+{% endfor %}
+<div class="text-right">{{ pagination }}</div>
+{% else %}
+<p>{{ text_no_reviews }}</p>
+{% endif %} 

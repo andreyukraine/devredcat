@@ -1,0 +1,103 @@
+{{ header }}
+<div class="fluid-width">
+  <div id="account-edit" class="container layer-category">
+    {% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      </div>
+    {% endif %}
+
+    <div class="row">
+      <div class="col-sm-3">
+        {{ menu }}
+      </div>
+
+      <div class="bl-account col-sm-9">
+        <div class="row visible-xs">
+          <div class="col-sm-12">
+            <span class="text-21 bl-bold">{{ text_address }}</span>
+          </div>
+        </div>
+        <div class="bl-form-content">
+          <div class="bl-mt-30-mb-30">
+            {% if addresses %}
+            {% for result in addresses %}
+              <div class="row">
+                <div class="col-lg-5">
+                  <p class="text-21">{{ result.name }}</p>
+                  {% set first_address = result.addresses|first %}
+{#                  <button type="button" class="button add-address" data-guid="{{ first_address.customer_cod_guid }}">Додати адресу</button>#}
+                </div>
+                <div class="col-lg-7">
+                  {% if result.addresses %}
+                    {% for address in result.addresses %}
+                      <div class="line-address-info" style="margin-bottom: 20px;">
+                        <div class="address-info">
+                        {% if address.type == "car" %}
+                          <p>{{ address.city }}, {{ address.address_1 }}{% if address.np_house %}, буд. {{ address.np_house }}{% endif %}{% if address.np_apartment %}, кв. {{ address.np_apartment }}{% endif %}</p>
+                        {% elseif address.type == "np_post" or address.type == "np_poshtomat" %}
+                            <p>{{ address.np_city_name }}</p>
+                            <p>{{ address.np_post_name }}</p>
+                            <p>Отримувач: {{ address.np_customer_name }}
+                              {{ address.np_customer_lastname }}
+                              {{ address.np_customer_phone }}
+                            </p>
+                          {% else %}
+                            <p>{{ address.np_city_name }}</p>
+                            <p>{{ address.np_street_name }}</p>
+                              {% if address.np_house %}дім: {{ address.np_house }}{% endif %}
+                              {% if address.np_level %}поверх: {{ address.np_level }}{% endif %}
+                              {% if address.np_apartment %}кв: {{ address.np_apartment }}{% endif %}
+                            </p>
+                            <p>Отримувач:
+                              {{ address.np_customer_name }}
+                              {{ address.np_customer_lastname }}
+                              {{ address.np_customer_phone }}
+                            </p>
+                          {% endif %}
+                        </div>
+                        <div class="address-actions">
+                          {% if address.can_edit %}
+                            <span class="edit-address" data-id="{{ address.address_id }}"><img width="20" height="20" alt="edit" src="/image/edit-icon.svg"></span>
+                            <a href="{{ address.delete }}" onclick="return confirm('Ви впевнені?')"><img width="20" height="20" alt="delete" src="/image/trash-icon.svg"></a>
+                          {% endif %}
+                        </div>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-12"><br><br></div>
+              </div>
+            {% endfor %}
+          </div>
+          {% else %}
+            <p>{{ text_empty }}</p>
+{#            <button type="button" class="button add-address" data-guid="">Додати адресу</button>#}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-address" class="modal fade" role="dialog"></div>
+
+<script>
+$(document).ready(function() {
+  $('.add-address').on('click', function() {
+    var guid = $(this).data('guid');
+    $('#modal-address').load('index.php?route=account/address/getModal&customer_cod_guid=' + guid, function() {
+      $('#modal-address').modal('show');
+    });
+  });
+
+  $('.edit-address').on('click', function() {
+    var id = $(this).data('id');
+    $('#modal-address').load('index.php?route=account/address/getModal&address_id=' + id, function() {
+      $('#modal-address').modal('show');
+    });
+  });
+});
+</script>
+{{ footer }}
