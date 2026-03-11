@@ -4061,7 +4061,7 @@ class ModelExtensionModuleOcimport extends Model
     $this->db->query("DELETE FROM `" . DB_PREFIX . "product_to_store`");
     $this->db->query("DELETE FROM `" . DB_PREFIX . "product_discount`");
     $this->db->query("DELETE FROM `" . DB_PREFIX . "product_attribute`");
-пше
+
     $this->db->query("DELETE FROM `" . DB_PREFIX . "attribute`");
     $this->db->query("DELETE FROM `" . DB_PREFIX . "attribute_description`");
 
