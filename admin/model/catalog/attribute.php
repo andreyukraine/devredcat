@@ -118,4 +118,30 @@ class ModelCatalogAttribute extends Model {
 
 		return $query->row['total'];
 	}
+
+	public function getAttributeValuesByFilter($attribute_id, $language_id, $filter_name = '') {
+		$sql = "SELECT DISTINCT text FROM " . DB_PREFIX . "af_attribute_values WHERE attribute_id = '" . (int)$attribute_id . "' AND language_id = '" . (int)$language_id . "'";
+
+		if ($filter_name !== '') {
+			$sql .= " AND text LIKE '%" . $this->db->escape($filter_name) . "%'";
+		}
+
+		$sql .= " ORDER BY sort_order ASC, text ASC LIMIT 20";
+
+		$query = $this->db->query($sql);
+
+		if (!$query->rows) {
+			$sql = "SELECT DISTINCT text FROM " . DB_PREFIX . "product_attribute WHERE attribute_id = '" . (int)$attribute_id . "' AND language_id = '" . (int)$language_id . "'";
+
+			if ($filter_name !== '') {
+				$sql .= " AND text LIKE '%" . $this->db->escape($filter_name) . "%'";
+			}
+
+			$sql .= " ORDER BY text ASC LIMIT 20";
+
+			$query = $this->db->query($sql);
+		}
+
+		return $query->rows;
+	}
 }

@@ -4061,7 +4061,7 @@ class ModelExtensionModuleOcimport extends Model
     $this->db->query("DELETE FROM `" . DB_PREFIX . "product_to_store`");
     $this->db->query("DELETE FROM `" . DB_PREFIX . "product_discount`");
     $this->db->query("DELETE FROM `" . DB_PREFIX . "product_attribute`");
-
+пше
     $this->db->query("DELETE FROM `" . DB_PREFIX . "attribute`");
     $this->db->query("DELETE FROM `" . DB_PREFIX . "attribute_description`");
 
@@ -4097,20 +4097,30 @@ class ModelExtensionModuleOcimport extends Model
     $product_ids = array_column($this->db->query("SELECT product_id FROM `" . DB_PREFIX . "product`")->rows, 'product_id');
     if (empty($product_ids)) return;
 
-    $this->db->query("DELETE FROM `" . DB_PREFIX . "af_attribute_values`");
+    // НЕ видаляємо af_attribute_values, щоб зберегти sort_order
     $this->db->query("DELETE FROM `" . DB_PREFIX . "af_product_attribute`");
     $this->db->query("DELETE FROM `" . DB_PREFIX . "af_values`");
     $this->db->query("DELETE FROM `" . DB_PREFIX . "af_translit`");
 
-    $data_to_insert = [];
     $language_id = (int)$this->config->get('config_language_id') ?: $this->getLanguageId($this->config->get('config_language'));
 
-    // === 1. Атрибути ===
+    // 1. Завантажуємо всі існуючі значення в пам'ять
+    $existing_values = [];
+    $query = $this->db->query("SELECT attribute_value_id, attribute_id, language_id, text FROM `" . DB_PREFIX . "af_attribute_values`");
+    foreach ($query->rows as $row) {
+      $val_text = trim($row['text']);
+      $existing_values[$row['attribute_id']][$row['language_id']][mb_strtolower($val_text, 'UTF-8')] = $row['attribute_value_id'];
+    }
+
+    $data_to_insert = [];
+    $af_values_to_ensure = [];
+
+    // === 2. Обробка атрибутів ===
     $attributes = $this->db->query("
-    SELECT pa.product_id, pa.attribute_id, pa.language_id,
-           REPLACE(REPLACE(TRIM(pa.text), '\\r', ''), '\\n', '') AS text
-    FROM `" . DB_PREFIX . "product_attribute` pa
-    WHERE pa.product_id IN (" . implode(',', array_map('intval', $product_ids)) . ")");
+      SELECT pa.product_id, pa.attribute_id, pa.language_id,
+             REPLACE(REPLACE(TRIM(pa.text), '\r', ''), '\n', '') AS text
+      FROM `" . DB_PREFIX . "product_attribute` pa
+      WHERE pa.product_id IN (" . implode(',', array_map('intval', $product_ids)) . ")");
 
     foreach ($attributes->rows as $row) {
       $texts = explode($this->separator ?: ',', $row['text']);
@@ -4118,47 +4128,87 @@ class ModelExtensionModuleOcimport extends Model
         $text = trim($text);
         if ($text === '') continue;
 
-        $attribute_value_id = $this->getAttributeValue($text, $row['attribute_id'], $row['language_id']);
-        $this->ensureAfValueExists($row['attribute_id'], $attribute_value_id, 'attribute');
+        $lower_text = mb_strtolower($text, 'UTF-8');
 
-        $data_to_insert[] = "('{$row['product_id']}', '{$row['attribute_id']}', '{$attribute_value_id}')";
+        if (!isset($existing_values[$row['attribute_id']][$row['language_id']][$lower_text])) {
+          // Використовуємо INSERT IGNORE про всяк випадок
+          $this->db->query("INSERT IGNORE INTO `" . DB_PREFIX . "af_attribute_values` SET attribute_id = '" . (int)$row['attribute_id'] . "', language_id = '" . (int)$row['language_id'] . "', text = '" . $this->db->escape($text) . "', sort_order = 0");
+          $attribute_value_id = $this->db->getLastId();
+          
+          if (!$attribute_value_id) {
+            $tmp_q = $this->db->query("SELECT attribute_value_id FROM `" . DB_PREFIX . "af_attribute_values` WHERE attribute_id = '" . (int)$row['attribute_id'] . "' AND language_id = '" . (int)$row['language_id'] . "' AND text = '" . $this->db->escape($text) . "'");
+            $attribute_value_id = $tmp_q->num_rows ? $tmp_q->row['attribute_value_id'] : 0;
+          }
+          
+          if ($attribute_value_id) {
+            $existing_values[$row['attribute_id']][$row['language_id']][$lower_text] = $attribute_value_id;
+          }
+        } else {
+          $attribute_value_id = $existing_values[$row['attribute_id']][$row['language_id']][$lower_text];
+        }
+
+        if ($attribute_value_id) {
+          $af_values_to_ensure['attribute'][$row['attribute_id']][$attribute_value_id] = true;
+          $data_to_insert[] = "('{$row['product_id']}', '{$row['attribute_id']}', '{$attribute_value_id}')";
+        }
       }
     }
 
-    // === 2. Опції ===
+    // === 3. Обробка опцій ===
     $options = $this->db->query("
-    SELECT 
-      pov.product_id,
-      po.option_id,
-      pov.option_value_id,
-      ovd.name AS value_name,
-      ovd.language_id
-    FROM `" . DB_PREFIX . "product_option_value` pov
-    JOIN `" . DB_PREFIX . "product_option` po ON po.product_option_id = pov.product_option_id
-    JOIN `" . DB_PREFIX . "option_value_description` ovd ON ovd.option_value_id = pov.option_value_id
-    WHERE pov.product_id IN (" . implode(',', array_map('intval', $product_ids)) . ")
-      AND ovd.language_id = '" . $language_id . "'
-  ");
+      SELECT pov.product_id, po.option_id, ovd.name AS value_name, ovd.language_id
+      FROM `" . DB_PREFIX . "product_option_value` pov
+      JOIN `" . DB_PREFIX . "product_option` po ON po.product_option_id = pov.product_option_id
+      JOIN `" . DB_PREFIX . "option_value_description` ovd ON ovd.option_value_id = pov.option_value_id
+      WHERE pov.product_id IN (" . implode(',', array_map('intval', $product_ids)) . ")
+        AND ovd.language_id = '" . $language_id . "'
+    ");
 
     foreach ($options->rows as $row) {
       $text = trim($row['value_name']);
       if ($text === '') continue;
 
-      $attribute_value_id = $this->getAttributeValue($text, $row['option_id'], $row['language_id']);
-      $this->ensureAfValueExists($row['option_id'], $attribute_value_id, 'option');
+      $lower_text = mb_strtolower($text, 'UTF-8');
 
-      $data_to_insert[] = "('{$row['product_id']}', '{$row['option_id']}', '{$attribute_value_id}')";
+      if (!isset($existing_values[$row['option_id']][$row['language_id']][$lower_text])) {
+        $this->db->query("INSERT IGNORE INTO `" . DB_PREFIX . "af_attribute_values` SET attribute_id = '" . (int)$row['option_id'] . "', language_id = '" . (int)$row['language_id'] . "', text = '" . $this->db->escape($text) . "', sort_order = 0");
+        $attribute_value_id = $this->db->getLastId();
+        
+        if (!$attribute_value_id) {
+          $tmp_q = $this->db->query("SELECT attribute_value_id FROM `" . DB_PREFIX . "af_attribute_values` WHERE attribute_id = '" . (int)$row['option_id'] . "' AND language_id = '" . (int)$row['language_id'] . "' AND text = '" . $this->db->escape($text) . "'");
+          $attribute_value_id = $tmp_q->num_rows ? $tmp_q->row['attribute_value_id'] : 0;
+        }
+
+        if ($attribute_value_id) {
+          $existing_values[$row['option_id']][$row['language_id']][$lower_text] = $attribute_value_id;
+        }
+      } else {
+        $attribute_value_id = $existing_values[$row['option_id']][$row['language_id']][$lower_text];
+      }
+
+      if ($attribute_value_id) {
+        $af_values_to_ensure['option'][$row['option_id']][$attribute_value_id] = true;
+        $data_to_insert[] = "('{$row['product_id']}', '{$row['option_id']}', '{$attribute_value_id}')";
+      }
     }
 
-    // === 3. Масове вставлення
+    // === 4. Масове вставлення зв'язків ===
     if (!empty($data_to_insert)) {
-      $this->db->query("
-      INSERT INTO `" . DB_PREFIX . "af_product_attribute` 
-        (product_id, attribute_id, attribute_value_id) 
-      VALUES " . implode(",", $data_to_insert));
+      $chunks = array_chunk($data_to_insert, 1000);
+      foreach ($chunks as $chunk) {
+        $this->db->query("INSERT IGNORE INTO `" . DB_PREFIX . "af_product_attribute` (product_id, attribute_id, attribute_value_id) VALUES " . implode(",", $chunk));
+      }
     }
 
-    // === 4. Оновлення поля af_values в таблиці product
+    foreach ($af_values_to_ensure as $type => $groups) {
+      foreach ($groups as $group_id => $values) {
+        foreach ($values as $value_id => $dummy) {
+          $this->db->query("INSERT IGNORE INTO `" . DB_PREFIX . "af_values` SET `type` = '" . $this->db->escape($type) . "', `group_id` = '" . (int)$group_id . "', `value` = '" . (int)$value_id . "'");
+        }
+      }
+    }
+
+    // === 5. Оновлення поля af_values в таблиці product ===
     $this->db->query("SET SESSION group_concat_max_len = 1000000");
     $this->db->query("
       UPDATE `" . DB_PREFIX . "product` p
@@ -4171,7 +4221,7 @@ class ModelExtensionModuleOcimport extends Model
       WHERE p.product_id IN (" . implode(',', array_map('intval', $product_ids)) . ")
     ");
 
-    // === 5. Очистка кешу
+    // === 6. Очистка кешу ===
     foreach ([
                'af-category', 'af-manufacturer', 'af-price', 'af-ean', 'af-filter',
                'af-option', 'af-option-values', 'af-total-attribute', 'af-total-category',
@@ -4181,8 +4231,7 @@ class ModelExtensionModuleOcimport extends Model
              ] as $key) {
       $this->deleteCache($key);
     }
-
-    //file_put_contents($this->STATUS_FILE, "completed\n", LOCK_EX);
+    file_put_contents($this->STATUS_FILE, "completed\n", LOCK_EX);
   }
 
 

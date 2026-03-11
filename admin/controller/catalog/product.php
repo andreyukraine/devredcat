@@ -604,8 +604,8 @@ class ControllerCatalogProduct extends Controller
   protected function getForm()
   {
 
-    $this->document->addStyle("catalog/view/javascript/bootstrap-select/bootstrap-select.min.css");
-    $this->document->addScript("catalog/view/javascript/bootstrap-select/bootstrap-select.min.js");
+    $this->document->addStyle("view/javascript/bootstrap-select/bootstrap-select.min.css");
+    $this->document->addScript("view/javascript/bootstrap-select/bootstrap-select.min.js");
 
     $data['text_form'] = !isset($this->request->get['product_id']) ? $this->language->get('text_add') : $this->language->get('text_edit');
 

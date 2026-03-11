@@ -1701,6 +1701,7 @@
       $('#attribute tbody').append(html);
 
       attributeautocomplete(attribute_row);
+      attributevalueautocomplete(attribute_row);
 
       attribute_row++;
     }
@@ -1725,12 +1726,49 @@
         'select': function (item) {
           $('input[name=\'product_attribute[' + attribute_row + '][name]\']').val(item['label']);
           $('input[name=\'product_attribute[' + attribute_row + '][attribute_id]\']').val(item['value']);
+
+          attributevalueautocomplete(attribute_row);
         }
       });
     }
 
+    function attributevalueautocomplete(attribute_row) {
+      {% for language in languages %}
+      $('textarea[name=\'product_attribute[' + attribute_row + '][product_attribute_description][{{ language.language_id }}][text]\']').autocomplete({
+        'source': function (request, response) {
+          var $textarea = $(this);
+          var attribute_id = $textarea.closest('tr').find('input[name$="[attribute_id]"]').val();
+
+          if (!attribute_id) {
+            console.log('Autocomplete: attribute_id not found for row ' + attribute_row);
+            response([]);
+            return;
+          }
+
+          $.ajax({
+            url: 'index.php?route=catalog/attribute/value_autocomplete&user_token={{ user_token }}&attribute_id=' + attribute_id + '&language_id={{ language.language_id }}&filter_name=' + encodeURIComponent(request),
+            dataType: 'json',
+            success: function (json) {
+              console.log('Autocomplete response for attribute ' + attribute_id + ' (lang {{ language.language_id }}):', json);
+              response($.map(json, function (item) {
+                return {
+                  label: item['text'],
+                  value: item['text']
+                }
+              }));
+            }
+          });
+        },
+        'select': function (item) {
+          $(this).val(item['value']);
+        }
+      });
+      {% endfor %}
+    }
+
     $('#attribute tbody tr').each(function (index, element) {
       attributeautocomplete(index);
+      attributevalueautocomplete(index);
     });
     //--></script>
   <script type="text/javascript"><!--

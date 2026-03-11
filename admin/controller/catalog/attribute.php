@@ -442,4 +442,26 @@ class ControllerCatalogAttribute extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
+
+	public function value_autocomplete() {
+		$json = array();
+
+		if (isset($this->request->get['attribute_id'])) {
+			$this->load->model('catalog/attribute');
+
+			$filter_name = isset($this->request->get['filter_name']) ? $this->request->get['filter_name'] : '';
+			$language_id = isset($this->request->get['language_id']) ? (int)$this->request->get['language_id'] : (int)$this->config->get('config_language_id');
+
+			$results = $this->model_catalog_attribute->getAttributeValuesByFilter($this->request->get['attribute_id'], $language_id, $filter_name);
+
+			foreach ($results as $result) {
+				$json[] = array(
+					'text' => strip_tags(html_entity_decode($result['text'], ENT_QUOTES, 'UTF-8'))
+				);
+			}
+		}
+
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
+	}
 }
