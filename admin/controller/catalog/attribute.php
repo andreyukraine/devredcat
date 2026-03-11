@@ -54,6 +54,14 @@ class ControllerCatalogAttribute extends Controller {
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
 			$this->model_catalog_attribute->editAttribute($this->request->get['attribute_id'], $this->request->post);
 
+			if (isset($this->request->post['af_attribute_values'])) {
+				$this->load->model('extension/d_ajax_filter/attribute');
+
+				foreach ($this->request->post['af_attribute_values'] as $language_id => $values) {
+					$this->model_extension_d_ajax_filter_attribute->editAttributeValues($values);
+				}
+			}
+
 			$this->session->data['success'] = $this->language->get('text_success');
 
 			$url = '';
@@ -306,6 +314,23 @@ class ControllerCatalogAttribute extends Controller {
 
 		if (isset($this->request->get['attribute_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
 			$attribute_info = $this->model_catalog_attribute->getAttribute($this->request->get['attribute_id']);
+		}
+
+		$this->load->model('extension/d_ajax_filter/attribute');
+
+		if (isset($this->request->post['af_attribute_values'])) {
+			$data['af_attribute_values'] = $this->request->post['af_attribute_values'];
+		} elseif (isset($this->request->get['attribute_id'])) {
+			$data['af_attribute_values'] = array();
+
+			$this->load->model('localisation/language');
+			$languages = $this->model_localisation_language->getLanguages();
+
+			foreach ($languages as $language) {
+				$data['af_attribute_values'][$language['language_id']] = $this->model_extension_d_ajax_filter_attribute->getAttributeValues($this->request->get['attribute_id'], $language['language_id']);
+			}
+		} else {
+			$data['af_attribute_values'] = array();
 		}
 
 		$this->load->model('localisation/language');

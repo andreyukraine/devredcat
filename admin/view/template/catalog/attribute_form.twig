@@ -76,6 +76,51 @@
               <input type="text" name="sort_order" value="{{ sort_order }}" placeholder="{{ entry_sort_order }}" id="input-sort-order" class="form-control" />
             </div>
           </div>
+
+          {% if af_attribute_values %}
+            <div class="form-group">
+              <label class="col-sm-2 control-label">Attribute Values</label>
+              <div class="col-sm-10">
+                <ul class="nav nav-tabs" id="af_attribute_values_tabs">
+                  {% for language in languages %}
+                    <li {% if loop.first %}class="active"{% endif %}><a href="#af_language{{ language.language_id }}" data-toggle="tab"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /> {{ language.name }}</a></li>
+                  {% endfor %}
+                </ul>
+                <div class="tab-content">
+                  {% for language in languages %}
+                    <div class="tab-pane {% if loop.first %}active{% endif %}" id="af_language{{ language.language_id }}">
+                      <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                          <thead>
+                          <tr>
+                            <td class="text-left">Value</td>
+                            <td class="text-right" style="width: 150px;">Sort Order</td>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          {% if af_attribute_values[language.language_id] %}
+                            {% for value in af_attribute_values[language.language_id] %}
+                              <tr>
+                                <td class="text-left">{{ value.text }}</td>
+                                <td class="text-right">
+                                  <input type="text" name="af_attribute_values[{{ language.language_id }}][{{ value.attribute_value_id }}][sort_order]" value="{{ value.sort_order }}" class="form-control text-right" />
+                                </td>
+                              </tr>
+                            {% endfor %}
+                          {% else %}
+                            <tr>
+                              <td class="text-center" colspan="2">No values found for this language</td>
+                            </tr>
+                          {% endif %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
         </form>
       </div>
     </div>
