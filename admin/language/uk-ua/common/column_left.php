@@ -33,6 +33,7 @@ $_['text_event']                       = 'Події';
 $_['text_extension']                   = 'Доповнення';
 $_['text_feed']                        = 'Канали просування';
 $_['text_filter']                      = 'Фільтри';
+$_['text_filter_settings']             = 'Налаштування фільтру';
 $_['text_fraud']                       = 'Антифрод';
 $_['text_geo_zone']                    = 'Географічні зони';
 $_['text_information']                 = 'Статті';

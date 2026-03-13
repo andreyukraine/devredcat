@@ -33,7 +33,7 @@
         apiUrls: {
           ajax: filterData.apiUrls.ajax
         }
-      }, { text_total: "Знайдено" });
+      }, filterData.translations);
 
       ReactApp.renderComponent('ViewSwitcher', {}, 'view-switcher-container');
     } else {
@@ -41,10 +41,12 @@
       window.addEventListener('load', function () {
         ReactApp.init({
           groups: filterData.groups,
+          initialQuantities: filterData.initialQuantities,
+          initialTotal: filterData.initialTotal,
           apiUrls: {
             ajax: filterData.apiUrls.ajax
           }
-        }, { text_total: "Знайдено" });
+        }, filterData.translations);
 
         ReactApp.renderComponent('ViewSwitcher', {}, 'view-switcher-container');
       });

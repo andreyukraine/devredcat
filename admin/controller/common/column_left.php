@@ -118,6 +118,14 @@ class ControllerCommonColumnLeft extends Controller {
 				);
 			}
 
+			if ($this->user->hasPermission('access', 'catalog/filter_settings')) {
+				$catalog[] = array(
+					'name'	   => $this->language->get('text_filter_settings'),
+					'href'     => $this->url->link('catalog/filter_settings', 'user_token=' . $this->session->data['user_token'], true),
+					'children' => array()
+				);
+			}
+
 			if ($this->user->hasPermission('access', 'catalog/review')) {
 				$catalog[] = array(
 					'name'	   => $this->language->get('text_review'),

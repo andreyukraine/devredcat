@@ -365,11 +365,17 @@ const FilterComponent = forwardRef(({ filters, setFilters, groups, initialQuanti
         </div>
       )}
 
-      {/* Опції та атрибути */}
-      {['option', 'attribute'].map(type => (
-        <div key={type} className={`${type}s`}>
-          {Object.values(groups?.[type] || {}).map(group => (
-            <div key={group.group_id} className="filter-section">
+      {/* Опції та атрибути (об'єднані та відсортовані) */}
+      <div className="filters-container">
+        {[
+          ...Object.values(groups?.option || {}).map(g => ({ ...g, type: 'option' })),
+          ...Object.values(groups?.attribute || {}).map(g => ({ ...g, type: 'attribute' }))
+        ]
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+        .map(group => {
+          const type = group.type;
+          return (
+            <div key={`${type}_${group.group_id}`} className="filter-section">
               <div className="f-name" onClick={(e) => {
                 const isIconClicked = e.target.closest('.icon-mc-up, .icon-mc-down');
                 if (!isIconClicked) {
@@ -386,7 +392,6 @@ const FilterComponent = forwardRef(({ filters, setFilters, groups, initialQuanti
                 {Object.values(group.values || {}).map(item => {
                   const isChecked = (filters[`${type}s`]?.[group.group_id] || []).includes(item.value);
                   
-                  // Знаходимо кількість для поточної опції/атрибута
                   const typeQuantities = quantities[type] || {};
                   const groupQuantities = typeQuantities[group.group_id] || typeQuantities[`_${group.group_id}`] || {};
                   const quantity = groupQuantities[item.value] ?? groupQuantities[`_${item.value}`] ?? 0;
@@ -410,9 +415,9 @@ const FilterComponent = forwardRef(({ filters, setFilters, groups, initialQuanti
                 })}
               </div>
             </div>
-          ))}
-        </div>
-      ))}
+          );
+        })}
+      </div>
 
       {loading && <div className="loading">Завантаження...</div>}
       {error && <div className="error">{error}</div>}

@@ -63,8 +63,6 @@ class ControllerExtensionModuleDAjaxFilter extends Controller
 
     $data['is_mobile'] = $this->mobile_detect->isMobile();
 
-    $this->document->addScript('catalog/view/javascript/react/react-filter.js');
-
     $json = array();
 
     $data['setting'] = $setting;
@@ -106,11 +104,37 @@ class ControllerExtensionModuleDAjaxFilter extends Controller
     $this->{'model_extension_module_' . $this->codename}->prepareTableFilter($filter_data);
     uasort($base_attribs, array($this, "compare"));
 
+    // Завантаження користувацьких налаштувань фільтра
+    $this->load->model('setting/setting');
+    $filter_settings = $this->model_setting_setting->getSetting('filter_settings');
+    $show_settings = isset($filter_settings['filter_settings_show']) ? $filter_settings['filter_settings_show'] : [];
+    $sort_settings = isset($filter_settings['filter_settings_sort_order']) ? $filter_settings['filter_settings_sort_order'] : [];
+
     foreach ($base_attribs as $key => $value) {
       if (file_exists(DIR_APPLICATION . '/controller/extension/d_ajax_filter/' . $key . '.php')) {
         $result = $this->load->controller('extension/' . $this->codename . '/' . $key, ($value + array('module_setting' => $setting)), $filter_data);
         if (!empty($result)) {
-          $data['groups'][$key] = $result;
+          // Застосовуємо фільтрацію та сортування для атрибутів та опцій
+          if ($key == 'attribute' || $key == 'option') {
+            $prefix = ($key == 'attribute') ? 'a' : 'o';
+            $filtered_result = [];
+            foreach ($result as $group_key => $group_data) {
+              $id = $prefix . $group_data['group_id'];
+              if (isset($show_settings[$id]) && $show_settings[$id]) {
+                $group_data['sort_order'] = isset($sort_settings[$id]) ? (int)$sort_settings[$id] : 0;
+                $filtered_result[$group_key] = $group_data;
+              }
+            }
+            // Сортуємо групи всередині типу (наприклад, всі вибрані атрибути між собою)
+            uasort($filtered_result, function($a, $b) {
+              return $a['sort_order'] - $b['sort_order'];
+            });
+            $result = $filtered_result;
+          }
+
+          if (!empty($result)) {
+            $data['groups'][$key] = $result;
+          }
         }
       }
     }
